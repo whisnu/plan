@@ -37,21 +37,23 @@ Dokumen ini merupakan satu-satunya artefak kanonikal (*Single Canonical Artifact
 | **Aturan Mutasi Kode** | Zero Source Code Mutation | **Aturan Database** | Zero Database Migration / DDL |
 | **Lokasi Kanonikal GitHub**| `whisnu/plan:main/PE-02_...md` (Root) | **Format Pengiriman** | Single Canonical Markdown File |
 
-### 1.2 Hierarki Sumber Otoritas dan Batas Kewenangan (Bagian 1.3 — AUDIT-NEW-09 PO APPROVED)
-Sesuai Bagian 1.3 mandat audit dan Keputusan Product Owner yang Telah Disahkan (AUDIT-NEW-09 PO APPROVED), seluruh perumusan spesifikasi teknis, validasi rencana, dan penyelesaian konflik wajib mematuhi hierarki otoritas kanonikal enam tingkat berikut:
+### 1.2 Hierarki Sumber Otoritas dan Batas Kewenangan (AUDIT-NEW-09 — PO APPROVED)
+Sesuai Keputusan Product Owner yang Telah Disahkan (AUDIT-NEW-09 PO APPROVED), seluruh perumusan spesifikasi teknis, validasi rencana, pembuktian implementasi, dan resolusi konflik wajib mematuhi hierarki otoritas kanonikal enam tingkat berikut:
 
-1. **Tingkat 1 — Keputusan Resmi Product Owner atau Architecture Board**: Keputusan tertulis resmi yang tercatat dalam dokumen tata kelola (termasuk keputusan otorisasi, persetujuan parameter, dan pembekuan baseline).
-2. **Tingkat 2 — Nexa White Paper v5.6 dan Development Roadmap v4.8**: Dokumen normatif fundamental produk Nexa sesuai ruang lingkup dan batasan masing-masing.
-3. **Tingkat 3 — Kontrak dan Perilaku Nyata Repositori Aktual**: Kode sumber *tracked* terverifikasi (`fc08a5c...`) dan skema database statis DDL aktif (`schema.postgres.sql`).
-4. **Tingkat 4 — Temuan Audit Historis Beserta Bukti yang Mendasarinya**: Temuan terverifikasi repositori (A-01..A-30, B-01..B-09, F-01..F-15, dan AUDIT-NEW-01..10) beserta bukti faktualnya.
-5. **Tingkat 5 — Spesifikasi Usulan Teknis yang Belum Memperoleh Otorisasi**: Rincian teknis berstatus `[PROPOSED SPECIFICATION]` yang menunggu keputusan formal PO/Arsitektur.
-6. **Tingkat 6 — Interpretasi atau Asumsi Teknis**: Analisis perancang selama penyusunan plan yang belum diuji atau belum disahkan.
+1. **Level 1 — Keputusan eksplisit Product Owner yang telah disetujui untuk ruang lingkup PE-02.**
+2. **Level 2 — Kontrak produk dan governance Nexa yang telah disetujui atau dibekukan.**
+3. **Level 3 — White Paper dan Roadmap yang telah disetujui, sepanjang masih berada dalam ruang lingkupnya.**
+4. **Level 4 — Repository aktual sebagai bukti implementasi, bukan sebagai otoritas untuk mengubah kontrak produk.**
+5. **Level 5 — Standar internasional yang relevan, sepanjang tidak bertentangan dengan persyaratan Nexa pada tingkat yang lebih tinggi.**
+6. **Level 6 — Temuan audit historis, bukti pendukungnya, proposal yang belum disetujui, dan interpretasi teknis. Materi pada level ini harus mempertahankan statusnya dan tidak otomatis menjadi ketentuan normatif.**
 
 > **Aturan Penanganan Pertentangan Otoritatif Kanonikal:**
 > 1. Sumber dengan tingkat otoritas lebih rendah **dilarang keras** mengubah, membatalkan, atau mengesampingkan fakta, kontrak, atau keputusan pada tingkat yang lebih tinggi.
 > 2. Keputusan PO pada ruang lingkup PE-02 **tidak boleh** mengubah baseline Sprint 16 yang telah frozen atau kontrak PE-01 yang telah dikunci.
-> 3. Jika terjadi pertentangan antara dua sumber otoritatif pada tingkat yang sama atau ambiguitas material yang belum diselesaikan sumber normatif, Programmer **wajib menghentikan penetapan kontrak** (`CONFLICT — STOP AND CLARIFY`) dan meminta penetapan resmi tertulis dari Product Owner. Dilarang keras menyelesaikan konflik melalui asumsi, ekstrapolasi sepihak, atau tebakan bebas.
-> 4. Seluruh bagian dokumen ini yang merujuk pada hierarki otoritas (termasuk §3.1 dan §10.3) secara hierarkis tunduk penuh pada ketentuan kanonikal Bagian 1.2 ini.
+> 3. Repository aktual (Level 4) hanya berfungsi sebagai bukti kondisi implementasi yang ada, bukan otoritas untuk merekayasa atau mengubah kontrak produk tanpa keputusan tingkat di atasnya.
+> 4. Temuan audit, usulan spesifikasi, atau interpretasi teknis (Level 6) mempertahankan status asalnya dan tidak otomatis menjadi ketentuan normatif.
+> 5. Jika terjadi pertentangan antara dua sumber otoritatif pada tingkat yang sama atau ambiguitas material yang belum diselesaikan sumber normatif, Programmer **wajib menghentikan penetapan kontrak** (`CONFLICT — STOP AND CLARIFY`) dan meminta penetapan resmi tertulis dari Product Owner. Dilarang keras menyelesaikan konflik melalui asumsi, ekstrapolasi sepihak, atau tebakan bebas.
+> 6. Seluruh bagian dokumen ini yang merujuk pada hierarki otoritas (termasuk §3.1 dan §10.3) secara hierarkis tunduk penuh pada ketentuan kanonikal Bagian 1.2 ini.
 
 ### 1.3 Rekonstruksi Historis Temuan Awal sampai REV6 dan REV22 (Bagian 2.2)
 Sesuai Bagian 2.2, riwayat audit merupakan fondasi pengambilan keputusan yang tidak boleh dihapus atau disederhanakan menjadi ringkasan sepihak. Matriks berikut mendokumentasikan evolusi historis dan risiko yang wajib dicegah secara operasional pada REV6:
@@ -69,12 +71,18 @@ Sesuai Bagian 2.2, riwayat audit merupakan fondasi pengambilan keputusan yang ti
 | **REV12–REV21** | Rangkaian koreksi berlanjut dan sebagian temuan kemudian dikonsolidasikan dalam register berikutnya. | Tidak boleh menyimpulkan bahwa semua temuan telah tertutup hanya karena nomor revisi bertambah. |
 | **REV22** | Status `REVISE REQUIRED`; F-01..F-15 merangkum temuan teknis penting. | Register historis hilang, digabung, atau dinyatakan selesai tanpa bukti yang sesuai. |
 
-### 1.4 Batas Revisi Governance, Aturan Siklus Koreksi & Anti-Overprocessing
-Siklus koreksi ini mematuhi batas tata kelola normatif berdasarkan White Paper v5.6 dan Roadmap v4.8:
+### 1.4 Batas Revisi Governance, Aturan Siklus Koreksi & Otorisasi PO Override (DEF-10)
+Siklus koreksi ini mematuhi batas tata kelola normatif berdasarkan White Paper v5.6, Roadmap v4.8, serta Keputusan Otoritatif Product Owner:
 1. **Titik Awal Hitungan Corrective Revision**: Sesuai White Paper v5.6 §Governance, hitungan corrective revision pertama (REV1) dihitung secara sah sejak audit independen pertama yang menghasilkan kewajiban koreksi formal dalam siklus terkait.
 2. **Batas Maksimum Tiga Revisi Korektif (Max 3 Revisions)**: Tata kelola membatasi maksimum tiga siklus corrective revisions (REV1, REV2, REV3). Apabila REV3 gagal memenuhi seluruh kriteria kelulusan audit independen, siklus ditutup secara definitif. Pembuatan REV4 dilarang keras dalam siklus yang sama. Kegagalan setelah REV3 mewajibkan penerbitan prompt Programmer yang secara substantif baru dari Product Owner / Governance Authority.
-3. **Larangan Reset Administratif**: Siklus revisi tidak dapat dan dilarang di-reset secara administratif melalui penggantian nama file, pengubahan nomor versi, pengubahan label revisi, atau penamaan prompt baru. Instruksi REV6.2 adalah penyempurnaan instruksi Programmer untuk objek koreksi yang sedang berjalan, bukan penetapan siklus baru dan bukan reset hitungan revisi.
-4. **Pelaporan Faktual Status Siklus Aktif (DEF-10)**: Berdasarkan penelusuran riwayat commit dan repositori lokal `whisnu/plan`, dokumen audit independen pertama yang memulai siklus corrective PE-02 ini tidak tersimpan dalam riwayat Git lokal. Oleh karena itu, jumlah revisi korektif yang telah terpakai secara sah pada siklus aktif dilaporkan berstatus **`NOT VERIFIED / PENDING PO CLARIFICATION`**. Programmer secara tegas dilarang menebak nomor siklus atau menyatakan tersedianya jatah revisi baru tanpa konfirmasi tertulis PO. Batas maksimum 3 revisi korektif per siklus tetap mengikat secara absolut; pembuatan REV4 dilarang keras.
+3. **Larangan Reset Administratif**: Siklus revisi tidak dapat dan dilarang di-reset secara administratif melalui penggantian nama file, pengubahan nomor versi, pengubahan label revisi, atau penamaan prompt baru. Seluruh riwayat audit historis tetap tercatat utuh.
+4. **Otorisasi Product Owner Governance Override & Resumption**:
+   - Berdasarkan keputusan resmi tertulis Product Owner (*PO Governance Override & Resumption Authorization*), prasyarat konfirmasi tertulis corrective revision count sebelum memulai pekerjaan **dikecualikan secara khusus untuk mandat koreksi AUDIT-NEW-01 sampai AUDIT-NEW-10**.
+   - Pengecualian administratif ini berlaku eksklusif untuk menyelesaikan perbaikan teknis yang telah diidentifikasi pada artefak kanonikal `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`.
+   - Pengecualian ini **tidak mereset, tidak mengubah, dan tidak merekayasa** catatan hitungan revisi historis; pekerjaan ini **bukan REV4** dari siklus lama dan **bukan pembukaan siklus koreksi baru**.
+   - Programmer tidak memperoleh kewenangan untuk memperluas ruang lingkup produk, mengubah model kepercayaan, atau menciptakan kontrak baru di luar mandat koreksi ini.
+   - **Status Otorisasi Dokumen Rencana**: Koreksi Implementation Plan PE-02 berstatus **`AUTHORIZED BY PO OVERRIDE`**.
+   - **Status Otorisasi Implementasi**: Implementasi kode PE-02 tetap mutlak **`NOT AUTHORIZED`** sampai diterbitkannya keputusan otorisasi implementasi terpisah oleh Product Owner.
 5. **Anti-Overprocessing**: Tidak ada pembuatan dokumen pendamping, plan alternatif, fase audit buatan, duplikasi berkas kanonikal, atau perubahan kosmetik tanpa dasar. Seluruh perbaikan dilakukan secara *in-place* pada satu-satunya berkas kanonikal ini.
 6. **Pemisahan Penutupan Dokumen vs Substantif**: Dokumen secara tegas membedakan antara tindakan koreksi plan (*Plan-Corrected*) dan penyelesaian substantif atas blocker (*Substantively Resolved*). Masalah substantif yang bergantung pada keputusan PO atau arsitektur eksternal tetap dinyatakan `OPEN / BLOCKED`.
 
@@ -92,25 +100,23 @@ Sesuai mandat koreksi Bagian II (DEF-06) dan hasil audit REV6.3 (DEFECT-03), tab
 | **DEF-07** | §6.12, §7.1 (B-06) | Pengakuan residual risk TOCTOU belum operasional untuk evaluasi penerimaan risiko. | Rinci protected asset, threat model, race window, protection boundary, batas POSIX, deteksi fail-closed, dan acceptance authority; pertahankan B-06 terblokir. | POSIX.1-2017; `fs_safe.ts#L30-L55` | Analisis B-06 terperinci secara operasional; B-06 tetap `BLOCKED` pending risk acceptance PO. | §6.12, §7.1 (B-06) | `BLOCKED` (Menunggu Penerimaan Resmi Risiko) | Penerimaan formal residual risk userspace POSIX pending otorisasi PO/Lead Security Architect. |
 | **DEF-08** | §5.1, §7.2 (F-09), §8 | Kasus batas regex `^[a-zA-Z0-9_-]+\.nx$` belum dirinci; ekuivalensi fungsi `cleanBase` belum dibuktikan. | Dokumentasikan matriks kasus batas (multiple dots, uppercase, separator, dsb.); tegaskan `cleanBase` adalah helper sanitasi internal, bukan regex validasi. | Manifest Schema §5.1; `marketplace/server.js:164` | Aturan regex kanonikal dan perilaku kasus batas terdefinisi pasti tanpa asumsi helper. | §5.1, §7.2 (F-09) | `PASS` (Spesifikasi Kasus Batas Terbukti) | Format ekstensi non-lowercase ditolak tegas fail-closed. |
 | **DEF-09** | §4.1, §4.4 (E-08), §14 | Klaim Git baseline dan kebersihan repositori berpotensi melebihi cakupan inspeksi riil. | Catat baseline commit `fc08a5c...`, branch `main`, tracked bersih (0 diff), 2 untracked docs diakui, `evidence/` gitignored; DB live dan mobile dinyatakan `NOT VERIFIED`. | `git rev-parse HEAD`; `git diff`; `git status`; `.gitignore:28` | Klaim repositori sebanding dengan inspeksi aktual; live DB dan mobile dinyatakan `NOT VERIFIED`. | §4.1, §4.4 (E-08), §14 | `PASS` (Batas Klaim Bukti Terverifikasi) | Verifikasi runtime live DB pending Sprint 17. |
-| **DEF-10** | §1.4, §14 | Status siklus corrective revision belum dibuktikan dari riwayat audit primer di repositori. | Rinci aturan tata kelola (max 3 revisi, titik awal audit pertama, no reset); laporkan status siklus `NOT VERIFIED / PENDING PO CLARIFICATION`. | WP v5.6 §Governance; Roadmap v4.8 | Status siklus dinyatakan faktual tanpa tebakan atau klaim reset sepihak; batas 3 revisi tetap mengikat. | §1.4 (Aturan Siklus), §14 | `NOT VERIFIED / BLOCKED` (Status Siklus Belum Terbukti) | Konfirmasi jumlah revisi terpakai pada siklus aktif pending keputusan PO; pengecualian administratif diberikan oleh PO Override. |
+| **DEF-10** | §1.4, §14 | Status siklus corrective revision belum dibuktikan dari riwayat audit primer di repositori. | Rinci aturan tata kelola (max 3 revisi, titik awal audit pertama, no reset); terapkan otorisasi eksplisit PO Governance Override untuk penyelesaian AUDIT-NEW-01..10 tanpa menunggu konfirmasi hitungan revisi; larang klaim REV4 / cycle baru. | WP v5.6 §Governance; Roadmap v4.8; PO Override Mandate | Status siklus dan otorisasi PO Override dicatat faktual tanpa rekayasa riwayat revisi; batas 3 revisi tetap diakui; koreksi plan diotorisasi; implementasi PE-02 tetap NOT AUTHORIZED. | §1.4 (Aturan Siklus & PO Override), §14 | `PASS (GOVERNANCE OVERRIDE APPLIED)` | PO Override mengotorisasi kelanjutan koreksi teknis plan; riwayat revisi tidak direset; implementasi tetap NOT AUTHORIZED. |
 
 ### 1.5.2 Matriks Penanganan Temuan Audit Komprehensif Baru (AUDIT-NEW-01 sampai AUDIT-NEW-10)
 Tabel berikut merangkum disposisi dan penanganan objektif terhadap sepuluh temuan audit komprehensif baru berdasarkan mandat dan keputusan Product Owner:
 
 | ID Audit | Lokasi Terdampak | Temuan / Gap Teknis | Tindakan Koreksi Spesifik | Dasar Otoritatif | Status Penyelesaian | Keterangan / Tindak Lanjut |
 |:---:|---|---|---|---|:---:|---|
-| **AUDIT-NEW-01** | §5.2, §5.3, §6.15, §8 | Kontradiksi urutan JIT: safe-open sebelum ZIP/manifest; bijeksi mendahului parse manifest; objek safe-open ambigu. | Rekonsiliasi urutan 8 tahap JIT secara sekuensial: pisahkan file ZIP sumber vs berkas `.nx` diekstrak; archive check independen dari manifest; parse manifest sebelum bijeksi; safe-open dieksekusi atomik pada berkas `.nx` pasca-ekstraksi sebelum dibaca. | Mandat PO AUDIT-NEW-01; POSIX.1-2017 | `CORRECTED` | Urutan dependensi operasional dan data prasyarat terbukti konsisten; prinsip JIT pre-verification tanpa pra-otorisasi dipatuhi. |
-| **AUDIT-NEW-02** | §5.1, §8 (AC-01) | Contoh manifest menggunakan nilai dummy/ilustratif namun diklaim membuktikan seluruh Tier 3 invariants. | Pisahkan tegas 5 layer validasi (JSON syntax, Schema structure, Semantic, Cryptographic, Package/member). Beri label tegas contoh manifest murni struktural, nilai dummy tidak membuktikan kriptografi. | Mandat PO AUDIT-NEW-02; RFC 8259 | `CORRECTED` | Tidak ada klaim pemenuhan kriptografis semu dari data dummy; kewajiban verifikasi Tier 3 tetap utuh. |
-| **AUDIT-NEW-03** | §4.4 (E-07), §6.12 | Bukti E-07 hanya memuat `O_NOFOLLOW`, `fstatSync`, dan `isFile()`, namun diklaim membuktikan `lstatSync` dan perbandingan `dev`/`ino`. | Batasi klaim E-07 pada kode riil yang ada; nyatakan verifikasi ganda `lstatSync` dan `dev`/`ino` sebagai celah implementasi kode desktop (`NOT DEMONSTRATED BY E-07 / RESIDUAL GAP`); pertahankan B-06 terblokir. | `fs_safe.ts#L30-L55`; Mandat PO AUDIT-NEW-03 | `CORRECTED (KLAIM DIBATASI PADA BUKTI RIIL)` | B-06 tetap `OPEN / BLOCKED` pending pengujian unit anomali dan risk acceptance formal PO/Security Architect. |
-| **AUDIT-NEW-04** | §6 (NC-09), §6.9, §8, §9 | NC-09 mencatat "5 objek", padahal §6.9 merinci 8 objek kriptografi/hash diskrit. | Rekonsiliasi judul dan deskripsi NC-09 menjadi "Pemetaan Delapan Objek Kriptografis / Hash Diskrit (3 Tanda Tangan Ed25519 & 5 Hash SHA-256)" di seluruh register dan matriks. | §6.9; Mandat PO AUDIT-NEW-04 | `CORRECTED` | Seluruh 8 objek diinventarisasi 1:1 tanpa objek hilang, digabung, atau dihitung ganda. |
-| **AUDIT-NEW-05** | §4.4 (E-03), §8 (AC-17), §13 | AC-17 mengklaim ketiadaan mutasi runtime DB aktif, padahal E-03 murni inspeksi statis berkas DDL `schema.postgres.sql`. | Batasi klaim AC-17 murni pada kepatuhan statis berkas skema DDL di repositori; tegaskan status live/runtime database sebagai `NOT VERIFIED — EVIDENCE NOT AVAILABLE`. | `schema.postgres.sql`; Mandat PO AUDIT-NEW-05 | `CORRECTED (KLAIM DIBATASI PADA BUKTI STATIS)` | Zero-DDL pada berkas statis terbukti 100%; runtime live DB berstatus jujur `NOT VERIFIED`. |
-| **AUDIT-NEW-06** | §6.7, §7.1 (REQ-B03-03), §8 (AC-02), §10.3 | Aturan penolakan symlink/hardlink belum mendefinisikan representasi hardlink dalam ZIP secara deterministik. | Memasukkan aturan PO APPROVED: hanya regular file & directory diterima; symlink & special file ditolak; hardlink tidak didukung; dua berkas byte identik adalah 2 file independen; tipe ambigu ditolak fail-closed (`ERR_ZIP_INVALID`). | Keputusan PO: APPROVED (AUDIT-NEW-06) | `CORRECTED` | Aturan penanganan entry ZIP deterministik, fail-closed, dan selaras dengan format PE-01. |
-| **AUDIT-NEW-07** | §5.1, §6.7, §7.1 (REQ-B03-01), §8 (AC-01..02), §10.3 | Aturan keunikan nama berkas case-sensitive berisiko tabrakan pada filesystem case-insensitive (e.g. `TrackA.nx` vs `tracka.nx`). | Memasukkan aturan PO APPROVED: pertahankan nama asli; periksa keunikan case-insensitive via ASCII case folding; nama bentrok ditolak fail-closed; cantumkan tabel boundary matrix wajib; berlaku lintas platform POSIX/Windows/Android. | Keputusan PO: APPROVED (AUDIT-NEW-07) | `CORRECTED` | Boundary matrix terpasang lengkap di §5.1 dan §6.7; penolakan fail-closed deterministik. |
-| **AUDIT-NEW-08** | §6.15, §8 (AC-02, AC-13) | Pemetaan error code pada AC-02 dan AC-13 tidak deterministik (pilihan ganda kode error). | Pecah pemetaan pemicu menjadi 1:1 deterministik: format ZIP/entry type/case-clash $\rightarrow$ `ERR_ZIP_INVALID`; ketidakcocokan bijeksi 1:1 $\rightarrow$ `ERR_ZIP_ENTRY_MISMATCH`; kuota ukuran/entri $\rightarrow$ `ERR_ZIP_QUOTA_EXCEEDED`; rasio kompresi $\rightarrow$ `ERR_ZIP_BOMB_DETECTED`. | §6.15; Mandat PO AUDIT-NEW-08 | `CORRECTED` | Seluruh skenario pengujian AC-02 dan AC-13 memiliki satu expected error code pasti. |
-| **AUDIT-NEW-09** | §1.2 | Hierarki sumber otoritas pada §1.2 dan bagian lain berpotensi menimbulkan interpretasi bercabang. | Menetapkan satu hierarki otoritas kanonikal 6-tingkat di §1.2; selaraskan aturan konflik; seluruh bagian lain mengacu ke §1.2. | Keputusan PO: APPROVED (AUDIT-NEW-09) | `CORRECTED` | Hierarki otoritas tunggal kanonis terpasang di §1.2 tanpa versi ganda. |
-| **AUDIT-NEW-10** | §5.2 (Tahap 7), §6 (NC-05), §7.2 (F-03), §8 (AC-10), §10.4 | Invariant 3-Way Identity Binding ($ownCertPubKey \equiv containerSigKey \equiv genesisPubKey$) tidak memiliki dasar kontrak normatif White Paper v5.6. | Jangan klaim sebagai invariant terbukti; tandai relasi kesamaan key secara eksplisit sebagai `UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED`; pertahankan pemisahan 3 peran tanda tangan; eskalasikan kebutuhan klarifikasi resmi PO/Arsitektur. | Keputusan PO: CLARIFY (AUDIT-NEW-10) | `UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED` | NC-05 dan AC-10 tetap terblokir pending klarifikasi tertulis PO/Arsitektur atas relasi identitas signer. |
-
----
+| **AUDIT-NEW-01** | §1.5.1, §5.2, §5.3, §8 | Urutan JIT pada Stage 5 mensyaratkan manifest valid/trusted sebelum bijeksi; narasi §1.5.1 tidak selaras dengan §5.2. | Menyelaraskan urutan dependensi JIT 8 tahap di seluruh dokumen (§1.5.1 dan §5.2); mendekopling pemeriksaan bijeksi fisik (Tahap 5) dari keputusan trust signer (Tahap 4); memisahkan tegas tiga jenis hasil pemeriksaan (integritas fisik arsip, validitas/trust, playback authorization); menegaskan informasi diagnostik fisik tetap tersedia di NX Verify jika signer UNKNOWN/UNTRUSTED tanpa menyamakan hasil diagnostik dengan izin playback. | Mandat PO AUDIT-NEW-01; POSIX.1-2017 | `PASS (TARGETED CORRECTION APPLIED)` | Urutan dependensi logis dan fisik konsisten penuh; tidak ada tahap yang mendahului prasyaratnya; pemisahan hasil diagnostik vs otorisasi playback terpasang jelas. |
+| **AUDIT-NEW-02** | §5.1, §8 (AC-01) | Contoh manifest menggunakan nilai dummy/ilustratif namun diklaim membuktikan seluruh Tier 3 invariants. | Pisahkan tegas 5 layer validasi (JSON syntax, Schema structure, Semantic, Cryptographic, Package/member). Beri label tegas contoh manifest murni struktural, nilai dummy tidak membuktikan kriptografi. | Mandat PO AUDIT-NEW-02; RFC 8259 | `PASS (PRESERVED)` | Tidak ada klaim pemenuhan kriptografis semu dari data dummy; kewajiban verifikasi Tier 3 tetap utuh. |
+| **AUDIT-NEW-03** | §4.4 (E-07), §6.12 | Bukti E-07 hanya memuat `O_NOFOLLOW`, `fstatSync`, dan `isFile()`, namun diklaim membuktikan `lstatSync` dan perbandingan `dev`/`ino`. | Batasi klaim E-07 pada kode riil yang ada; nyatakan verifikasi ganda `lstatSync` dan `dev`/`ino` sebagai celah implementasi kode desktop (`NOT DEMONSTRATED BY E-07 / RESIDUAL GAP`); pertahankan B-06 terblokir. | `fs_safe.ts#L30-L55`; Mandat PO AUDIT-NEW-03 | `PASS (PRESERVED)` | B-06 tetap `OPEN / BLOCKED` pending pengujian unit anomali dan risk acceptance formal PO/Security Architect. |
+| **AUDIT-NEW-04** | §6 (NC-09), §6.9, §8, §9 | Beberapa objek kriptografi/hash masih berupa label deskriptif tanpa field pasti; kontradiksi exclusion JCS manifest vs circular dependency B-08. | Menginventarisasi 8 objek kriptografis diskrit (3 Ed25519 & 5 SHA-256) dengan field persis atau penanda `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT`; mencatat relasi circular dependency vs usulan eksklusi signature JCS sebagai `UNRESOLVED / REQUIRES CLARIFICATION (B-08)` tanpa asumsi sepihak. | §6.9; Mandat PO AUDIT-NEW-04; RFC 8785; RFC 8032 | `PASS (TARGETED CORRECTION APPLIED)` | Seluruh 8 objek terpetakan lengkap dengan payload, generator, verifier, dan referensi; kontradiksi JCS dicatat jujur berstatus unresolved B-08. |
+| **AUDIT-NEW-05** | §4.4 (E-03), §8 (AC-17), §13 | AC-17 mengklaim ketiadaan mutasi runtime DB aktif, padahal E-03 murni inspeksi statis berkas DDL `schema.postgres.sql`. | Batasi klaim AC-17 murni pada kepatuhan statis berkas skema DDL di repositori; tegaskan status live/runtime database sebagai `NOT VERIFIED — EVIDENCE NOT AVAILABLE`. | `schema.postgres.sql`; Mandat PO AUDIT-NEW-05 | `PASS (PRESERVED)` | Zero-DDL pada berkas statis terbukti 100%; runtime live DB berstatus jujur `NOT VERIFIED`. |
+| **AUDIT-NEW-06** | §5.2, §6.7, §7.1 (REQ-B03-03/07), §8 (AC-02), §10.3 | Hardlink diperlakukan seolah-olah tipe entri ZIP generik universal; kontradiksi penolakan entri direktori di Stage 2 vs izin direktori keputusan PO. | Menerapkan keputusan PO AUDIT-NEW-06: regular files & directories diterima; symlinks & special files (FIFO, socket, dev) ditolak fail-closed `ERR_ZIP_INVALID`; semantik hardlink tidak didukung; berkas byte identik independen; hapus asumsi pengujian tipe hardlink generik universal di REQ-B03-03; harmonisasi flat archive pada path manifest bukan larangan direktori ZIP. | Keputusan PO: APPROVED (AUDIT-NEW-06) | `PASS (TARGETED CORRECTION APPLIED)` | Aturan tipe entri ZIP selaras penuh dengan keputusan PO; tidak ada pengujian tipe hardlink fiktif; konflik flat archive vs direktori terselesaikan. |
+| **AUDIT-NEW-07** | §5.1, §6.7, §7.1 (REQ-B03-01), §8 (AC-01..02), §10.3 | Aturan keunikan nama berkas case-sensitive berisiko tabrakan pada filesystem case-insensitive (e.g. `TrackA.nx` vs `tracka.nx`). | Memasukkan aturan PO APPROVED: pertahankan nama asli; periksa keunikan case-insensitive via ASCII case folding; nama bentrok ditolak fail-closed; cantumkan tabel boundary matrix wajib; berlaku lintas platform POSIX/Windows/Android. | Keputusan PO: APPROVED (AUDIT-NEW-07) | `PASS (PRESERVED)` | Boundary matrix terpasang lengkap di §5.1 dan §6.7; penolakan fail-closed deterministik. |
+| **AUDIT-NEW-08** | §6.15, §8 (AC-02, AC-13) | Kondisi collision dan kuota berpotensi menghasilkan kode error berbeda tergantung layer pemeriksaan (tidak deterministik). | Memasang matriks pemetaan kondisi ke kode error kanonikal deterministik 1:1 di §6.15 untuk seluruh kondisi AC-02 dan AC-13 tanpa pilihan ganda; pisahkan tegas collision ZIP (`ERR_ZIP_INVALID`), collision manifest (`ERR_MANIFEST_MALFORMED`), dan bijeksi mismatch (`ERR_ZIP_ENTRY_MISMATCH`); tidak ada kode error baru. | §6.15; Mandat PO AUDIT-NEW-08 | `PASS (TARGETED CORRECTION APPLIED)` | Setiap kondisi kegagalan spesifik memiliki tepat satu pemetaan error code deterministik di seluruh layer dan pengujian. |
+| **AUDIT-NEW-09** | §1.2, §3.1, §10.3 | Hierarki sumber otoritas pada §1.2 menggabungkan PO dan Arsitektur, menempatkan repository sebagai pengubah kontrak, dan belum memuat urutan keputusan PO yang tepat. | Mengganti hierarki otoritas lama dengan urutan persis 6 tingkat yang telah disahkan PO: Level 1 Keputusan PO PE-02, Level 2 Kontrak Produk & Governance Beku, Level 3 White Paper & Roadmap, Level 4 Repository Aktual sebagai Bukti Implementasi, Level 5 Standar Internasional, Level 6 Temuan Audit / Proposal / Interpretasi di §1.2, §3.1, dan §10.3. | Keputusan PO: APPROVED (AUDIT-NEW-09) | `PASS (TARGETED CORRECTION APPLIED)` | Hierarki otoritas kanonikal 6 tingkat terpasang persis sesuai keputusan PO tanpa interpretasi bercabang. |
+| **AUDIT-NEW-10** | §2.2 (No 8), §5.2, §6 (NC-05), §7.2 (F-03), §8 (AC-10), §10.4 | Negative control 8 pada §2.2 menyatakan 3 public key berbeda, padahal relasi kesamaan maupun perbedaan belum diverifikasi normatif. | Menghilangkan seluruh asumsi equality maupun difference atas 3 kunci ($ownCertPubKey \equiv containerSigKey \equiv genesisPubKey$) termasuk koreksi pada negative control nomor 8 di §2.2; mempertahankan status `UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED` tanpa keputusan sepihak. | Keputusan PO: CLARIFY (AUDIT-NEW-10) | `PASS (TARGETED CORRECTION APPLIED)` | Tidak ada asumsi equality maupun difference yang tidak berdasar kontrak normatif; status unresolved dicatat jujur menunggu penetapan resmi PO/Arsitektur. |
 
 ### 1.5.1 Catatan Tindak Lanjut Temuan Audit Komprehensif Historis (Temuan 1 s.d. 10)
 Tabel berikut merinci resolusi teknis dan substantif untuk setiap temuan audit utama:
@@ -118,7 +124,7 @@ Tabel berikut merinci resolusi teknis dan substantif untuk setiap temuan audit u
 | ID Audit | Ringkasan Temuan Audit | Resolusi Teknis & Substantif pada Plan Kanonikal | Status Dokumen |
 |:---:|:---|:---|:---:|
 | **Temuan 1** | Nomenklatur dan pemetaan tanda tangan berpotensi mencampuradukkan Album Signer vs Container Creator. | Memisahkan tegas 3 tanda tangan: (1) Album Signer Signature (manifest kanonikal, NC-02 $\rightarrow$ AC-03), (2) Container Packaging Signature (kontainer individual `.nx`, NC-06 $\rightarrow$ AC-04), dan (3) Genesis Cert Signature (sertifikat genesis track, NC-05 $\rightarrow$ AC-10). | `CORRECTED` |
-| **Temuan 2** | Urutan tahapan JIT 8-tahap belum merinci seluruh pemeriksaan kriptografis secara eksplisit. | Merinci mapping eksplisit 8 tahap JIT ke AC penguji (Tahap 1 safe-open, Tahap 2 ZIP flat, Tahap 3 strict parse, Tahap 4 manifest JCS & signer trust, Tahap 5 container pkg & genesis binding, Tahap 6 license, Tahap 7 audio SHA-256, Tahap 8 decrypt & buffer). Pre-verifikasi trek berikutnya dilarang memberi otorisasi awal. | `CORRECTED` |
+| **Temuan 2** | Urutan tahapan JIT 8-tahap belum merinci seluruh pemeriksaan kriptografis secara eksplisit. | Merinci mapping eksplisit 8 tahap JIT ke AC penguji sesuai dependensi logis dan fisik: Tahap 1 Open Arsip ZIP Wrapper Sumber (AC-02), Tahap 2 Validasi Integritas Fisik & Keamanan Arsip ZIP (AC-02, AC-13), Tahap 3 Ekstraksi & Strict JSON Parse Manifes Kanonikal (AC-01, AC-05), Tahap 4 Manifest JCS Canonicalization, Signer Signature & Trust Verification (AC-03, AC-06..08), Tahap 5 Pemeriksaan Bijeksi 1:1 Manifes-ke-ZIP & Case-Insensitive Uniqueness (AC-02, AC-13), Tahap 6 Ekstraksi Member .nx & Atomic Filesystem Safe-Open Descriptors (AC-20, AC-21), Tahap 7 Validasi Format Kontainer PE-01, Genesis Cert Ownership & Active License (AC-04, AC-10, AC-22), Tahap 8 Verifikasi Digest SHA-256 Audio, Dekripsi Payload & Buffer Registration (AC-09, AC-22..24). Pre-verifikasi trek berikutnya dilarang memberi otorisasi awal. Memisahkan tiga jenis hasil pemeriksaan (integritas fisik arsip, validitas & trust, serta playback authorization). | `CORRECTED` |
 | **Temuan 3** | AC-25 mencampuradukkan kebijakan signer `UNKNOWN` dengan hierarki status agregat NX Verify. | AC-07 dikunci eksklusif pada kebijakan signer `UNKNOWN` (dep: B-09 / NC-04 / CONF-01). AC-25 dikunci eksklusif pada hierarki agregat Verify (dep: CONF-02). Dependensi B-09/CONF-01 dicabut dari AC-25. | `CORRECTED` |
 | **Temuan 4** | Kontradiksi status NC-12: menyatakan blocker `NONE` padahal B-06 masih terbuka. | Menyelaraskan status blocker NC-12 menjadi `OPEN / BLOCKED BY B-06`. Membedakan containment, symlink, post-open descriptor, dan concurrent ancestor rename. Fail-closed tidak diartikan menghilangkan race condition di userspace. | `CORRECTED` |
 | **Temuan 5** | Taksonomi error dan status `ERR_ZIP_INVALID` di luar daftar 20 kode (DEFECT-02). | Memetakan skenario kegagalan unpacking kontainer di `internal/container/container.go#L112` ke dalam kode `ERR_ZIP_INVALID` di bawah usulan taksonomi NC-15, dan mengeliminasi kode dugaan `ERR_GENESIS_SIGNATURE_INVALID` yang tidak ada di baseline. Diakui secara tegas bahwa 20 kode error kanonikal berstatus Proposed Specification (NC-15) yang belum dibekukan dalam White Paper v5.6, dan kode diskrit kegagalan tanda tangan Genesis berstatus Unresolved Taxonomy (fail-closed `canPlay: false` pasti). | `CORRECTED (PROPOSED SPEC DISCLOSED)` |
@@ -215,7 +221,7 @@ Tabel berikut membuktikan penelusuran individual per AC mencakup seluruh 27 AC t
 | ID AC | Kontrak Dasar | Klasifikasi Utama | Dasar Klasifikasi & Sumber Otoritatif | Dependensi Langsung & Blocker Terkait | Status Dependensi | Dimensi & Gate | Hasil Verifikasi Konsistensi |
 |:---:|:---:|:---|:---|:---|:---:|:---:|:---|
 | **AC-01** | NC-01 | `PO DECISION REQUIRED` | White Paper v5.6 §Manifest; RFC 8259; §5.1 Skema Manifest | NC-01 / Kebijakan Unknown Fields Manifest Strict vs Permissive | `PENDING PO DECISION` | PO Decision / Gate A Blocker | Konsisten; menunggu keputusan resmi tertulis PO. |
-| **AC-02** | NC-01/07 | `TEST-PLANNED — BLOCKED BY PROPOSED SPEC` | White Paper v5.6; PKWARE APPNOTE; §5.1 Regex Filename | NC-07 / Proposal struktur flat & penolakan entri direktori via `ERR_ZIP_INVALID` (B-07) | `OPEN (PROPOSAL DEPENDENCY)` | Technical Proposal / Gate B | Konsisten; pengujian terblokir pembekuan aturan flat direktori B-07. |
+| **AC-02** | NC-01/07 | `TEST-PLANNED — BLOCKED BY PROPOSED SPEC` | White Paper v5.6; PKWARE APPNOTE; §5.1 Regex Filename | NC-07 / Validasi arsip ZIP wrapper, penerimaan direktori & regular file, penolakan symlink/special via `ERR_ZIP_INVALID`, dan bijeksi 1:1 via `ERR_ZIP_ENTRY_MISMATCH` (AUDIT-NEW-06/08) | `OPEN (PROPOSAL DEPENDENCY)` | Technical Proposal / Gate B | Konsisten; pengujian terblokir pembekuan parameter kuota B-07. |
 | **AC-03** | NC-02 | `TEST-PLANNED — EXECUTION BLOCKED` | IETF RFC 8032; `crypto.ts#L45`; §6.2 | B-08 (Circular Dependency tanda tangan manifest di dalam payload JCS) | `BLOCKED` | Architecture Blocker / Gate B | Konsisten; pengujian terblokir circular dependency signature. |
 | **AC-04** | NC-06 | `TEST-PLANNED — SPEC READY` | IETF RFC 8032; `container.go#L110`; PE-01 Baseline | Baseline PE-01 Beku (`.nx` container packaging signature) | `CLOSED (FROZEN BASELINE)` | Spec Ready / Gate A Ready | Konsisten; format kontainer `.nx` anggota album beku. |
 | **AC-05** | NC-03 | `TEST-PLANNED — EXECUTION BLOCKED` | White Paper v5.6 §Parsers; Nexa Parser Policy | B-01 (Modul Strict JSON Parser Engine belum diimplementasikan) | `BLOCKED (MODULE PENDING)` | Module Pending / Gate B | Konsisten; spesifikasi uji duplicate key siap, modul pending koding. |
@@ -256,7 +262,7 @@ Sesuai Bagian 2.4 mandat audit, dokumen ini menerapkan 18 kontrol operasional mu
 | 5 | Kontrak spesifikasi dinyatakan `RESOLVED` meskipun kode implementasi belum dibuat. | Status `SPECIFIED` secara tegas bukan `RESOLVED`; modul belum dibuat dilabeli `NOT IMPLEMENTED`. | `G`, `B` |
 | 6 | Pengujian berstatus `[TEST-PLANNED]` dipresentasikan seolah-olah telah lulus. | Dilarang menaikkan `TEST-PLANNED` menjadi `TEST-PASSED` tanpa bukti eksekusi aktual di lingkungan uji. | `V`, `AC` |
 | 7 | Hash manifest, kontainer, audio payload, sertifikat Genesis, dan paket ZIP dipertukarkan. | Wajib bedakan 8 objek kriptografi diskrit secara terisolasi (3 tanda tangan dan 5 hash). | `I`, `NC-09` |
-| 8 | Tanda tangan Album Signer, Container Creator, dan Genesis Certificate digabungkan konseptual. | Wajib pisahkan arsitektur 3 tanda tangan independen dengan kunci publik pembanding berbeda. | `I`, `NC-02/05/06` |
+| 8 | Tanda tangan Album Signer, Container Creator, dan Genesis Certificate digabungkan konseptual atau diasumsikan memiliki relasi key equality/difference tanpa kontrak normatif. | Wajib pisahkan arsitektur 3 peran tanda tangan independen; status relasi kesamaan maupun perbedaan 3 kunci publik pembanding ($ownCertPubKey \equiv containerSigKey \equiv genesisPubKey$) secara eksplisit dinyatakan `UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED` tanpa asumsi sepihak (AUDIT-NEW-10). | `I`, `NC-02/05/06` |
 | 9 | Kegagalan kriptografi diperlakukan sebagai kegagalan jaringan atau diatasi via fallback. | Seluruh anomali signature, hash mismatch, dan sertifikat tidak sah wajib melempar fail-closed. | `PR`, `NC-11/15` |
 | 10 | Pemeriksaan path sebelum membuka file dianggap cukup mencegah semua race condition. | Wajib gunakan invariant descriptor pasca-open (`O_NOFOLLOW` + `fstat`) dan akui batas POSIX userspace. | `G`, `NC-12` |
 | 11 | Penolakan signer `UNKNOWN` dianggap otomatis melarang seluruh pemeriksaan integritas anggota. | Penolakan pemutaran (playback) TIDAK membatalkan verifikasi integritas fisik untuk diagnostik Verify. | `I`, `NC-04/14` |
@@ -303,16 +309,30 @@ Dokumen ini mengonsolidasikan 7 akomodasi positif dari V5-REV1 dan secara jujur 
 
 ## 3. SUMBER OTORITATIF SERTA ATURAN PENANGANAN KETIDAKPASTIAN
 
-### 3.1 Hierarki Sumber Otoritatif
-Seluruh klausul teknis dalam dokumen ini disusun berdasarkan hierarki sumber otoritatif yang mengikat:
+### 3.1 Hierarki Sumber Otoritatif (AUDIT-NEW-09 — PO APPROVED)
+Seluruh klausul teknis, evaluasi pembuktian, dan batasan implementasi dalam dokumen ini tunduk secara ketat pada hierarki otoritas 6-tingkat kanonikal yang telah disahkan Product Owner (§1.2):
 
 ```
-[Level 1: Governance & Product Truth]
-   ├── Nexa White Paper v5.6 (Arsitektur Ekosistem & Prinsip Fail-Closed)
-   ├── Nexa Development Roadmap v4.8 (Target Fitur Album & Keputusan PO Tertunda)
-   └── Sprint 16 Closeout Report & Acceptance Memo (Baseline Ekosistem Beku)
+[Level 1: Keputusan Eksplisit Product Owner untuk Ruang Lingkup PE-02]
+   ├── Otorisasi Scope, Governance Override, Persetujuan Parameter, & Batas Rilis
+   └── Penetapan Keputusan Normatif Tertulis yang Mengikat
           │
-[Level 2: Standar Normatif Internasional]
+[Level 2: Kontrak Produk dan Governance Nexa yang Telah Disetujui / Dibekukan]
+   ├── Sprint 16 Closeout Report & Acceptance Memo (Baseline Ekosistem Beku)
+   ├── PE-01 Offline NxCert Hidden-by-Default (Baseline Kontainer Mandiri Beku)
+   └── Governance Policy (Batas 3 Siklus Korektif, Anti-Overprocessing, No Reset)
+          │
+[Level 3: White Paper dan Roadmap yang Telah Disetujui (Sepanjang dalam Ruang Lingkupnya)]
+   ├── Nexa White Paper v5.6 (Arsitektur Ekosistem & Prinsip Fail-Closed)
+   └── Nexa Development Roadmap v4.8 (Target Fitur Album & Keputusan Terbuka)
+          │
+[Level 4: Repository Aktual sebagai Bukti Implementasi (Bukan Otoritas Pengubah Kontrak)]
+   ├── marketplace/db/schema.postgres.sql (Bukti Skema Database DDL Aktif)
+   ├── internal/container/container.go (Bukti Implementasi Engine Packaging Go)
+   ├── sdk/typescript/src/sdk.ts & container.ts (Bukti Implementasi SDK Nexa)
+   └── player-desktop/main.js (Bukti Implementasi NX Player Desktop)
+          │
+[Level 5: Standar Internasional yang Relevan (Sepanjang Tidak Bertentangan)]
    ├── IETF RFC 8785 (JSON Canonicalization Scheme - JCS)
    ├── IETF RFC 8032 (Ed25519 Pure Edwards-curve Digital Signature Algorithm)
    ├── IETF RFC 8259 (The JavaScript Object Notation Data Interchange Format)
@@ -320,11 +340,10 @@ Seluruh klausul teknis dalam dokumen ini disusun berdasarkan hierarki sumber oto
    ├── IETF RFC 1951 (DEFLATE Compressed Data Format Specification)
    └── POSIX.1-2017 (Standard for Information Technology — Portable Operating System Interface)
           │
-[Level 3: Artefak Kode Sumber & Skema Terverifikasi di Repositori Linux]
-   ├── marketplace/db/schema.postgres.sql (Skema Database PostgreSQL Aktif)
-   ├── sdk/typescript/src/sdk.ts & container.ts (Implementasi SDK Nexa)
-   ├── player-desktop/main.js (Implementasi NX Player Desktop)
-   └── internal/container/container.go (Engine Packaging Kontainer Go)
+[Level 6: Temuan Audit Historis, Bukti Pendukung, Proposal Belum Disetujui, & Interpretasi]
+   ├── Temuan Audit Historis Beserta Bukti Faktualnya (A-01..A-30, B-01..B-09, F-01..F-15, AUDIT-NEW)
+   ├── Usulan Spesifikasi Teknis yang Belum Disahkan ([PROPOSED SPECIFICATION])
+   └── Interpretasi dan Analisis Perancang (Mempertahankan Status, Bukan Ketentuan Normatif)
 ```
 
 ### 3.2 Prosedur Stop-and-Clarify Mutlak
@@ -618,7 +637,7 @@ NX Player menerapkan prosedur otorisasi JIT 8-tahap sekuensial yang merinci selu
 2. **Tahap 2 — Validasi Integritas Fisik & Keamanan Arsip ZIP (Archive-Level Security Check)**:
    - *Objek Fisik*: Struktur internal ZIP (Central Directory & Local File Headers).
    - *Prasyarat*: **Independen dari manifest**.
-   - *Pemeriksaan*: Validasi header ZIP standar; penolakan symlink, hardlink, FIFO, socket, device files (`ERR_ZIP_INVALID` — AUDIT-NEW-06); penolakan entri direktori berakhiran `/` (`ERR_ZIP_INVALID`); verifikasi kuota ukuran terkompresi $\le 500$ MB, uncompressed cumulative extraction $\le 4$ GB desimal, dan total entri $\le 200$ (`ERR_ZIP_QUOTA_EXCEEDED`); verifikasi rasio kompresi batas bomb (`ERR_ZIP_BOMB_DETECTED`).
+   - *Pemeriksaan*: Validasi header ZIP standar; menerima *regular files* dan *directories* (sesuai Keputusan PO AUDIT-NEW-06); menolak symlink dan *special files* (FIFO, socket, device files) fail-closed dengan `ERR_ZIP_INVALID`; semantik hardlink ZIP tidak didukung; dua entri dengan isi byte identik tetap diperlakukan sebagai entri independen; verifikasi kuota ukuran terkompresi $\le 500$ MB, uncompressed cumulative extraction $\le 4$ GB desimal, dan total entri $\le 200$ (`ERR_ZIP_QUOTA_EXCEEDED`); verifikasi rasio kompresi batas bomb (`ERR_ZIP_BOMB_DETECTED`).
    - *AC Penguji*: **AC-02, AC-13** (NC-07 / B-07).
 3. **Tahap 3 — Ekstraksi & Strict JSON Parse Manifes Kanonikal (Manifest Parse & Schema Invariants)**:
    - *Objek Fisik*: Berkas entri tunggal `album_manifest.json` di dalam arsip ZIP.
@@ -633,7 +652,7 @@ NX Player menerapkan prosedur otorisasi JIT 8-tahap sekuensial yang merinci selu
    - *AC Penguji*: **AC-03, AC-06, AC-07, AC-08** (NC-02, NC-03, NC-04, B-02, B-08, B-09).
 5. **Tahap 5 — Pemeriksaan Bijeksi 1:1 Manifes-ke-ZIP & Case-Insensitive Uniqueness**:
    - *Objek Data*: Daftar `tracks[].file_name` pada manifes vs Central Directory ZIP.
-   - *Prasyarat*: Manifes terbukti valid dan terpercaya pada Tahap 3 & 4.
+   - *Prasyarat*: Manifes telah berhasil di-parse secara sintaksis dan skema pada Tahap 3, serta daftar entri Central Directory ZIP telah tersedia dari Tahap 2. Pemeriksaan bijeksi adalah validasi integritas fisik/konsistensi deklarasi yang independen dari keputusan trust/otorisasi signer pada Tahap 4.
    - *Pemeriksaan*: Memvalidasi bijeksi eksak 1:1 antara manifes dan ZIP (setiap file di manifes wajib ada di ZIP; tidak ada file ekstra di ZIP selain manifes dan member `.nx`); validasi keunikan nama berkas case-insensitive via ASCII case folding (AUDIT-NEW-07).
    - *Error Code*: `ERR_ZIP_ENTRY_MISMATCH` (jika jumlah/nama tidak cocok); `ERR_ZIP_INVALID` (jika terjadi benturan nama case-insensitive atau file asing non-`.nx`).
    - *AC Penguji*: **AC-02, AC-13** (NC-01, NC-07).
@@ -655,9 +674,17 @@ NX Player menerapkan prosedur otorisasi JIT 8-tahap sekuensial yang merinci selu
    - *Pemeriksaan*: Menghitung digest SHA-256 atas bitstream audio dan mencocokkannya dengan `sha256` pada entri manifes `tracks[]` dan `underlying_cert_id` Genesis Certificate (`ERR_CONTAINER_HASH_MISMATCH`). Setelah terverifikasi cocok, mendekripsi payload audio terenkripsi dan mendaftarkan audio buffer ke output pipeline pemutar audio desktop.
    - *AC Penguji*: **AC-09, AC-22, AC-23, AC-24** (NC-05, NC-13).
 
-> **Hubungan Kriptografis & Perlindungan Mutlak JIT (Temuan 2, Temuan 9, Target T-06):**  
-> - *Pemisahan Trust vs Integritas*: Signer trust (Tahap 4) mengevaluasi kredibilitas penerbit album; integritas container/genesis (Tahap 5) mengevaluasi keabsahan struktur kontainer; integritas payload (Tahap 7) mengevaluasi keaslian audio. Penolakan pemutaran pada Tahap 4 (misal signer `UNKNOWN` atau `UNTRUSTED`) TIDAK membatalkan keabsahan verifikasi integritas fisik pada Tahap 5 dan 7 untuk kebutuhan audit/diagnostik.  
+> **Hubungan Kriptografis, Tiga Jenis Hasil Pemeriksaan & Pemisahan Diagnostik Verify vs Otorisasi Playback (AUDIT-NEW-01, Temuan 2, Temuan 9):**
+> Dokumen secara tegas membedakan tiga jenis hasil pemeriksaan independen:
+> 1. **Pemeriksaan Fisik / Integritas Arsip**: Meliputi struktur internal ZIP, tipe entri (regular file/directory vs symlink/special), path containment, kuota ukuran/entri, kelengkapan arsip, dan konsistensi bijeksi 1:1 antara deklarasi manifest vs Central Directory ZIP.
+> 2. **Pemeriksaan Validitas dan Trust**: Meliputi validasi skema JSON manifest, kanonisasi JCS, verifikasi tanda tangan digital Ed25519, evaluasi signer trust di Registry, validasi Genesis Certificate, dan kontrak kriptografis terkait.
+> 3. **Keputusan Playback Authorization**: Evaluasi apakah member trek album yang diminta memiliki lisensi/entitlement aktif dan diizinkan untuk didekripsi serta didaftarkan ke audio output pipeline.
+>
+> *Prinsip Diagnostik Terpisah (NX Verify vs Playback Authorization)*: Signer yang berstatus `UNKNOWN` atau `UNTRUSTED` tidak boleh secara otomatis menyebabkan seluruh informasi diagnostik integritas fisik menjadi tidak tersedia di NX Verify, apabila pemeriksaan fisik tersebut masih dapat dilakukan secara aman dan independen. Namun demikian, hasil diagnostik integritas fisik yang valid tersebut **TIDAK BOLEH** dianggap sebagai bukti bahwa member album tersebut *trusted* atau memiliki izin pemutaran (*playback authorization*).
+>
+> - *Pemisahan Trust vs Integritas*: Signer trust (Tahap 4) mengevaluasi kredibilitas penerbit album; integritas container packaging dan genesis certificate (Tahap 7) mengevaluasi keabsahan struktur kontainer; integritas audio payload (Tahap 8) mengevaluasi keaslian bitstream audio. Penolakan pemutaran pada Tahap 4 (misal signer `UNKNOWN` atau `UNTRUSTED`) TIDAK membatalkan keabsahan verifikasi integritas fisik pada Tahap 5, 7, dan 8 untuk kebutuhan audit/diagnostik.
 > - *Larangan Pre-Otorisasi*: Pra-verifikasi integritas trek berikutnya dalam antrean album **DILARANG KERAS** ditafsirkan sebagai pemberian otorisasi pemutaran lebih awal atau pendaftaran buffer audio sebelum trek tersebut benar-benar aktif diputar oleh pengguna. Setiap trek wajib melalui Tahap 6, 7, dan 8 secara *just-in-time* saat transisi pemutaran terjadi.
+
 
 ---
 
@@ -714,29 +741,32 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
   - *Malformed Escape Syntax*: Jika urutan escape salah secara sintaksis (e.g. `\u123z`, escape terpotong `\u12`, atau lone surrogates `\uD800` tanpa pasangan legal), parser menolak dengan **`ERR_MANIFEST_MALFORMED`**.
 - **Pemisahan Parser vs Serializer JCS**: Strict Parser (B-01, AC-05) bertugas pada tahap deserialisasi byte stream mentah. RFC 8785 JCS Serializer (B-02, AC-06) bertugas pada tahap serialisasi kanonisasi deterministik (pengurutan kunci UTF-16, format bilangan tanpa $-0$, minifikasi whitespace).
 
-#### 6.7 Rincian NC-07: Batas Keamanan Ekstraksi Arsip ZIP Wrapper (Temuan 5, Spesifikasi Tambahan 3 & 4)
-- Status Kontrak: **`PROPOSED SPECIFICATION`** (Menunggu keputusan formal Otoritas Arsitektur di bawah Blocker B-07).
-- **Klarifikasi Acuan Standar Eksternal**:
-  - Standar **PKWARE APPNOTE.TXT / ISO/IEC 21320-1** murni mendefinisikan struktur format arsip ZIP (central directory, local headers, data descriptors).
-  - Standar **IETF RFC 1951** murni mendefinisikan format kompresi bitstream DEFLATE.
-  - Standar-standar eksternal tersebut **TIDAK PERNAH** menetapkan batas kuota ukuran aplikasi Nexa (seperti 500 MB atau 4 GB desimal), batasan 200 entri, atau rasio kompresi tertentu (seperti 10:1 atau 100:1). Nilai-nilai numerik tersebut adalah usulan spesifikasi tingkat aplikasi Nexa (`PROPOSED SPECIFICATION`). Standar eksternal PKWARE APPNOTE dan IETF RFC 1951 murni mengatur spesifikasi format berkas arsip dan algoritma kompresi bitstream DEFLATE, dan **TIDAK DAPAT** otomatis dijadikan dasar penetapan ambang batas keamanan rasio kompresi (angka 100:1 hanyalah referensi pembanding eksternal yang belum diverifikasi secara normatif).
-- **Prinsip Keamanan Normatif yang Disetujui (Baseline Invariants)**:
-  - *Penolakan Format Corrupt*: Arsip ZIP yang rusak atau tidak sesuai spesifikasi layout ditolak fail-closed dengan `ERR_ZIP_INVALID` (diverifikasi dalam kode baseline `container.go#L112`).
-  - *Penahanan Filesystem (Safe-Open)*: Upaya path traversal (`../`) atau manipulasi symlink ditolak fail-closed dengan `ERR_FILESYSTEM_CONTAINMENT_VIOLATION` (NC-12).
-  - *Bijeksi 1:1*: Setiap berkas reguler `.nx` di dalam ZIP wajib terdaftar dalam `tracks[]` manifest, dan setiap track di manifest wajib ada di dalam ZIP. Ketidakcocokan memicu `ERR_ZIP_ENTRY_MISMATCH`.
-  - *Lingkup Perlindungan*: Seluruh batas kuota dan ekstraksi diterapkan **EKSKLUSIF PADA PEMBUNGKUS ARSIP DISTRIBUSI ZIP**, dan **DILARANG KERAS** diperluas atau diterapkan pada ukuran kontainer audio individual `.nx` mandiri.
-- **Rincian Usulan Batas Ekstraksi Pembungkus ZIP (Proposed Specification B-07)**:
-  - *Usulan Struktur Flat & Penolakan Entri Direktori*: Arsip pembungkus ZIP diusulkan berstruktur flat pada root direktori. Ditemukannya entri direktori (entry name berakhiran `/` atau bertipe folder) diusulkan ditolak fail-closed dengan `ERR_ZIP_INVALID`.
-  - *Usulan Ukuran Terkompresi Maksimum*: Diusulkan batas maksimum 500 MB (desimal: $500 \times 10^6 = 500.000.000$ bytes fail-closed). Pelanggaran diusulkan memicu `ERR_ZIP_QUOTA_EXCEEDED`.
-  - *Pemisahan Batas Dekompresi (Per-Entri 2 GiB vs Akumulasi Wrapper 4 GB Desimal)*:
-    - *Batas Per-Entri Kontainer*: Setiap kontainer audio individual `.nx` di dalam wrapper dibatasi maksimum payload 2 GiB (biner: $2 \times 1024^3 = 2.147.483.648$ bytes), terverifikasi fisik pada baseline kode `internal/container/container.go#L106` (`payloadLen > 2*1024*1024*1024`). Batas ukuran payload 2 GiB ini saat ini belum memiliki Acceptance Criteria penguji khusus dalam AC Register §8 (AC-11 dan AC-12 murni menguji ekstraksi mandiri dan pemenuhan invariant packaging PE-01). Celah pengujian ini dicatat secara terbuka dan memerlukan keputusan formal Product Owner / Arsitektur.
-    - *Batas Akumulasi Dekompresi Wrapper Total*: Diusulkan batas akumulasi ekstraksi total seluruh entri sebesar 4 GB desimal (desimal: $4 \times 10^9 = 4.000.000.000$ bytes fail-closed). Pelanggaran diusulkan memicu `ERR_ZIP_QUOTA_EXCEEDED` (diuji via AC-13).
-  - *Usulan Jumlah Entri Maksimum*: Diusulkan kuota 200 entri total di central directory header (1 manifest + $\le 199$ trek audio). Pelanggaran diusulkan memicu `ERR_ZIP_QUOTA_EXCEEDED`. (Catatan: panduan 50 member di White Paper v5.6 merupakan rekomendasi UI, sedangkan kuota teknis ZIP wrapper adalah $\le 200$ entri).
-  - *Usulan Rasio Kompresi (Ambiguitas Nilai Usulan B-07 vs Referensi Pembanding Eksternal)*:
-    - Diusulkan dievaluasi pada dua tingkat (per-entri untuk uncompressed $> 1\text{ MB}$ dan global agregat uncompressed kumulatif $> 1\text{ MB}$).
-    - *Status Ambiguitas Nilai Rasio*: Proposal teknis B-07 mengusulkan rasio kompresi ketat **10:1**, sedangkan angka **100:1** merupakan referensi pembanding eksternal yang belum diverifikasi secara normatif (standar eksternal PKWARE APPNOTE maupun RFC 1951 tidak memuat ambang rasio keamanan tersebut). Kedua nilai ini murni kandidat usulan teknis dan belum dibekukan normatif dalam White Paper v5.6. Keduanya berstatus **`PROPOSED SPECIFICATION — PENDING ARCHITECTURE DECISION (B-07)`**. Tidak ada satu nilai yang diperlakukan sebagai batas normatif final sebelum diterbitkannya keputusan resmi arsitektur.
-    - Penanganan `compressed == 0` saat uncompressed $> 0$ diusulkan ditolak fail-closed dengan `ERR_ZIP_BOMB_DETECTED` (infinite ratio).
-    - Pelanggaran rasio kompresi terhadap ambang batas yang disahkan diusulkan memicu `ERR_ZIP_BOMB_DETECTED`.
+#### 6.7 Rincian NC-07: Batas Keamanan Ekstraksi Arsip ZIP Wrapper (Temuan 5, Spesifikasi Tambahan 3, AUDIT-NEW-06)
+- Evaluasi batasan keamanan saat ekstraksi arsip pembungkus ZIP menggunakan pustaka dekompresi streaming:
+  1. *Ukuran Maksimum File Terkompresi*: $\le 500	ext{ MB}$ (`[PROPOSED SPECIFICATION — PENDING ARCHITECTURE DECISION B-07]`).
+  2. *Ukuran Maksimum Dekompresi Kumulatif Wrapper*: $\le 4	ext{ GB desimal}$ ($4 	imes 10^9$ bytes).
+  3. *Batas Payload Individual Kontainer `.nx`*: $\le 2	ext{ GiB}$ ($2 	imes 1024^3 = 2.147.483.648$ bytes) sesuai batas biner `internal/container/container.go#L106` (`[REPOSITORY-VERIFIED]`).
+  4. *Maksimum Jumlah Entri Central Directory*: $\le 200	ext{ entri}$ (`[PROPOSED SPECIFICATION — PENDING B-07]`).
+  5. *Ambang Batas Rasio Kompresi ZIP Bomb*: Ambang rasio kompresi batas bomb berstatus usulan spesifikasi teknis NC-07 / B-07 (ambiguitas rasio kompresi 10:1 usulan perancang B-07 vs referensi pembanding eksternal 100:1 yang belum diverifikasi normatif). Pembuktian format APPNOTE dan RFC 1951 tidak memuat ambang rasio keamanan numerik tersebut. Jika rasio dekompresi melampaui ambang batas usulan B-07 atau `compressed_size == 0` saat `uncompressed_size > 0`, proses streaming dihentikan fail-closed dan melempar **`ERR_ZIP_BOMB_DETECTED`**.
+
+- **Aturan Normatif Tipe Entri ZIP Sesuai Keputusan Product Owner (AUDIT-NEW-06 PO APPROVED)**:
+
+| Tipe Entri | Perlakuan | Alasan / Kode Error |
+|---|---|---|
+| Regular file | Diterima | Sesuai aturan validasi arsip dan regex nama berkas member |
+| Directory | Diterima | Sesuai Keputusan PO (AUDIT-NEW-06 PO APPROVED) |
+| Symlink | Ditolak | Fail-closed (`ERR_ZIP_INVALID`) |
+| Special file (FIFO, socket, dev) | Ditolak | Fail-closed (`ERR_ZIP_INVALID`) |
+| Hardlink semantics | Tidak didukung | Semantik hardlink bukan fitur ZIP generik universal |
+| Identical payload pada beberapa entri | Diterima sebagai entri independen | Setiap entri diekstrak mandiri tanpa asumsi relasi link |
+
+- **Harmonisasi Struktur Flat Archive vs Direktori**:
+  - Keputusan PO secara tegas menerima entri direktori di dalam arsip ZIP.
+  - Pembatasan struktur "flat" berlaku pada path relatif member kontainer `.nx` yang dideklarasikan pada manifest (`tracks[].file_name` wajib memenuhi regex `^[a-zA-Z0-9_-]+\.nx$`), yang melarang deklarasi trek dalam subdirektori bersarang (e.g. `discs/track01.nx`).
+  - Ketentuan Keputusan PO (Level 1) mengesampingkan usulan lama B-07 yang melarang entri direktori.
+- **Pencegahan Path Traversal**: Nama berkas entri diperiksa terhadap pola traversal (`../`, `..\`, absolute path, leading slashes). Pelanggaran melempar **`ERR_ZIP_INVALID`**.
+- **Case-Insensitive Filename Collision**: Pemeriksaan keunikan entri ZIP dan manifes dilakukan secara case-insensitive via ASCII case-folding (`toLowerASCII`) sesuai Keputusan PO (AUDIT-NEW-07). Tabrakan nama melempar **`ERR_ZIP_INVALID`** (pada ZIP) atau **`ERR_MANIFEST_MALFORMED`** (pada manifes).
+- **Status Blocker**: Parameter numerik kuota (500MB, 4GB desimal, 200 entri, ambang rasio kompresi) berstatus **`PROPOSED SPECIFICATION`** di bawah blocker **B-07**.
 
 #### 6.8 Rincian NC-08: Batas Atomisitas Transaksi Marketplace & Ketiadaan 2PC (Temuan 6)
 - Transaksi database lokal PostgreSQL menggunakan advisory lock `pg_advisory_xact_lock(hashtext(user_id || ':' || album_id))` untuk mutual exclusion.
@@ -746,16 +776,89 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
   3. *Kendala Zero-DDL*: Skema database PostgreSQL beku (`schema.postgres.sql`) melarang penambahan kolom foreign key baru atau tabel outbox terdistribusi.
 - **Status Arsitektur**: Selama gap ketiadaan 2PC dan batasan Zero-DDL belum diselesaikan oleh otoritas arsitektur, NC-08 berstatus **`BLOCKED`** di bawah blocker B-04 / CONF-03.
 
-#### 6.9 Rincian NC-09: Pemetaan Delapan Objek Kriptografis / Hash Diskrit (Temuan 1, Temuan 8, Bagian 5.3)
-Dokumen ini memisahkan secara formal delapan objek kriptografis diskret (3 tanda tangan digital Ed25519 dan 5 nilai hash SHA-256) agar tidak terjadi tumpang tindih penanganan error atau substitusi nilai hash yang keliru:
-1. **Album Signer Signature (Ed25519)**: Tanda tangan digital Album Signer atas byte kanonikal UTF-8 payload manifest `album_manifest.json` (NC-02 $\rightarrow$ AC-03, terblokir B-08). Input: byte kanonikal JCS manifest (field signature dikecualikan). Nilai pembanding: verifikasi Ed25519 terhadap `album_signer_public_key`. Error: `ERR_MANIFEST_SIGNATURE_INVALID`.
-2. **Container Packaging Signature (Ed25519)**: Tanda tangan digital Container Creator atas byte packaging kontainer individual `.nx` (NC-06 $\rightarrow$ AC-04). Input: byte packaging kontainer `.nx`. Nilai pembanding: verifikasi Ed25519 terhadap `creator_public_key`. Error: `ERR_CONTAINER_SIGNATURE_INVALID`.
-3. **Genesis Certificate Signature (Ed25519)**: Tanda tangan digital Genesis Creator atas payload sertifikat genesis track audio individual (`sdk.ts#L205-L235`, NC-05 $\rightarrow$ AC-10). Input: payload sertifikat genesis. Nilai pembanding: verifikasi Ed25519 terhadap `GENESIS_PUBLIC_KEY`. Error: penolakan binding fail-closed (`canPlay: false`; status kode error kanonikal: unresolved in baseline taxonomy pending architecture definition).
-4. **Audio Track Binary Payload Hash (SHA-256)**: SHA-256 atas data audio mentah (bitstream audio) di dalam kontainer `.nx` (NC-05/09 $\rightarrow$ AC-09). Input: bitstream audio mentah. Nilai pembanding: digest `audio_sha256` pada manifest dan sertifikat genesis. Error: `ERR_CONTAINER_HASH_MISMATCH`.
-5. **Canonical Album Manifest Hash (SHA-256)**: SHA-256 atas byte stream kanonikal RFC 8785 JCS manifest (NC-02/09 $\rightarrow$ AC-03). Input: byte kanonikal UTF-8 manifest hasil serialisasi JCS tanpa field signature.
-6. **Container Packaging Hash (SHA-256)**: SHA-256 atas struktur packaging kontainer `.nx` lengkap (NC-06 $\rightarrow$ AC-04, AC-12). Input: byte kontainer `.nx` utuh.
-7. **Genesis Certificate Hash (SHA-256)**: SHA-256 atas data sertifikat genesis kanonikal (NC-05 $\rightarrow$ AC-10). Input: byte sertifikat genesis track.
-8. **Distribution ZIP Archive Package Hash (SHA-256)**: SHA-256 atas arsip ZIP pembungkus distribusi fisik secara keseluruhan (`acquired_package_sha256` pada tabel database child acquisition — semantik kolom terblokir B-05, NC-09 $\rightarrow$ AC-16). Input: berkas fisik pembungkus ZIP album.
+#### 6.9 Rincian NC-09: Pemetaan Delapan Objek Kriptografis / Hash Diskrit (Temuan 1, Temuan 8, AUDIT-NEW-04)
+Dokumen ini menyusun inventaris lengkap delapan objek kriptografis diskrit (3 tanda tangan digital Ed25519 dan 5 nilai hash SHA-256) berdasarkan kontrak normatif dan repositori aktual, memisahkan fakta terbukti dari proposal teknis tanpa menciptakan nama field fiktif:
+
+1. **Objek 1 — Album Signer Signature (Ed25519)**
+   - *Nama Field / Properti*: `album_signer_signature` (didefinisikan pada proposal skema manifest §5.1).
+   - *Jenis Objek*: Ed25519 digital signature (RFC 8032).
+   - *Data / Payload Objek*: Byte kanonikal UTF-8 payload manifest `album_manifest.json`.
+   - *Status Hubungan JCS*: `UNRESOLVED / REQUIRES CLARIFICATION (B-08)` — Terdapat proposal teknis yang mengusulkan field `album_signer_signature` dikecualikan dari serialisasi RFC 8785 JCS, namun kontrak normatif B-08 mencatat adanya dependensi sirkular (*circular dependency*) jika signature disertakan di dalam payload yang dikanonisasi. Dokumen ini **TIDAK** menetapkan exclusion tersebut sebagai kontrak final yang sah, dan **TIDAK** mengabaikan circular dependency B-08 secara sepihak. Status exclusion tetap berstatus usulan spesifikasi yang memerlukan keputusan formal tertulis dari Product Owner / Architecture Board.
+   - *Tujuan Objek*: Membuktikan integritas deklarasi metadata manifest album dan mengautentikasi Album Signer.
+   - *Pihak Pembuat*: Album Signer / Publisher.
+   - *Pihak Pemverifikasi*: NX Player (Tahap 4 JIT) dan NX Verify.
+   - *Relasi dengan Objek Lain*: Mengautentikasi daftar trek dan hash audio; tidak memvalidasi bitstream audio secara langsung tanpa pencocokan hash individual masing-masing trek.
+   - *Referensi Sumber*: §5.1 Skema Manifest; White Paper v5.6; RFC 8785; RFC 8032; B-08 / NC-02.
+
+2. **Objek 2 — Container Packaging Signature (Ed25519)**
+   - *Nama Field / Properti*: `signature` pada trailer kontainer biner Go (`internal/container/container.go#L60-L80`) / `creator_signature` pada definisi SDK (`sdk/typescript/src/container.ts#L45`).
+   - *Jenis Objek*: Ed25519 digital signature (RFC 8032).
+   - *Data / Payload Objek*: Byte payload biner kontainer `.nx` (header + chunk data terenkripsi).
+   - *Tujuan Objek*: Memvalidasi keabsahan struktur packaging kontainer individual `.nx` oleh Creator.
+   - *Pihak Pembuat*: Container Creator / Packaging Engine (`internal/container/container.go`).
+   - *Pihak Pemverifikasi*: Container Unpack engine (`container.go#L110-L160`) / NX Player (Tahap 7 JIT).
+   - *Relasi dengan Objek Lain*: Menandatangani kontainer `.nx` individual; independen dari Album Signer Signature dan arsip ZIP pembungkus.
+   - *Referensi Sumber*: `internal/container/container.go`; `sdk/typescript/src/container.ts`; NC-06 / AC-04.
+
+3. **Objek 3 — Genesis Certificate Signature (Ed25519)**
+   - *Nama Field / Properti*: `issuer_signature` / `signature` pada sertifikat genesis (`sdk/typescript/src/sdk.ts#L205-L235`).
+   - *Jenis Objek*: Ed25519 digital signature (RFC 8032).
+   - *Data / Payload Objek*: Payload representasi kanonikal sertifikat genesis (lapisan 1 & lapisan 2).
+   - *Tujuan Objek*: Membuktikan kepemilikan dan rantai asal-usul trek audio genesis oleh pencipta asli.
+   - *Pihak Pembuat*: Genesis Creator / Issuer Authority (`sdk.ts`).
+   - *Pihak Pemverifikasi*: SDK Nexa (`sdk.ts#L227`) / NX Player (Tahap 7 JIT).
+   - *Relasi dengan Objek Lain*: Terikat pada `underlying_cert_id` dan digest bitstream audio. Relasi kesamaan identitas 3 kunci ($ownCertPubKey \equiv containerSigKey \equiv genesisPubKey$) secara eksplisit berstatus `UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED` (AUDIT-NEW-10).
+   - *Referensi Sumber*: `sdk/typescript/src/sdk.ts#L205-L235`; NC-05 / AC-10.
+
+4. **Objek 4 — Audio Track Binary Payload Hash (SHA-256)**
+   - *Nama Field / Properti*: `sha256` pada array `tracks[]` manifest (`tracks[].sha256` pada §5.1) dan `underlying_cert_id` pada Genesis Certificate (`sdk.ts#L210`).
+   - *Jenis Objek*: SHA-256 cryptographic digest (32 bytes / 64 hex characters).
+   - *Data / Payload Objek*: Bitstream audio mentah biner di dalam kontainer individual `.nx`.
+   - *Tujuan Objek*: Menjamin integritas bitstream audio mentah agar tidak mengalami modifikasi atau kerusakan.
+   - *Pihak Pembuat*: Audio encoder / packaging pipeline.
+   - *Pihak Pemverifikasi*: NX Player (Tahap 8 JIT) dan NX Verify.
+   - *Relasi dengan Objek Lain*: Dicocokkan dengan `tracks[].sha256` pada manifest dan `underlying_cert_id` pada Genesis Certificate (`ERR_CONTAINER_HASH_MISMATCH` jika tidak cocok).
+   - *Referensi Sumber*: `sdk.ts#L210`; §5.1 Skema Manifest; NC-05 / NC-09 / AC-09.
+
+5. **Objek 5 — Canonical Album Manifest Hash (SHA-256)**
+   - *Nama Field / Properti*: `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT` (tidak ada konstanta nama field tersendiri dalam kontrak; merupakan digest internal sebelum penandatanganan Ed25519).
+   - *Jenis Objek*: SHA-256 hash.
+   - *Data / Payload Objek*: Byte stream hasil serialisasi kanonikal RFC 8785 JCS atas manifest JSON (status exclusion signature: `UNRESOLVED / REQUIRES CLARIFICATION (B-08)`).
+   - *Tujuan Objek*: Digest payload perantara untuk operasi penandatanganan dan verifikasi Ed25519 Album Signer.
+   - *Pihak Pembuat*: Crypto Engine / Album Signer Tool.
+   - *Pihak Pemverifikasi*: Crypto Engine / NX Player (Tahap 4 JIT).
+   - *Relasi dengan Objek Lain*: Merupakan input hash bagi Album Signer Signature (Objek 1).
+   - *Referensi Sumber*: RFC 8785 JCS; RFC 8032; B-08; NC-02.
+
+6. **Objek 6 — Container Packaging Hash (SHA-256)**
+   - *Nama Field / Properti*: `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT` (digest internal biner paket `.nx`, bukan kolom database tersendiri).
+   - *Jenis Objek*: SHA-256 hash.
+   - *Data / Payload Objek*: Struktur biner packaging kontainer individual `.nx` lengkap.
+   - *Tujuan Objek*: Menjamin integritas struktur packaging kontainer `.nx` sebelum ditandatangani.
+   - *Pihak Pembuat*: Engine packaging (`internal/container/container.go`).
+   - *Pihak Pemverifikasi*: Container parser / `container.go`.
+   - *Relasi dengan Objek Lain*: Merupakan input digest bagi Container Packaging Signature (Objek 2).
+   - *Referensi Sumber*: `internal/container/container.go`; NC-06 / AC-12.
+
+7. **Objek 7 — Genesis Certificate Hash (SHA-256)**
+   - *Nama Field / Properti*: `FIELD IDENTIFIER NOT VERIFIED IN REPOSITORY DDL` (skema DDL aktif tidak mendefinisikan kolom hash sertifikat genesis tersendiri; dihitung dari canonical representation sertifikat).
+   - *Jenis Objek*: SHA-256 hash.
+   - *Data / Payload Objek*: Payload string representasi kanonikal sertifikat genesis.
+   - *Tujuan Objek*: Menghasilkan digest atas payload sertifikat genesis untuk operasi tanda tangan dan verifikasi.
+   - *Pihak Pembuat*: SDK Nexa (`sdk/typescript/src/sdk.ts`).
+   - *Pihak Pemverifikasi*: SDK Nexa (`sdk/typescript/src/sdk.ts`).
+   - *Relasi dengan Objek Lain*: Digunakan untuk memverifikasi integritas Genesis Certificate Signature (Objek 3).
+   - *Referensi Sumber*: `sdk/typescript/src/sdk.ts#L205-L235`; NC-05 / AC-10.
+
+8. **Objek 8 — Distribution ZIP Archive Package Hash (SHA-256)**
+   - *Nama Field / Properti*: `acquired_package_sha256` pada tabel database child acquisition (`marketplace/db/schema.postgres.sql#L63`).
+   - *Jenis Objek*: SHA-256 hash (direpresentasikan sebagai hex string).
+   - *Data / Payload Objek*: Berkas fisik arsip ZIP pembungkus distribusi album secara utuh.
+   - *Tujuan Objek*: Menyimpan hash arsip ZIP paket akuisisi pada pencatatan transaksi marketplace.
+   - *Pihak Pembuat*: Marketplace Packaging / Distribution Service.
+   - *Pihak Pemverifikasi*: Marketplace Server / Transaction Manager.
+   - *Relasi dengan Objek Lain*: Disimpan pada baris database child acquisition; semantik penulisan hash arsip ZIP ke baris child berstatus `BLOCKED BY ARCHITECTURE (B-05)`.
+   - *Referensi Sumber*: `marketplace/db/schema.postgres.sql#L63`; B-05 / NC-09 / AC-16.
 
 > **Aturan Isolasi Kriptografis Mutlak:** Dilarang keras mempertukarkan atau mensubstitusikan nilai hash antar-objek berbeda. Signature manifest TIDAK membuktikan integritas audio payload anggota secara otomatis tanpa verifikasi mandiri atas hash audio dan sertifikat genesis anggota masing-masing.
 
@@ -818,6 +921,27 @@ Tabel berikut merinci taksonomi 20 kode error diskrit tersebut beserta status pr
 | `ERR_REGISTRY_SIGNATURE_INVALID` | Trust Store | Signature respons Registry tidak valid | Fail-closed; tolak respons | AC-18, AC-19 | Proposed Specification (NC-15 / Error Taxonomy Spec) |
 | `ERR_LICENSE_DAEMON_COMMUNICATION` | Marketplace Server | Panggilan HTTP ke Sprint 12 License Daemon gagal | Fail-closed; rollback mutasi DB lokal uncommitted; efek samping daemon eksternal tidak terkompensasi (gap 2PC B-04 / CONF-03) | AC-14 | Proposed Specification (NC-15; dependensi B-04/CONF-03) |
 
+#### Matriks Pemetaan Kondisi ke Kode Error Deterministik 1:1 (AUDIT-NEW-08 — PO MANDATE)
+Untuk memastikan kepatuhan atas mandat AUDIT-NEW-08, setiap kondisi kegagalan spesifik pada AC-02, AC-05, dan AC-13 dipetakan secara deterministik 1:1 ke satu kode error kanonikal tanpa pilihan ganda:
+
+| Kondisi Kegagalan Spesifik | Layer Pemeriksaan | Kode Error Kanonikal | Referensi Normatif | AC Terkait |
+|---|---|---|---|:---:|
+| Arsip ZIP rusak / format truncated / central directory corrupt | ZIP Reader | `ERR_ZIP_INVALID` | PKWARE APPNOTE §4.3; `container.go#L112` | AC-02 |
+| ZIP memuat entri symlink atau special file (FIFO, socket, dev) | ZIP Reader | `ERR_ZIP_INVALID` | Keputusan PO (AUDIT-NEW-06); POSIX.1 | AC-02 |
+| Benturan nama entri ZIP case-insensitive (e.g. `TrackA.nx` vs `tracka.nx`) | ZIP Reader / Extractor | `ERR_ZIP_INVALID` | Keputusan PO (AUDIT-NEW-07); §5.1 Boundary Matrix | AC-02 |
+| Berkas asing di ZIP di luar manifes dan member `.nx` | Packaging Validator | `ERR_ZIP_INVALID` | §5.1 Skema Manifest; §5.2 Tahap 5 | AC-02 |
+| Path traversal saat ekstraksi ZIP (`../`, `..\`, absolute path, leading slashes) | ZIP Extractor | `ERR_ZIP_INVALID` | PKWARE APPNOTE §4.4.17; POSIX.1 | AC-02 |
+| Duplikasi nama file di manifes / benturan case-insensitive pada deklarasi | Manifest Validator | `ERR_MANIFEST_MALFORMED` | §5.1 Skema Manifest; AC-01 | AC-01 |
+| Duplikasi key JSON di manifest (literal atau Unicode escape) | Strict JSON Parser | `ERR_MANIFEST_DUPLICATE_KEY` | RFC 8259; RFC 8785; NC-03 | AC-05 |
+| Ketidakcocokan bijeksi 1:1 deklarasi manifes vs entri ZIP (file manifes hilang di ZIP atau entri ZIP tidak ada di manifes) | Packaging Validator | `ERR_ZIP_ENTRY_MISMATCH` | §5.2 Tahap 5; AC-02, AC-13 | AC-02, AC-13 |
+| Ukuran arsip terkompresi > 500 MB | ZIP Wrapper Extractor | `ERR_ZIP_QUOTA_EXCEEDED` | Usulan B-07; §6.7 | AC-13 |
+| Akumulasi ekstraksi uncompressed > 4 GB desimal ($4 \times 10^9$ bytes) | ZIP Wrapper Extractor | `ERR_ZIP_QUOTA_EXCEEDED` | Usulan B-07; §6.7 | AC-13 |
+| Jumlah entri ZIP > 200 entri | ZIP Wrapper Extractor | `ERR_ZIP_QUOTA_EXCEEDED` | Usulan B-07; §6.7 | AC-13 |
+| Rasio kompresi melampaui batas bomb (ambang rasio usulan B-07) | ZIP Wrapper Extractor | `ERR_ZIP_BOMB_DETECTED` | Usulan B-07; §6.7 | AC-13 |
+| Path traversal saat Safe-Open descriptor filesystem | Filesystem Safe-Open | `ERR_FILESYSTEM_CONTAINMENT_VIOLATION` | POSIX.1-2017 `O_NOFOLLOW`; §6.12 | AC-20 |
+
+> **Prinsip Determinisme Bebas Konflik**: Pemetaan di atas memisahkan secara tegas collision pada entri ZIP (`ERR_ZIP_INVALID`), collision pada deklarasi manifes (`ERR_MANIFEST_MALFORMED`), dan ketidaksesuaian bijeksi antara keduanya (`ERR_ZIP_ENTRY_MISMATCH`). Tidak ada kondisi yang menghasilkan lebih dari satu kode error. Tidak ada kode error baru yang diciptakan di luar 20 taksonomi kanonikal.
+
 > **Catatan Ketidakpastian Taksonomi Error & Kepatuhan Fail-Closed (R-02 / Stop-and-Clarify):**  
 > 1. **Fail-Closed atas Kegagalan Genesis Certificate Signature**: Pada Tahap 5 otorisasi JIT player (§5.1) dan AC-10 (§8), kegagalan verifikasi tanda tangan digital Ed25519 Genesis Certificate diwajibkan secara tegas berperilaku **fail-closed** (`canPlay: false`).  
 > 2. **Status Kode Error Spesifik**: Taksonomi 20 kode error kanonikal di atas tidak memuat konstanta `ERR_GENESIS_SIGNATURE_INVALID`. Pemetaan kode error kanonikal spesifik untuk kegagalan signature genesis berstatus **`UNRESOLVED IN BASELINE TAXONOMY (PENDING ARCHITECTURE DEFINITION)`**.  
@@ -866,11 +990,11 @@ Sesuai Bagian II (DEF-02), evaluasi keterlacakan B-03 dipisahkan secara ketat pe
 |:---:|---|---|---|:---:|---|---|:---:|
 | **REQ-B03-01** | Validasi Nama Berkas Entri ZIP & Case-Insensitive Uniqueness (AUDIT-NEW-07 — PO APPROVED) | PKWARE APPNOTE; §5.1 Skema Manifest | §5.1 Skema Manifest; §6.7 | AC-02 | Pengujian unit nama entri ZIP dengan karakter titik ganda, spasi, karakter kontrol ASCII, serta evaluasi case-folding deterministik (`toLowerASCII`) sesuai Boundary Matrix §5.1 lintas POSIX/Windows/Android. | Ekstraksi ditolak fail-closed dengan `ERR_ZIP_INVALID`. | `PARTIALLY COVERED (PROPOSED SPEC)` |
 | **REQ-B03-02** | Pencegahan ZIP Path Traversal (`../`, `..\\`, absolute path, leading slashes) | PKWARE APPNOTE §4.4.17; POSIX.1 | §6.7 Batas Ekstraksi; §6.12 | AC-02, AC-20 | Pengujian arsip ZIP sintetis dengan entri `../../evil.nx` atau `/tmp/evil.nx`. | ZIP reader menolak penulisan berkas di luar target extraction directory (`ERR_ZIP_INVALID`). | `COVERED` |
-| **REQ-B03-03** | Penolakan Entri Symlink, Hardlink & Special Files (AUDIT-NEW-06 — PO APPROVED) | PKWARE APPNOTE; POSIX.1 | §6.7 Aturan Ekstraksi; §6.12 | AC-02, AC-21 | Pengujian ZIP dengan entri bertipe symbolic link, hardlink, FIFO, socket, atau device files. Dua entri byte identik adalah 2 file independen; tipe ambigu ditolak fail-closed. | Ekstraktor mendeteksi tipe non-regular file dan menolak ekstraksi fail-closed (`ERR_ZIP_INVALID`). | `COVERED` |
+| **REQ-B03-03** | Penolakan Entri Symlink & Special Files, serta Independensi Entri Byte Identik (AUDIT-NEW-06 — PO APPROVED) | PKWARE APPNOTE; POSIX.1 | §6.7 Aturan Ekstraksi; §6.12 | AC-02, AC-21 | Pengujian ZIP dengan entri bertipe symbolic link, FIFO, socket, atau device files. Tidak mengasumsikan tipe hardlink generik universal dalam ZIP; dua entri dengan isi byte identik diuji sebagai 2 file independen; tipe ambigu ditolak fail-closed. | Ekstraktor mendeteksi entri symlink/special file dan menolak ekstraksi fail-closed (`ERR_ZIP_INVALID`). Entri dengan byte identik diekstrak sebagai berkas reguler independen. | `COVERED` |
 | **REQ-B03-04** | Pembatasan Rasio Dekompresi ZIP Bomb (Ambiguitas Rasio Usulan B-07 10:1 vs Referensi Pembanding Eksternal 100:1 yang Belum Diverifikasi per-entri & global) | Usulan Spesifikasi NC-07 (B-07) | §6.7 Rasio Kompresi; §6.15 | AC-13 | Ekstraksi berkas terkompresi tinggi (e.g. 1MB kompresi mengembang > 10MB pada batas 10:1 atau > 100MB pada referensi pembanding 100:1), atau `compressed == 0` saat `uncompressed > 0`. Catatan: nilai 100:1 adalah referensi pembanding eksternal yang belum diverifikasi normatif; PKWARE APPNOTE dan RFC 1951 tidak memuat ambang rasio keamanan tersebut. | Dekompresi stream dibatalkan fail-closed melempar `ERR_ZIP_BOMB_DETECTED`. | `PARTIALLY COVERED (PROPOSED SPEC — AMBIGUITAS RASIO 10:1 vs 100:1 PENDING KEPUTUSAN ARSITEKTUR B-07)` |
 | **REQ-B03-05** | Pembatasan Ukuran Dekompresi: Batas Per-Entri Kontainer ($\le 2\text{ GiB}$) vs Batas Akumulasi Ekstraksi Wrapper ($\le 4\text{ GB desimal}$) | `container.go#L106` (Payload Kontainer $\le 2\text{ GiB}$ / $2 \times 1024^3$ bytes); Usulan Spesifikasi NC-07 / B-07 (Wrapper $\le 4\text{ GB desimal}$ / $4 \times 10^9$ bytes) | §6.7 Batas Ukuran; §8 (AC-13); `container.go#L106` | AC-13 (Validasi Kuota Akumulatif Wrapper $\le 4\text{ GB desimal}$); **CELAH PENGUJIAN AC REGISTER** (Batas payload kontainer individual 2 GiB [$2 \times 1024^3 = 2.147.483.648$ bytes] pada `container.go#L106` belum memiliki AC penguji eksplisit di AC Register; AC-11 dan AC-12 dicabut dari pemetaan ini karena murni menguji ekstraksi mandiri dan pemenuhan invariant packaging PE-01 tanpa cakupan batas 2 GiB) | (a) Pengujian ekstraksi wrapper multi-entri dengan akumulasi byte ekstraksi > 4 GB desimal ($4 \times 10^9$ bytes) diuji via AC-13; (b) Pengujian batas payload kontainer tunggal > 2 GiB ($2 \times 1024^3$ bytes pada `container.go#L106`) diidentifikasi secara terbuka sebagai celah pengujian pada AC Register yang menunggu penetapan kriteria uji formal dari PO/Arsitektur. | (a) Akumulasi byte wrapper > 4 GB desimal membatalkan ekstraksi fail-closed melempar `ERR_ZIP_QUOTA_EXCEEDED`; (b) Pengujian batas payload 2 GiB individual kontainer menunggu penetapan kriteria uji formal dari PO/Arsitektur. | `PARTIALLY COVERED (CELAH PENGUJIAN AC REGISTER UNTUK BATAS PAYLOAD 2 GiB; BATAS WRAPPER 4 GB DESIMAL PROPOSED SPEC B-07)` |
 | **REQ-B03-06** | Pembatasan Jumlah Entri: Panduan UI Manifest ($\le 50$ Track) vs Kuota Entri Arsip Wrapper ($\le 200$ Entri) | WP v5.6 (UI guidance); Usulan Spesifikasi NC-07 / B-07 (Batas 200 Entri) | §5.1 Skema Manifest; §6.7 Batas Entri Wrapper | AC-13 (Pengujian Kuota Wrapper > 200 Entri); **CELAH PENGUJIAN AC REGISTER** (Validasi batas panduan 50 track manifest belum memiliki AC penguji khusus di AC Register; AC-05 dicabut karena murni menguji duplicate keys) | (a) Ekstraksi ZIP dengan total entri central directory > 200 diuji via AC-13; (b) Validasi manifest dengan jumlah track > 50 (atau > 199 skema maxItems) diidentifikasi secara terbuka sebagai celah pengujian yang memerlukan penetapan AC baru oleh PO/Arsitektur. | (a) Wrapper > 200 entri ditolak fail-closed melempar `ERR_ZIP_QUOTA_EXCEEDED`; (b) Penolakan manifest track > 50 menunggu penambahan AC penguji definitif dari PO/Arsitektur. | `PARTIALLY COVERED (CELAH PENGUJIAN UNTUK 50-MEMBER MANIFEST & PROPOSED SPEC B-07 UNTUK 200-ENTRI WRAPPER)` |
-| **REQ-B03-07** | Penegakan Struktur Flat ZIP (Penolakan Entri Direktori) | Usulan Spesifikasi NC-07 (B-07) | §5.1 Skema; §6.7 Flat; §6.15 | AC-02 | Pengujian arsip ZIP yang memuat entri berakhiran `/` atau bertipe direktori. | Ekstraksi ditolak fail-closed dengan `ERR_ZIP_INVALID`. | `PARTIALLY COVERED (PROPOSED SPEC)` |
+| **REQ-B03-07** | Penegakan Keputusan PO atas Entri Direktori & Larangan Subdirektori Member (AUDIT-NEW-06 — PO APPROVED) | Keputusan PO AUDIT-NEW-06; PKWARE APPNOTE; §5.1 Skema | §5.1 Skema; §6.7; §6.15 | AC-02 | Pengujian arsip ZIP yang memuat entri direktori (diterima sesuai keputusan PO) vs manifest dengan deklarasi path bersubdirektori (ditolak via regex manifest). | Entri direktori diterima; manifest dengan path bersubdirektori ditolak fail-closed dengan `ERR_MANIFEST_MALFORMED`. | `COVERED` |
 | **REQ-B03-08** | Filesystem Safe-Open Flag Atomik (`O_RDONLY \| O_NOFOLLOW`) | POSIX.1-2017; `fs_safe.ts` | §6.12 Invariant Safe-Open | AC-20 | Panggilan pembukaan berkas `.nx` pada target symlink di leaf component path. | Kernel mengembalikan `ELOOP`; fungsi melempar `ERR_FILESYSTEM_CONTAINMENT_VIOLATION`. | `COVERED` |
 | **REQ-B03-09** | Verifikasi Post-Open Descriptor (`fstat` vs `lstat` & dev/ino match) | POSIX.1-2017; `fs_safe.ts` | §6.12 Invariant Descriptor | AC-21 | Pengujian pergantian berkas dengan symlink atau modifikasi inode pasca-open. | Pemeriksaan descriptor mendeteksi mismatch, menutup `fd`, fail-closed `canPlay: false`. | `PARTIALLY COVERED (SECURITY RESIDUAL RISK)` |
 
@@ -912,7 +1036,7 @@ Tabel berikut merinci seluruh 27 Acceptance Criteria (AC-01 sampai AC-27) secara
 | ID | Kontrak Dasar | Sumber Otoritatif | Skenario Uji / Kondisi Masukan | Expected Result / Kriteria Keberhasilan | Status Kesiapan Uji | Dependensi Blocker / Governance |
 |:---:|:---:|:---|:---|:---|:---:|:---:|
 | **AC-01** | NC-01 | White Paper v5.6 §Manifest; RFC 8259; AUDIT-NEW-02 | Manifest tanpa properti wajib, memiliki properti tambahan (`additionalProperties: false`), atau gagal validasi Level 1-3 | Manifest ditolak fail-closed dengan error `ERR_MANIFEST_MALFORMED`. Contoh manifest adalah ilustratif dan dummy value tidak membuktikan Level 4. | `[PO DECISION REQUIRED]` | PO / Arsitektur (Kebijakan Unknown Fields & Level Validasi) |
-| **AC-02** | NC-01/07| White Paper v5.6; APPNOTE; AUDIT-NEW-06/07/08 | Format ZIP rusak, entri non-flat/direktori, symlink/hardlink/special entry terdeteksi (AUDIT-NEW-06), regex filename tidak sesuai, atau benturan nama case-insensitive (AUDIT-NEW-07) | Arsip wrapper ditolak fail-closed dengan error deterministik `ERR_ZIP_INVALID`. Jika terjadi ketidakcocokan bijeksi 1:1 manifes $\leftrightarrow$ ZIP, ditolak dengan `ERR_ZIP_ENTRY_MISMATCH` (AUDIT-NEW-08). | `[TEST-PLANNED — EXECUTION BLOCKED BY PROPOSED SPEC]` | B-07 (Batas Kuota ZIP Wrapper Masih Berstatus Usulan) |
+| **AC-02** | NC-01/07 | White Paper v5.6; APPNOTE; AUDIT-NEW-06/07/08 | Validasi arsip ZIP wrapper: menerima regular files dan directories; menolak symlink dan special files (FIFO, socket, dev) fail-closed (`ERR_ZIP_INVALID`); menolak arsip rusak/truncated (`ERR_ZIP_INVALID`); menolak benturan nama case-insensitive pada entri ZIP (`ERR_ZIP_INVALID`); menolak deklarasi manifes dengan nama berkas non-regex atau benturan case-insensitive (`ERR_MANIFEST_MALFORMED`); menolak ketidakcocokan bijeksi 1:1 deklarasi manifes vs entri ZIP (`ERR_ZIP_ENTRY_MISMATCH`). | Arsip wrapper dan deklarasi dievaluasi sesuai pemetaan 1:1 deterministik. Tipe entri non-reguler (symlink, special files) dan arsip rusak ditolak fail-closed dengan `ERR_ZIP_INVALID`. Ketidakcocokan bijeksi 1:1 ditolak dengan `ERR_ZIP_ENTRY_MISMATCH` (AUDIT-NEW-08). | `[TEST-PLANNED — EXECUTION BLOCKED BY PROPOSED SPEC]` | B-07 (Batas Kuota ZIP Wrapper Masih Berstatus Usulan) |
 | **AC-03** | NC-02 | IETF RFC 8032; `crypto.ts` | Signature manifest 128-hex tidak valid atau payload dimodifikasi | Verifikasi tanda tangan manifest gagal (`ERR_MANIFEST_SIGNATURE_INVALID`). | `[BLOCKED BY ARCHITECTURE]` | B-08 (Circular Dependency Manifest Sig) |
 | **AC-04** | NC-06 | IETF RFC 8032; `container.go` | Signature kontainer `.nx` anggota album dimodifikasi | Verifikasi tanda tangan kontainer `.nx` gagal (`ERR_CONTAINER_SIGNATURE_INVALID`). | `[TEST-PLANNED — SPEC READY]` | Baseline Frozen (PE-01) |
 | **AC-05** | NC-03 | WP v5.6 §Parsers; Nexa Policy | Payload manifest memuat duplicate keys literal atau via decoded Unicode escape | Parser menolak payload fail-closed dengan error `ERR_MANIFEST_DUPLICATE_KEY`. | `[TEST-PLANNED — BLOCKED BY B-01]` | B-01 (Strict Parser Engine - Implementation Module Pending) |
@@ -923,7 +1047,7 @@ Tabel berikut merinci seluruh 27 Acceptance Criteria (AC-01 sampai AC-27) secara
 | **AC-10** | NC-05 | White Paper v5.6 §Genesis; `sdk.ts#L205-L255`; AUDIT-NEW-10 | Signature Genesis Certificate invalid / issuer mismatch / evaluasi relasi 3-Way Identity Binding | Verifikasi binding anggota gagal fail-closed (`canPlay: false`, `is_valid: false`, `status: INVALID`). Relasi 3-Way Identity Binding berstatus `UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED` (AUDIT-NEW-10 PO CLARIFY). Representasi kode error diskrit Genesis signature belum ditetapkan di baseline. | `[TEST-PLANNED — BLOCKED BY UNRESOLVED TAXONOMY & 3-WAY BINDING]` | Dependensi NC-05 / B-09 / AUDIT-NEW-10 (Menunggu klarifikasi tertulis resmi PO/Arsitektur) |
 | **AC-11** | NC-06 | White Paper v5.6 §Container | Ekstraksi kontainer audio mandiri dari arsip ZIP | File terekstrak utuh di storage tanpa merusak byte kanonikal container. (Catatan: AC-11 murni menguji ekstraksi mandiri kontainer; batas payload individual 2 GiB [$2 \times 1024^3 = 2.147.483.648$ bytes] pada `container.go#L106` adalah celah pengujian terpisah yang belum memiliki AC khusus). | `[TEST-PLANNED — SPEC READY]` | Tidak ada |
 | **AC-12** | NC-06 | White Paper v5.6 §Container | Pustaka packaging memvalidasi struktur kontainer hasil ekstraksi | Validasi packaging lulus seluruh invariant integritas baseline PE-01. (Catatan: AC-12 murni menguji invariant packaging PE-01; batas payload individual 2 GiB [$2 \times 1024^3 = 2.147.483.648$ bytes] pada `container.go#L106` adalah celah pengujian terpisah yang belum memiliki AC khusus). | `[TEST-PLANNED — SPEC READY]` | Tidak ada |
-| **AC-13** | NC-07 | Proposal B-07 (Acuan Format: APPNOTE; RFC 1951); AUDIT-NEW-08 | Arsip pembungkus ZIP melebihi usulan batas kuota B-07 (ukuran compressed > 500M, uncomp > 4 GB desimal, entri > 200) atau rasio dekompresi melampaui ambang bomb | Ekstraksi dibatalkan fail-closed dengan error deterministik 1:1: kuota ukuran/entri $\rightarrow$ `ERR_ZIP_QUOTA_EXCEEDED`; rasio dekompresi $\rightarrow$ `ERR_ZIP_BOMB_DETECTED`; entri direktori $\rightarrow$ `ERR_ZIP_INVALID` (AUDIT-NEW-08). | `[TEST-PLANNED — EXECUTION BLOCKED BY PROPOSED SPEC]` | B-07 (Batas Kuota ZIP Wrapper Masih Berstatus Usulan) |
+| **AC-13** | NC-07 | Proposal B-07 (Acuan Format: APPNOTE; RFC 1951); AUDIT-NEW-08 | Arsip pembungkus ZIP dievaluasi terhadap kuota batas keamanan dan rasio kompresi | Ekstraksi dibatalkan fail-closed dengan pemetaan deterministik 1:1: kuota ukuran terkompresi > 500M, akumulasi uncompressed > 4 GB desimal, atau entri > 200 $\rightarrow$ `ERR_ZIP_QUOTA_EXCEEDED`; rasio dekompresi melampaui batas bomb $\rightarrow$ `ERR_ZIP_BOMB_DETECTED`; ketidakcocokan bijeksi 1:1 $\rightarrow$ `ERR_ZIP_ENTRY_MISMATCH` (AUDIT-NEW-08). | `[TEST-PLANNED — EXECUTION BLOCKED BY PROPOSED SPEC]` | B-07 (Batas Kuota ZIP Wrapper Masih Berstatus Usulan) |
 | **AC-14** | NC-08 | `schema.postgres.sql#L63`; B-04 | Transaksi multi-item Marketplace gagal di tengah eksekusi sebelum commit | Rollback transaksi lokal membatalkan mutasi tanpa baris parsial yatim di DB lokal. | `[BLOCKED BY ARCHITECTURE]` | B-04 / NC-08 / CONF-03 |
 | **AC-15** | NC-08 | `server.js#L170`; NC-08 | Request settlement pembelian dikirim berulang dengan token identik | Marketplace mengenali replay dan mengembalikan state transaksi lama secara idempoten. | `[BLOCKED BY ARCHITECTURE]` | B-04 / NC-08 / CONF-03 |
 | **AC-16** | NC-09 | `schema.postgres.sql#L63`; B-05; §6.9; AUDIT-NEW-04 | Penyimpanan baris child acquisition dan pemetaan 8 objek kriptografis / hash diskrit | Penyimpanan data child acquisition mematuhi semantik kolom hash database yang sah; 8 objek kriptografi/hash dipetakan 1:1 sesuai rincian §6.9 (AUDIT-NEW-04). | `[BLOCKED BY ARCHITECTURE]` | B-05 / NC-09 (Semantik Hash DB & Pemetaan 8 Objek) |
@@ -984,17 +1108,25 @@ Keputusan resmi mengenai perilaku sistem terhadap signer `UNKNOWN` merupakan kew
 ### 10.3 Keputusan Product Owner yang Telah Disahkan (Mandat AUDIT-NEW — PO APPROVED)
 Bagian ini mendokumentasikan keputusan resmi tertulis yang telah disahkan oleh Product Owner untuk ruang lingkup PE-02:
 1. **Aturan Tipe Entry ZIP & Penolakan Hardlink (AUDIT-NEW-06 — PO APPROVED)**:
-   - Album ZIP hanya menerima entry bertipe *regular file* dan *directory*.
-   - Symlink, special files (FIFO, socket, dev), dan metadata hardlink ditolak fail-closed dengan `ERR_ZIP_INVALID`.
+   - Album ZIP menerima entry bertipe *regular file* dan *directory*.
+   - Symlink dan special files (FIFO, socket, dev) wajib ditolak fail-closed dengan `ERR_ZIP_INVALID`.
+   - Semantik hardlink ZIP tidak didukung; tidak diasumsikan adanya representasi hardlink generik universal dalam ZIP.
    - Dua entry dengan isi byte identik tetap diperlakukan sebagai dua file independen; kesamaan byte/hash dilarang digunakan untuk menyimpulkan hardlink.
    - Entry dengan metadata ambigu ditolak secara fail-closed (`ERR_ZIP_INVALID`).
+   - Penolakan subdirektori bersarang berlaku eksklusif pada path relatif member `.nx` yang dideklarasikan pada manifest (`tracks[].file_name`), bukan pelarangan entri direktori pada arsip ZIP.
 2. **Keunikan Nama Berkas Case-Insensitive Lintas Platform (AUDIT-NEW-07 — PO APPROVED)**:
    - Nama berkas asli tetap dipertahankan persis termasuk kapitalisasi yang diberikan.
    - Pemeriksaan keunikan entry ZIP dan manifest `tracks[].file_name` ditegakkan secara case-insensitive via ASCII case folding deterministik.
-   - Nama yang bertabrakan setelah case-folding (e.g. `TrackA.nx` vs `tracka.nx`) wajib ditolak fail-closed (`ERR_MANIFEST_MALFORMED` / `ERR_ZIP_INVALID`) sesuai Boundary Matrix §5.1.
+   - Nama yang bertabrakan setelah case-folding (e.g. `TrackA.nx` vs `tracka.nx`) wajib ditolak fail-closed (`ERR_MANIFEST_MALFORMED` pada manifest atau `ERR_ZIP_INVALID` pada entri ZIP) sesuai Boundary Matrix §5.1.
    - Berlaku konsisten lintas platform POSIX, Windows, dan Android.
 3. **Hierarki Sumber Otoritas Kanonikal 6-Tingkat (AUDIT-NEW-09 — PO APPROVED)**:
-   - Hierarki kanonis 6-tingkat disahkan pada §1.2 sebagai satu-satunya rujukan otoritas di seluruh dokumen.
+   - Hierarki kanonis 6-tingkat disahkan pada §1.2 sebagai satu-satunya rujukan otoritas di seluruh dokumen:
+     - Level 1: Keputusan eksplisit Product Owner untuk ruang lingkup PE-02.
+     - Level 2: Kontrak produk dan governance Nexa yang telah disetujui atau dibekukan.
+     - Level 3: White Paper dan Roadmap yang telah disetujui (sepanjang dalam ruang lingkupnya).
+     - Level 4: Repository aktual sebagai bukti implementasi, bukan sebagai otoritas untuk mengubah kontrak produk.
+     - Level 5: Standar internasional yang relevan (sepanjang tidak bertentangan).
+     - Level 6: Temuan audit historis, bukti pendukungnya, proposal yang belum disetujui, dan interpretasi teknis.
    - Sumber lebih rendah dilarang mengubah ketentuan sumber lebih tinggi; keputusan PO PE-02 tidak mengubah baseline frozen Sprint 16/PE-01; pertentangan otoritatif wajib ditangani via Stop-and-Clarify.
 
 ### 10.4 Kebutuhan Klarifikasi Terbuka Product Owner / Arsitektur (AUDIT-NEW-10 — PO CLARIFY)
@@ -1055,7 +1187,7 @@ Evaluasi 7 dimensi Preservation Gate disajikan secara objektif dengan membedakan
 - **G-04 (Preservation Gate Synchronization)**: `CONDITIONALLY MET` (Diselaraskan dengan evaluasi konservatif D-01 s.d. D-07 pada §12.1; kesimpulan preservasi berstatus PARTIAL; pengujian runtime fisik berstatus NOT VERIFIED).
 - **G-05 (Readiness Conclusion Cross-Check)**: `CONDITIONALLY MET` (Diselaraskan dengan disposisi kesiapan pada §13.1 dan register otoritatif §8; mengakui celah dan blocker yang masih terbuka; seluruh rekapitulasi AC konsisten 12 Spec Ready + 12 Execution Blocked + 3 PO Decision Required; diakui adanya ambiguitas rasio kompresi B-07 serta celah pengujian AC Register untuk batas payload 2 GiB [REQ-B03-05] dan batas 50 track manifest [REQ-B03-06] pada cakupan B-03).
 - **G-06 (Normative Contract & Acceptance Consistency)**: `CONDITIONALLY MET` (16 NC dan 27 AC terpetakan dua arah; ketergantungan blocker teknis B-01, B-02, B-06, B-08, gap spesifikasi usulan B-07, dan status unresolved 3-Way Identity Binding NC-05 dicatat eksplisit).
-- **G-07 (Governance Lock & Single File Output)**: `CONDITIONALLY MET WITH DISCLOSURE` (Hanya satu berkas rencana kanonikal yang dimodifikasi tanpa artefak duplikat; namun status jumlah revisi aktif dalam batas 3 revisi berstatus `NOT VERIFIED / PENDING PO CLARIFICATION` sesuai §1.4 sehingga kepatuhan batas siklus belum dapat dibuktikan secara penuh).
+- **G-07 (Governance Lock & Single File Output)**: `MET` (Pengecualian prasyarat administratif corrective revision count untuk mandat koreksi AUDIT-NEW-01..10 telah disahkan secara resmi oleh Product Owner melalui PO Governance Override; riwayat revisi historis tidak diubah atau direkayasa; tidak ada klaim REV4 atau cycle baru; satu berkas kanonikal dipertahankan tanpa artefak tambahan; implementasi kode PE-02 tetap NOT AUTHORIZED).
 - **G-08 (Zero Implementation Authorization)**: `MET` (Implementasi kode PE-02 tetap secara sah `NOT AUTHORIZED`).
 - **G-09 (Zero Mutation & Clean Repo State)**: `CONDITIONALLY MET WITH DISCLOSURE` (Nol mutasi kode tracked; keberadaan 2 berkas dokumen untracked di `docs/` dicatat transparan; inspeksi kebersihan repositori dibatasi pada tingkat direktori root dan tidak diklaim sebagai jaminan kebersihan rekursif).
 - **G-10 (Adversarial Plan Audit & Contradiction Filter)**: `NOT PASSED — REQUIRES TARGETED CORRECTIONS / OPEN MATERIAL GAPS ACKNOWLEDGED` (Mengakui secara jujur bahwa kontradiksi material CONF-01 s.d. CONF-03, circular dependency B-08, dan blocker B-04, B-05, B-06, B-07, B-09 belum diselesaikan).
