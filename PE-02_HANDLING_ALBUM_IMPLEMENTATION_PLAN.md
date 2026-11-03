@@ -872,7 +872,7 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
 Dokumen ini menyusun ulang inventarisasi seluruh objek tanda tangan digital Ed25519 dan nilai hash SHA-256 secara ketat berbasis bukti (*evidence-based inventory*). Dokumen **TIDAK LAGI** mempertahankan klaim kaku "delapan objek diskrit (3 Ed25519 + 5 SHA-256)" karena formulasi historis tersebut mencampuradukkan artefak kontrak nyata dengan langkah komputasi internal perancang:
 
 ##### A. Inventarisasi Objek Tanda Tangan Digital Ed25519 Teridentifikasi
-Berdasarkan penelusuran repositori aktual dan kontrak yang tersedia, terdapat **4 objek tanda tangan digital Ed25519** independen dengan konteks verifikasi dan payload masing-masing:
+§6.9 mempertahankan **empat entri inventaris konseptual signature** untuk membedakan peran, konteks, dan identitas konseptual masing-masing objek. Inventaris konseptual ini tidak dengan sendirinya membuktikan bahwa seluruh objek telah ditemukan atau diverifikasi dalam implementasi repositori aktual. Status bukti implementasi setiap entri mengikuti keterangan verifikasi yang dicantumkan pada tabel di bawah ini:
 
 | No | Object Identity | Object Type | Field Identifier | Storage / Source | Payload / Input | Producer | Verifier / Consumer | Relation | Evidence Status |
 |:---:|---|---|---|---|---|---|---|---|:---:|
@@ -895,7 +895,7 @@ Berdasarkan penelusuran repositori aktual dan kontrak yang tersedia, terdapat **
 >      **`NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`**.
 > 3. *Kesimpulan*: Objek 2 dan Objek 4 secara konseptual adalah dua objek tanda tangan digital independen dengan payload, lokasi penyimpanan, kunci penandatangan, dan verifier yang sepenuhnya berbeda. Status bukti implementasi primer kedua objek bagi audit independen adalah `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE` pending ketersediaan akses audit terhadap repositori sumber.
 
-> **Catatan Pemisahan Signature Genesis (AUDIT-NEW-04):** Objek 3 (`issuer_signature`) dan Objek 4 (`creator_signature`) secara tegas **TIDAK DIGABUNG** sebagai satu signature. Keduanya berada pada dua lapisan sertifikat berbeda, ditandatangani oleh dua entitas berbeda (Registry Authority vs Genesis Creator), diverifikasi terhadap dua kunci publik berbeda (`registryPubKey` vs `ownCert.creator_public_key`), dan mengevaluasi dua payload kanonikal yang berbeda.
+> **Catatan Pemisahan Signature Genesis (AUDIT-NEW-04):** Pembedaan Objek 3 (`issuer_signature`) dan Objek 4 (`creator_signature`) secara tegas dipertahankan sebagai **dua entri inventaris konseptual yang berbeda** dan tidak digabung menjadi satu signature. Keduanya mewakili dua peran sertifikat yang berbeda (sertifikat registri vs sertifikat kepemilikan genesis). Uraian mengenai entitas penandatangan (Registry Authority vs Genesis Creator), public key verifikasi (`registryPubKey` vs `ownCert.creator_public_key`), payload kanonikal, dan alur verifikasi merupakan deskripsi implementasi lokal yang dilaporkan Programmer. Karena source primer terkait pada repositori `whisnu/nexa` belum tersedia untuk pemeriksaan independen oleh Auditor, rincian implementasi tersebut berstatus **`NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`**.
 
 ##### B. Inventarisasi Field Hash SHA-256: Usulan Spesifikasi Manifest & Keberadaan Kolom DDL Database
 Dari penelusuran skema database dan spesifikasi manifest, terdapat **2 field hash SHA-256** dengan tingkat pembuktian yang berbeda secara tegas (dokumen ini tidak mengklaim keduanya sebagai kontrak normatif yang telah disahkan):
@@ -922,14 +922,14 @@ Sesuai arahan audit, dokumen ini membedakan secara tegas tiga tingkat fakta sepu
 ##### C. Analisis Entitas Komputasional Internal & Interpretasi Desain (Bukan Objek Tersimpan)
 Tiga entitas SHA-256 yang pada dokumen lama dihitung sebagai "Objek 5, 6, dan 7" diidentifikasi secara transparan sebagai **langkah komputasi internal perancang tanpa representasi field kontrak tersimpan**:
 
-| Entitas Komputasional | Objek Terkait | Field Identifier Kontrak | Fakta Kode & Repositori Aktual | Status Ontologis |
+| Entitas Komputasional | Objek Terkait | Field Identifier Kontrak | Deskripsi Implementasi yang Dilaporkan Programmer — NOT VERIFIED | Status Ontologis |
 |---|---|---|---|:---:|
 | Canonical Manifest Intermediate Hash | Album Manifest | `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT` | Algoritma PureEd25519 (RFC 8032) menandatangani payload kanonikal UTF-8 secara langsung; tidak ada field hash manifes mandiri yang disimpan dalam manifest maupun database. | `UNRESOLVED / DESIGNER COMPUTATIONAL INTERPRETATION` |
 | Container Packaging Intermediate Hash | Kontainer `.nx` | `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT` | Format biner Go (`container.go#L68-L134`) hanya memuat header ukuran, manifest, payload, dan 64-byte trailer signature; tidak ada field hash biner kontainer yang disimpan. | `UNRESOLVED / DESIGNER COMPUTATIONAL INTERPRETATION` |
 | Genesis Certificate Intermediate Hash | Genesis Cert | `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT / DDL` | Verifikasi di `sdk.ts#L219, L255` mengeksekusi `NexaCrypto.verify` langsung atas canonical string UTF-8; tidak ada kolom hash sertifikat genesis di database DDL. | `UNRESOLVED / DESIGNER COMPUTATIONAL INTERPRETATION` |
 
 ##### D. Status Identifier Referensi `underlying_cert_id`
-Berdasarkan verifikasi repositori aktual pada `sdk/typescript/src/sdk.ts#L250-L254`:
+Berdasarkan uraian implementasi lokal yang dilaporkan Programmer pada `sdk/typescript/src/sdk.ts#L250-L254`:
 ```typescript
 const certIdMatches = (!ownCert.underlying_cert_id || ownCert.underlying_cert_id === certID);
 ```
