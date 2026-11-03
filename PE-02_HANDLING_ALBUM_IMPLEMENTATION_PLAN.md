@@ -107,12 +107,12 @@ Tabel berikut merangkum disposisi dan penanganan objektif terhadap sepuluh temua
 
 | ID Audit | Lokasi Terdampak | Temuan / Gap Teknis | Tindakan Koreksi Spesifik | Dasar Otoritatif | Status Penyelesaian | Keterangan / Tindak Lanjut |
 |:---:|---|---|---|---|:---:|---|
-| **AUDIT-NEW-01** | §1.5.1, §5.2, §5.3, §8 | Urutan JIT pada Stage 5 mensyaratkan manifest valid/trusted sebelum bijeksi; narasi §1.5.1 tidak selaras dengan §5.2; batas diagnostik vs playback belum tegas. | Menyelaraskan urutan dependensi JIT 8 tahap di seluruh dokumen (§1.5.1 dan §5.2); menegaskan Tahap 3 hanya membaca manifes kanonikal (bukan ekstraksi member); mendekopling pemeriksaan bijeksi fisik (Tahap 5) dari keputusan trust signer (Tahap 4); memisahkan verifikasi digest audio dari dekripsi payload & buffer registration (Tahap 8); menegaskan pre-verifikasi dilarang memberi izin playback/buffer awal; menegaskan informasi diagnostik fisik tetap tersedia di NX Verify jika signer UNKNOWN/UNTRUSTED tanpa menjadikannya jalur playback alternatif (tidak ada dekripsi/buffer registration diagnostik); batas dekripsi diagnostik dicatat unresolved. | Mandat PO AUDIT-NEW-01; POSIX.1-2017 | `PASS (TARGETED CORRECTION APPLIED)` | Urutan dependensi logis dan fisik konsisten penuh; tidak ada tahap yang mendahului prasyaratnya; pemisahan hasil diagnostik vs otorisasi playback terpasang mutlak bebas backdoor. |
+| **AUDIT-NEW-01** | §1.5.1, §5.2, §5.3, §8 | Urutan JIT pada Stage 8 menggabungkan digest, dekripsi, dan buffer registration; batas diagnostik vs playback belum tegas. | Menyelaraskan urutan dependensi JIT 8 tahap di seluruh dokumen (§1.5.1 dan §5.2); memperbarui diagram dan uraian §5.2 dengan memecah Tahap 8 secara berurutan menjadi 8a Verifikasi Digest SHA-256 Audio mentah, 8b Dekripsi Payload Audio terotorisasi, dan 8c Pendaftaran Buffer Audio ke pipeline pemutar; menegaskan dekripsi 8b memerlukan lisensi aktif Tahap 7 dan dilarang otomatis dari keberhasilan digest; menegaskan 8c eksklusif current member dan dilarang via pre-verifikasi antrean; menegaskan informasi diagnostik fisik tetap tersedia di NX Verify jika signer UNKNOWN/UNTRUSTED tanpa membuka akses dekripsi/buffer (no backdoor playback); kebijakan dekripsi diagnostik dinyatakan UNRESOLVED — DIAGNOSTIC DECRYPTION POLICY NOT ESTABLISHED BY NORMATIVE CONTRACT (PO/Architecture Decision Required). | Mandat PO AUDIT-NEW-01; POSIX.1-2017 | `PASS (TARGETED CORRECTION APPLIED)` | Diagram dan narasi selaras 100%; pemisahan prasyarat 8a, 8b, 8c tegas; isolasi diagnostik vs otorisasi playback mutlak bebas celah. |
 | **AUDIT-NEW-02** | §5.1, §8 (AC-01) | Contoh manifest menggunakan nilai dummy/ilustratif namun diklaim membuktikan seluruh Tier 3 invariants. | Pisahkan tegas 5 layer validasi (JSON syntax, Schema structure, Semantic, Cryptographic, Package/member). Beri label tegas contoh manifest murni struktural, nilai dummy tidak membuktikan kriptografi. | Mandat PO AUDIT-NEW-02; RFC 8259 | `PASS (PRESERVED)` | Tidak ada klaim pemenuhan kriptografis semu dari data dummy; kewajiban verifikasi Tier 3 tetap utuh. |
 | **AUDIT-NEW-03** | §4.4 (E-07), §6.12 | Bukti E-07 hanya memuat `O_NOFOLLOW`, `fstatSync`, dan `isFile()`, namun diklaim membuktikan `lstatSync` dan perbandingan `dev`/`ino`. | Batasi klaim E-07 pada kode riil yang ada; nyatakan verifikasi ganda `lstatSync` dan `dev`/`ino` sebagai celah implementasi kode desktop (`NOT DEMONSTRATED BY E-07 / RESIDUAL GAP`); pertahankan B-06 terblokir. | `fs_safe.ts#L30-L55`; Mandat PO AUDIT-NEW-03 | `PASS (PRESERVED)` | B-06 tetap `OPEN / BLOCKED` pending pengujian unit anomali dan risk acceptance formal PO/Security Architect. |
-| **AUDIT-NEW-04** | §6 (NC-09), §6.9, §8, §9 | Beberapa objek kriptografi/hash masih berupa label deskriptif tanpa field pasti; status ontologis hash internal belum dipisahkan dari kontrak terbukti; klaim underlying_cert_id sebagai audio digest keliru; kontradiksi exclusion JCS manifest vs circular dependency B-08. | Menginventarisasi 8 objek kriptografis diskrit (3 Ed25519 & 5 SHA-256); mengoreksi pemahaman underlying_cert_id (adalah identifier referensi sertifikat induk, bukan audio hash); membuktikan secara faktual bahwa dari 5 hash hanya 2 yang memiliki field kontrak terbukti (tracks[].sha256 dan acquired_package_sha256), sedangkan 3 hash lainnya (manifest hash, container hash, genesis cert hash) berstatus interpretasi komputasional internal perancang (FIELD IDENTIFIER NOT VERIFIED IN CONTRACT); mencatat circular dependency JCS vs eksklusi signature sebagai UNRESOLVED / REQUIRES CLARIFICATION (B-08) tanpa penetapan sepihak. | §6.9; Mandat PO AUDIT-NEW-04; sdk.ts#L250; RFC 8785; RFC 8032 | `PASS (TARGETED CORRECTION APPLIED)` | Inventarisasi faktual dan jujur; tidak ada field fiktif; tidak ada ID yang disalahklasifikasikan sebagai hash; status B-08 tetap terbuka. |
+| **AUDIT-NEW-04** | §6 (NC-09), §6.9, §8, §9 | Klaim delapan objek kriptografi tidak didukung bukti; dua signature genesis digabung tanpa dasar; hash komputasi internal diklaim objek tersimpan; klaim underlying_cert_id sebagai audio digest keliru; JCS circular dependency B-08 terbuka. | Menyusun ulang §6.9 sebagai inventaris berbasis bukti tanpa memaksakan angka delapan: memisahkan 4 signature Ed25519 (manifest signer, container packaging, registry cert, genesis ownership cert); memisahkan 2 hash SHA-256 tersimpan normatif (tracks[].sha256 dan acquired_package_sha256); mengklasifikasikan 3 hash komputasi internal sebagai UNRESOLVED / DESIGNER COMPUTATIONAL INTERPRETATION (FIELD IDENTIFIER NOT VERIFIED IN CONTRACT); mengoreksi underlying_cert_id sebagai certificate identifier reference (bukan audio hash); mempertahankan B-05 dan B-08 unresolved tanpa asumsi normatif sepihak. | §6.9; Mandat PO AUDIT-NEW-04; sdk.ts#L205-L255; container.go; RFC 8785; RFC 8032 | `PASS (TARGETED CORRECTION APPLIED)` | Inventarisasi 100% berbasis bukti faktual; tidak ada klaim angka semu; pemisahan objek aktual vs komputasional transparan; B-05 & B-08 tetap terbuka. |
 | **AUDIT-NEW-05** | §4.4 (E-03), §8 (AC-17), §13 | AC-17 mengklaim ketiadaan mutasi runtime DB aktif, padahal E-03 murni inspeksi statis berkas DDL `schema.postgres.sql`. | Batasi klaim AC-17 murni pada kepatuhan statis berkas skema DDL di repositori; tegaskan status live/runtime database sebagai `NOT VERIFIED — EVIDENCE NOT AVAILABLE`. | `schema.postgres.sql`; Mandat PO AUDIT-NEW-05 | `PASS (PRESERVED)` | Zero-DDL pada berkas statis terbukti 100%; runtime live DB berstatus jujur `NOT VERIFIED`. |
-| **AUDIT-NEW-06** | §5.2, §6.7, §6.15, §7.1 (REQ-B03-03/07), §8 (AC-02), §10.3 | Hardlink diperlakukan seolah-olah tipe entri ZIP generik universal; kontradiksi penolakan entri direktori di Stage 2 dan tabel taksonomi §6.15 vs izin direktori keputusan PO. | Menerapkan keputusan PO AUDIT-NEW-06 di seluruh dokumen termasuk membersihkan baris ERR_ZIP_INVALID pada taksonomi §6.15 dari pelarangan entri direktori dan klaim deteksi hardlink generik: regular files & directories diterima; symlinks & special files (FIFO, socket, dev) ditolak fail-closed ERR_ZIP_INVALID; semantik hardlink tidak didukung; berkas byte identik independen; hapus asumsi pengujian tipe hardlink generik universal di REQ-B03-03; harmonisasi flat archive hanya mengatur path relatif member .nx manifest (regex ^[a-zA-Z0-9_-]+\.nx$), bukan pelarangan entri direktori ZIP. | Keputusan PO: APPROVED (AUDIT-NEW-06) | `PASS (TARGETED CORRECTION APPLIED)` | Aturan tipe entri ZIP selaras 100% dengan keputusan PO di seluruh dokumen tanpa menghidupkan kembali aturan lama di taksonomi; tidak ada klaim deteksi hardlink generik. |
+| **AUDIT-NEW-06** | §5.2, §6.7, §6.15, §7.1 (REQ-B03-03/07), §8 (AC-02), §10.3, §13.1 | Regresi pada §13.1 sebelumnya masih menyebut penolakan entri direktori; klaim deteksi hardlink generik ZIP belum dibersihkan. | Menghilangkan seluruh ketentuan penolakan direktori di §13.1 dan seluruh dokumen; menegaskan keputusan PO: regular files & directory entries diterima; symlinks & special files (FIFO, socket, dev) ditolak fail-closed ERR_ZIP_INVALID; semantik hardlink tidak didukung; berkas byte identik independen; hapus asumsi pengujian tipe hardlink generik universal di REQ-B03-03; harmonisasi flat archive ditegaskan hanya mengatur path relatif member .nx manifest (regex ^[a-zA-Z0-9_-]+\.nx$), bukan pelarangan entri direktori ZIP. | Keputusan PO: APPROVED (AUDIT-NEW-06) | `PASS (TARGETED CORRECTION APPLIED)` | Seluruh dokumen konsisten 100% dengan keputusan PO: direktori diterima; regresi §13.1 tuntas dieliminasi; tidak ada klaim deteksi hardlink generik. |
 | **AUDIT-NEW-07** | §5.1, §6.7, §7.1 (REQ-B03-01), §8 (AC-01..02), §10.3 | Aturan keunikan nama berkas case-sensitive berisiko tabrakan pada filesystem case-insensitive (e.g. `TrackA.nx` vs `tracka.nx`). | Memasukkan aturan PO APPROVED: pertahankan nama asli; periksa keunikan case-insensitive via ASCII case folding; nama bentrok ditolak fail-closed; cantumkan tabel boundary matrix wajib; berlaku lintas platform POSIX/Windows/Android. | Keputusan PO: APPROVED (AUDIT-NEW-07) | `PASS (PRESERVED)` | Boundary matrix terpasang lengkap di §5.1 dan §6.7; penolakan fail-closed deterministik. |
 | **AUDIT-NEW-08** | §5.1, §5.2 (Tahap 5), §6.7, §6.15, §8 (AC-02, AC-13) | Konflik pemetaan antara berkas asing di ZIP (sebelumnya dipetakan ke ERR_ZIP_INVALID) vs entri ekstra di ZIP (dipetakan ke ERR_ZIP_ENTRY_MISMATCH); ambiguitas kode error ganda. | Merekonsiliasi pemetaan secara deterministik bebas kontradiksi: seluruh ketidakcocokan bijeksi 1:1 manifes vs ZIP (baik berkas manifes hilang di ZIP maupun berkas reguler ekstra/asing di dalam ZIP) dipetakan secara eksklusif dan tunggal ke ERR_ZIP_ENTRY_MISMATCH; ERR_ZIP_INVALID dikunci eksklusif untuk kerusakan fisik ZIP, symlink/special file, path traversal, dan benturan nama case-insensitive antar-entri ZIP; sinkronkan §5.1, §5.2 Tahap 5, tabel taksonomi §6.15, matriks deterministik, dan AC-02/AC-13; taksonomi 20 kode ditegaskan berstatus Proposed Specification (NC-15) tanpa penambahan kode error baru. | §6.15; Mandat PO AUDIT-NEW-08 | `PASS (TARGETED CORRECTION APPLIED)` | Setiap kondisi kegagalan spesifik memiliki tepat satu pemetaan error code deterministik di seluruh layer, diagram, narasi, dan pengujian. |
 | **AUDIT-NEW-09** | §1.2, §3.1, §10.3 | Hierarki sumber otoritas pada §1.2 menggabungkan PO dan Arsitektur, menempatkan repository sebagai pengubah kontrak, dan belum memuat urutan keputusan PO yang tepat. | Mengganti hierarki otoritas lama dengan urutan persis 6 tingkat yang telah disahkan PO: Level 1 Keputusan PO PE-02, Level 2 Kontrak Produk & Governance Beku, Level 3 White Paper & Roadmap, Level 4 Repository Aktual sebagai Bukti Implementasi, Level 5 Standar Internasional, Level 6 Temuan Audit / Proposal / Interpretasi di §1.2, §3.1, dan §10.3. | Keputusan PO: APPROVED (AUDIT-NEW-09) | `PASS (TARGETED CORRECTION APPLIED)` | Hierarki otoritas kanonikal 6 tingkat terpasang persis sesuai keputusan PO tanpa interpretasi bercabang. |
@@ -124,7 +124,7 @@ Tabel berikut merinci resolusi teknis dan substantif untuk setiap temuan audit u
 | ID Audit | Ringkasan Temuan Audit | Resolusi Teknis & Substantif pada Plan Kanonikal | Status Dokumen |
 |:---:|:---|:---|:---:|
 | **Temuan 1** | Nomenklatur dan pemetaan tanda tangan berpotensi mencampuradukkan Album Signer vs Container Creator. | Memisahkan tegas 3 tanda tangan: (1) Album Signer Signature (manifest kanonikal, NC-02 $\rightarrow$ AC-03), (2) Container Packaging Signature (kontainer individual `.nx`, NC-06 $\rightarrow$ AC-04), dan (3) Genesis Cert Signature (sertifikat genesis track, NC-05 $\rightarrow$ AC-10). | `CORRECTED` |
-| **Temuan 2** | Urutan tahapan JIT 8-tahap belum merinci seluruh pemeriksaan kriptografis secara eksplisit. | Merinci mapping eksplisit 8 tahap JIT ke AC penguji sesuai dependensi logis dan fisik: Tahap 1 Open Arsip ZIP Wrapper Sumber (AC-02), Tahap 2 Validasi Integritas Fisik & Keamanan Arsip ZIP (AC-02, AC-13), Tahap 3 Pembacaan & Strict JSON Parse Manifes Kanonikal Tunggal `album_manifest.json` — bukan ekstraksi member `.nx` (AC-01, AC-05), Tahap 4 Manifest JCS Canonicalization, Signer Signature & Trust Verification (AC-03, AC-06..08), Tahap 5 Pemeriksaan Bijeksi 1:1 Manifes-ke-ZIP & Case-Insensitive Uniqueness — independen dari signer trust Tahap 4 (AC-02, AC-13), Tahap 6 Ekstraksi Member .nx & Atomic Filesystem Safe-Open Descriptors (AC-20, AC-21), Tahap 7 Validasi Format Kontainer PE-01, Genesis Cert Ownership & Active License (AC-04, AC-10, AC-22), Tahap 8 Verifikasi Digest SHA-256 Audio individual, diikuti Dekripsi Payload & Buffer Registration hanya jika playback diotorisasi (AC-09, AC-22..24). Pre-verifikasi trek berikutnya dilarang memberi otorisasi awal atau mendaftarkan buffer. Memisahkan secara tegas tiga jenis hasil pemeriksaan (integritas fisik arsip, validitas/trust, serta playback authorization) dan melarang dekripsi diagnostik tanpa otorisasi lisensi aktif. | `CORRECTED` |
+| **Temuan 2** | Urutan tahapan JIT 8-tahap belum merinci seluruh pemeriksaan kriptografis secara eksplisit; batas diagnostik vs playback belum tegas. | Merinci mapping eksplisit 8 tahap JIT ke AC penguji sesuai dependensi logis dan fisik: Tahap 1 Open Arsip ZIP Wrapper Sumber (AC-02), Tahap 2 Validasi Integritas Fisik & Keamanan Arsip ZIP (AC-02, AC-13), Tahap 3 Pembacaan & Strict JSON Parse Manifes Kanonikal Tunggal `album_manifest.json` — bukan ekstraksi member `.nx` (AC-01, AC-05), Tahap 4 Manifest JCS Canonicalization, Signer Signature & Trust Verification (AC-03, AC-06..08), Tahap 5 Pemeriksaan Bijeksi 1:1 Manifes-ke-ZIP & Case-Insensitive Uniqueness — independen dari signer trust Tahap 4 (AC-02, AC-13), Tahap 6 Ekstraksi Member .nx & Atomic Filesystem Safe-Open Descriptors (AC-20, AC-21), Tahap 7 Validasi Format Kontainer PE-01, Genesis Cert Ownership & Active License (AC-04, AC-10, AC-22), Tahap 8 dipisahkan berurutan menjadi Tahap 8a Verifikasi Digest SHA-256 Audio mentah, Tahap 8b Dekripsi Payload Audio terotorisasi, dan Tahap 8c Pendaftaran Buffer Audio ke pipeline pemutar (AC-09, AC-22..24). Pre-verifikasi trek berikutnya dilarang memberi otorisasi awal atau mendaftarkan buffer. Kebijakan dekripsi diagnostik dinyatakan `UNRESOLVED — DIAGNOSTIC DECRYPTION POLICY NOT ESTABLISHED BY NORMATIVE CONTRACT` tanpa asumsi sepihak (PO/Architecture Decision Required). | `CORRECTED` |
 | **Temuan 3** | AC-25 mencampuradukkan kebijakan signer `UNKNOWN` dengan hierarki status agregat NX Verify. | AC-07 dikunci eksklusif pada kebijakan signer `UNKNOWN` (dep: B-09 / NC-04 / CONF-01). AC-25 dikunci eksklusif pada hierarki agregat Verify (dep: CONF-02). Dependensi B-09/CONF-01 dicabut dari AC-25. | `CORRECTED` |
 | **Temuan 4** | Kontradiksi status NC-12: menyatakan blocker `NONE` padahal B-06 masih terbuka. | Menyelaraskan status blocker NC-12 menjadi `OPEN / BLOCKED BY B-06`. Membedakan containment, symlink, post-open descriptor, dan concurrent ancestor rename. Fail-closed tidak diartikan menghilangkan race condition di userspace. | `CORRECTED` |
 | **Temuan 5** | Taksonomi error dan status `ERR_ZIP_INVALID` di luar daftar 20 kode (DEFECT-02). | Memetakan skenario kegagalan unpacking kontainer di `internal/container/container.go#L112` ke dalam kode `ERR_ZIP_INVALID` di bawah usulan taksonomi NC-15, dan mengeliminasi kode dugaan `ERR_GENESIS_SIGNATURE_INVALID` yang tidak ada di baseline. Diakui secara tegas bahwa 20 kode error kanonikal berstatus Proposed Specification (NC-15) yang belum dibekukan dalam White Paper v5.6, dan kode diskrit kegagalan tanda tangan Genesis berstatus Unresolved Taxonomy (fail-closed `canPlay: false` pasti). | `CORRECTED (PROPOSED SPEC DISCLOSED)` |
@@ -198,7 +198,7 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 |    Skenario uji terencana, namun eksekusi pengujian terblokir      |   - AC-05 (B-01: Strict JSON Parser Engine)   |
 |    oleh modul implementasi internal yang belum dikoding, usulan    |   - AC-06 (B-02: RFC 8785 JCS Serializer)     |
 |    spesifikasi teknis yang belum dibekukan, taksonomi error        | Sub-Kategori 2b: [BLOCKED BY ARCH / SPEC] (10)|
-|    unresolved, atau blocker arsitektur aktif.                      |   - AC-02 (B-07/NC-07: Usulan Flat ZIP)       |
+|    unresolved, atau blocker arsitektur aktif.                      |   - AC-02 (B-07/NC-07: Validasi Wrapper ZIP Sesuai Keputusan PO Penerimaan Direktori & Format Member Flat)       |
 |                                                                    |   - AC-03 (B-08: Circular Dependency Sig)     |
 |                                                                    |   - AC-10 (NC-05/A-05: Taksonomi Error Gen)   |
 |                                                                    |   - AC-13 (B-07/NC-07: Usulan Kuota ZIP)      |
@@ -604,13 +604,13 @@ Ekosistem Nexa membedakan secara tegas tiga tanda tangan kriptografis independen
 NX Player menerapkan prosedur otorisasi JIT 8-tahap sekuensial yang merinci seluruh urutan operasional, dependensi data prasyarat, pemisahan objek fisik, dan pemeriksaan kriptografis secara teratur sebelum mendaftarkan buffer audio trek ke pipeline pemutaran:
 
 ```
-[Tahap 1: Open Arsip ZIP Wrapper Sumber] 
+[Tahap 1: Open Arsip ZIP Wrapper Sumber]
      │
      ▼
 [Tahap 2: Validasi Fisik & Integritas Arsip ZIP (Independen dari Manifes)]
      │
      ▼
-[Tahap 3: Ekstraksi & Strict JSON Parse Manifes Kanonikal]
+[Tahap 3: Pembacaan & Strict JSON Parse Manifes Kanonikal (Bukan Ekstraksi Member)]
      │
      ▼
 [Tahap 4: Manifest JCS Canonicalization, Signer Signature & Trust Check]
@@ -622,10 +622,17 @@ NX Player menerapkan prosedur otorisasi JIT 8-tahap sekuensial yang merinci selu
 [Tahap 6: Ekstraksi Member .nx & Atomic Filesystem Safe-Open Descriptors]
      │
      ▼
-[Tahap 7: Ekstraksi Format PE-01, Genesis Cert Ownership & Active License]
+[Tahap 7: Validasi Format Kontainer PE-01, Genesis Cert Ownership & Active License]
      │
      ▼
-[Tahap 8: Verifikasi Digest SHA-256 Audio, Dekripsi Payload & Buffer Registration]
+[Tahap 8a: Verifikasi Digest SHA-256 Bitstream Audio Mentah vs tracks[].sha256]
+     │ (Operasi diagnostik independen; dilarang otomatis membuka dekripsi)
+     ▼
+[Tahap 8b: Dekripsi Payload Audio (Hanya Dieksekusi jika Lisensi Aktif Valid)]
+     │ (Dilarang dalam mode diagnostik; diagnostic decryption policy: UNRESOLVED)
+     ▼
+[Tahap 8c: Pendaftaran Audio Buffer ke Output Pipeline Pemutar Audio Desktop]
+     │ (Eksklusif current member aktif; dilarang via background pre-verifikasi)
 ```
 
 #### Pemetaan Rinci Tahapan JIT ke Pemeriksaan Kriptografis, Dependensi & Acceptance Criteria (AUDIT-NEW-01)
@@ -669,14 +676,25 @@ NX Player menerapkan prosedur otorisasi JIT 8-tahap sekuensial yang merinci selu
      - **Status Relasi 3-Way Identity Binding (AUDIT-NEW-10 — PO CLARIFY)**: Relasi kesamaan identitas $ownCertPubKey \equiv containerSigKey \equiv genesisPubKey$ secara eksplisit dinyatakan **`UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED`**. Dokumen tidak mengklaim kesamaan ketiganya sebagai invariant terbukti, dan tidak mengklaim ketiganya wajib berbeda. Pemisahan tiga peran tanda tangan tetap dipertahankan.
      - Verifikasi entitlement / lisensi pemutaran aktif pengguna pada Marketplace / engine lokal (`ERR_PLAYBACK_UNAUTHORIZED`).
    - *AC Penguji*: **AC-04, AC-10, AC-22** (NC-05, NC-06, NC-13).
-8. **Tahap 8 — Verifikasi Digest SHA-256 Audio, Dekripsi Payload & Buffer Registration**:
-   - *Objek Data*: Bitstream payload audio mentah di dalam kontainer `.nx` trek aktif.
-   - *Pemeriksaan & Pemisahan Operasional*:
-     1. *Verifikasi Digest SHA-256 Audio*: Menghitung digest SHA-256 atas bitstream audio mentah biner kontainer `.nx` dan mencocokkannya secara eksak dengan deklarasi `tracks[].sha256` pada manifes album. Jika tidak cocok, proses dibatalkan fail-closed dengan melempar **`ERR_CONTAINER_HASH_MISMATCH`**. (Catatan normatif: properti `underlying_cert_id` pada Genesis Certificate adalah identifier sertifikat induk, bukan digest audio).
-     2. *Dekripsi Payload Audio & Buffer Registration*: Setelah digest SHA-256 terbukti cocok dan otorisasi pemutaran aktif pengguna terverifikasi sah pada Tahap 7, sistem mendekripsi payload audio terenkripsi dan mendaftarkan buffer audio ke pipeline pemutar audio desktop.
-     3. *Pemisahan Diagnostik vs Playback*: Jika evaluasi dilakukan dalam konteks diagnostik (NX Verify) atau ketika signer berstatus `UNKNOWN`/`UNTRUSTED` atau lisensi belum aktif, sistem HANYA memverifikasi digest SHA-256 audio mentah; sistem **DILARANG KERAS** mendekripsi payload audio atau mendaftarkan buffer ke pipeline pemutar audio.
-     4. *Batas Dekripsi Diagnostik*: Kontrak normatif Nexa belum mendefinisikan batasan apakah dekripsi parsial audio diizinkan dalam mode diagnostik tanpa lisensi aktif; hal ini dicatat secara eksplisit sebagai **`UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED`** (menunggu keputusan resmi Product Owner / Architecture Board). Tidak ada jalur diagnostik yang boleh menjadi jalur pemutaran audio alternatif (*no backdoor playback*).
-   - *AC Penguji*: **AC-09, AC-22, AC-23, AC-24** (NC-05, NC-13).
+8. **Tahap 8 — Verifikasi Digest SHA-256 Audio, Dekripsi Terotorisasi, dan Pendaftaran Buffer (AUDIT-NEW-01)**:
+   - **8a. Verifikasi Digest SHA-256 Audio (Audio Digest Verification)**:
+     - *Objek Data*: Payload biner bitstream audio mentah terenkripsi di dalam kontainer `.nx` trek aktif.
+     - *Prasyarat Pembacaan*: Deskriptor berkas aman yang dibuka atomik dari Tahap 6 dan integritas kemasan kontainer PE-01 dari Tahap 7.
+     - *Pemeriksaan*: Menghitung digest SHA-256 atas bitstream audio mentah biner kontainer `.nx` dan mencocokkannya secara eksak dengan deklarasi `tracks[].sha256` pada manifes album. Jika tidak cocok, proses dibatalkan fail-closed dengan melempar **`ERR_CONTAINER_HASH_MISMATCH`**.
+     - *Pemisahan Diagnostik (NX Verify)*: Pemeriksaan digest ini adalah pemeriksaan integritas fisik independen yang dapat dieksekusi dalam konteks diagnostik NX Verify tanpa memerlukan otorisasi pemutaran (*playback authorization*). Hasil digest yang valid pada mode diagnostik **TIDAK PERNAH** dianggap sebagai otorisasi pemutaran.
+   - **8b. Dekripsi Payload Audio (Decryption)**:
+     - *Prasyarat Mutlak*: Keberhasilan verifikasi digest 8a DAN status otorisasi pemutaran aktif pengguna terverifikasi sah pada Tahap 7 (*active entitlement / valid user license*).
+     - *Larangan Dekripsi Otomatis*: Dekripsi payload audio **TIDAK BOLEH** dianggap otomatis sebagai kelanjutan dari keberhasilan digest. Dekripsi **DILARANG KERAS** dilakukan hanya karena berkas berhasil diekstrak, Safe-Open berhasil, manifes valid, atau digest cocok.
+     - *Larangan Dekripsi Non-Otorisasi*: Dekripsi payload dilarang keras dalam kondisi diagnostic-only, signer `UNKNOWN`, `UNTRUSTED`, atau tanpa active license yang sah.
+     - *Kebijakan Dekripsi Diagnostik*: Dokumen secara tegas menetapkan:
+       **`UNRESOLVED — DIAGNOSTIC DECRYPTION POLICY NOT ESTABLISHED BY NORMATIVE CONTRACT`**
+       (Menunggu keputusan resmi Product Owner atau Architecture Authority). Tidak ada izin dekripsi otomatis untuk kebutuhan diagnostik dan tidak ada pintu belakang pemutaran (*no backdoor playback*).
+   - **8c. Pendaftaran Buffer Audio (Buffer Registration)**:
+     - *Operasi*: Pendaftaran buffer audio yang telah didekripsi ke dalam audio output pipeline pemutar audio desktop.
+     - *Prasyarat*: Seluruh prasyarat Tahap 1 s.d. 8b terpenuhi lengkap, dan trek merupakan trek yang sedang aktif diputar oleh pengguna (*current member*).
+     - *Larangan Keras Pre-Verifikasi*: Background pre-verification terhadap anggota album berikutnya dalam antrean **DILARANG KERAS** memicu buffer registration atau menghasilkan otorisasi implisit untuk anggota album yang belum menjadi *current member*.
+   - *Error Code*: `ERR_CONTAINER_HASH_MISMATCH` (pada 8a), `ERR_PLAYBACK_UNAUTHORIZED` (pada 8b).
+   - *AC Penguji*: **AC-09** (8a), **AC-22, AC-23, AC-24** (8b, 8c).
 
 > **Hubungan Kriptografis, Tiga Jenis Hasil Pemeriksaan & Pemisahan Diagnostik Verify vs Otorisasi Playback (AUDIT-NEW-01, Temuan 2, Temuan 9):**
 > Dokumen secara tegas membedakan tiga jenis hasil pemeriksaan independen:
@@ -720,7 +738,7 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
 | **NC-06** | Ekstraksi & Packaging Kontainer Audio Mandiri dalam Arsip Album | `SPECIFIED` | `NOT IMPLEMENTED` | `NONE` | Memuat verifikasi container signature `.nx` (AC-04); format kontainer PE-01 beku (AC-11, AC-12). |
 | **NC-07** | Batas Keamanan Ekstraksi Arsip ZIP Wrapper | `SPECIFIED` | `NOT IMPLEMENTED` | `PROPOSED SPEC` | Kuota 500M/4G desimal/200 flat tanpa direktori; usulan rasio kompresi B-07 (ambiguitas 10:1 vs 100:1 referensi pembanding eksternal yang belum diverifikasi pending arsitektur) per-entri & global (AC-13, B-07). |
 | **NC-08** | Marketplace Transaction Settlement & Replay Protection | `SPECIFIED` | `NOT IMPLEMENTED` | `BLOCKED` | Advisory lock hanya lokal PostgreSQL; ketiadaan 2PC ke daemon adalah B-04 (AC-14, AC-15). |
-| **NC-09** | Pemetaan Delapan Objek Kriptografis / Hash Diskrit (AUDIT-NEW-04) | `SPECIFIED` | `NOT IMPLEMENTED` | `BLOCKED` | Rincian 8 objek diskrit (3 signature Ed25519 & 5 hash SHA-256) di §6.9; semantik kolom `acquired_package_sha256` untuk child row adalah blocker B-05 (AC-16). |
+| **NC-09** | Inventarisasi Objek Kriptografis & Hash Berbasis Bukti Faktual (AUDIT-NEW-04) | `SPECIFIED` | `NOT IMPLEMENTED` | `BLOCKED` | Inventarisasi berbasis bukti atas signature Ed25519 dan hash SHA-256 faktual di §6.9; pemisahan objek terverifikasi dari entitas komputasional internal; semantik kolom `acquired_package_sha256` adalah blocker B-05 (AC-16). |
 | **NC-10** | Kepatuhan Mutlak Skema Zero-DDL Marketplace | `SPECIFIED` | `NOT IMPLEMENTED` | `NONE` | Skema PostgreSQL aktif dipatuhi; dapat diuji independen dari model B-04 (AC-17). |
 | **NC-11** | Mekanisme Offline Fallback Registry Terkendali | `SPECIFIED` | `NOT IMPLEMENTED` | `NONE` | Fallback HANYA untuk transport network error; HTTP 5xx/bad sig fail-closed (AC-18, AC-19). |
 | **NC-12** | Filesystem Safe-Open Berbasis Invariant Keamanan (AUDIT-NEW-03) | `SPECIFIED` | `NOT IMPLEMENTED` | `OPEN / BLOCKED BY B-06` | Pembukaan descriptor atomik `O_NOFOLLOW` + `fstatSync` terbukti oleh E-07; verifikasi ganda `lstatSync` dan `dev`/`ino` berstatus gap residu kode desktop; batas userspace POSIX diakui; fail-closed `canPlay: false` (AC-20, AC-21). |
@@ -786,91 +804,52 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
   3. *Kendala Zero-DDL*: Skema database PostgreSQL beku (`schema.postgres.sql`) melarang penambahan kolom foreign key baru atau tabel outbox terdistribusi.
 - **Status Arsitektur**: Selama gap ketiadaan 2PC dan batasan Zero-DDL belum diselesaikan oleh otoritas arsitektur, NC-08 berstatus **`BLOCKED`** di bawah blocker B-04 / CONF-03.
 
-#### 6.9 Rincian NC-09: Pemetaan Delapan Objek Kriptografis / Hash Diskrit & Evaluasi Keberadaan Kontrak (Temuan 1, Temuan 8, AUDIT-NEW-04)
-Dokumen ini menyusun inventaris faktual delapan objek kriptografis diskrit (3 tanda tangan digital Ed25519 dan 5 nilai hash SHA-256) berdasarkan kontrak normatif dan repositori aktual, memisahkan secara tegas objek yang benar-benar memiliki field kontrak dari interpretasi komputasional perancang:
+#### 6.9 Rincian NC-09: Inventarisasi Objek Kriptografis & Hash Berbasis Bukti Faktual (Temuan 1, Temuan 8, AUDIT-NEW-04)
+Dokumen ini menyusun ulang inventarisasi seluruh objek tanda tangan digital Ed25519 dan nilai hash SHA-256 secara ketat berbasis bukti (*evidence-based inventory*). Dokumen **TIDAK LAGI** mempertahankan klaim kaku "delapan objek diskrit (3 Ed25519 + 5 SHA-256)" karena formulasi historis tersebut mencampuradukkan artefak kontrak nyata dengan langkah komputasi internal perancang:
 
-1. **Objek 1 — Album Signer Signature (Ed25519)**
-   - *Nama Field / Properti*: `album_signer_signature` (didefinisikan pada proposal skema manifest §5.1).
-   - *Jenis Objek*: Ed25519 digital signature (RFC 8032).
-   - *Data / Payload Objek*: Byte kanonikal UTF-8 payload manifest `album_manifest.json`.
-   - *Status Hubungan JCS*: `UNRESOLVED / REQUIRES CLARIFICATION (B-08)` — Terdapat proposal teknis yang mengusulkan field `album_signer_signature` dikecualikan dari serialisasi RFC 8785 JCS, namun kontrak normatif B-08 mencatat adanya dependensi sirkular (*circular dependency*) jika signature disertakan di dalam payload yang dikanonisasi. Dokumen ini **TIDAK** menetapkan exclusion tersebut sebagai kontrak final yang sah, dan **TIDAK** mengabaikan circular dependency B-08 secara sepihak. Status exclusion tetap berstatus usulan spesifikasi yang memerlukan keputusan formal tertulis dari Product Owner / Architecture Board.
-   - *Tujuan Objek*: Membuktikan integritas deklarasi metadata manifest album dan mengautentikasi Album Signer.
-   - *Pihak Pembuat*: Album Signer / Publisher.
-   - *Pihak Pemverifikasi*: NX Player (Tahap 4 JIT) dan NX Verify.
-   - *Relasi dengan Objek Lain*: Mengautentikasi daftar trek dan deklarasi hash audio; tidak memvalidasi bitstream audio secara langsung tanpa verifikasi digest individual masing-masing trek.
-   - *Referensi Sumber*: §5.1 Skema Manifest; White Paper v5.6; RFC 8785; RFC 8032; B-08 / NC-02.
+##### A. Inventarisasi Objek Tanda Tangan Digital Ed25519 Teridentifikasi
+Berdasarkan penelusuran repositori aktual dan kontrak yang tersedia, terdapat **4 objek tanda tangan digital Ed25519** independen dengan konteks verifikasi dan payload masing-masing:
 
-2. **Objek 2 — Container Packaging Signature (Ed25519)**
-   - *Nama Field / Properti*: `signature` pada trailer biner Go (`internal/container/container.go#L60-L80`) / `creator_signature` pada definisi SDK (`sdk/typescript/src/container.ts#L45`).
-   - *Jenis Objek*: Ed25519 digital signature (RFC 8032, 64 bytes).
-   - *Data / Payload Objek*: Byte payload biner kontainer `.nx` (header + chunk data terenkripsi).
-   - *Tujuan Objek*: Memvalidasi keabsahan struktur packaging kontainer individual `.nx` oleh Creator.
-   - *Pihak Pembuat*: Container Creator / Packaging Engine (`internal/container/container.go`).
-   - *Pihak Pemverifikasi*: Container Unpack engine (`container.go#L110-L160`) / NX Player (Tahap 7 JIT).
-   - *Relasi dengan Objek Lain*: Menandatangani kontainer `.nx` individual; independen dari Album Signer Signature dan arsip ZIP pembungkus.
-   - *Referensi Sumber*: `internal/container/container.go`; `sdk/typescript/src/container.ts`; NC-06 / AC-04.
+| No | Object Identity | Object Type | Field Identifier | Storage / Source | Payload / Input | Producer | Verifier / Consumer | Relation | Evidence Status |
+|:---:|---|---|---|---|---|---|---|---|:---:|
+| 1 | Album Manifest Signer Signature | Ed25519 Digital Signature | `album_signer_signature` | `album_manifest.json` (§5.1) | Byte kanonikal UTF-8 representasi RFC 8785 JCS manifest album (status eksklusi signature: unresolved B-08) | Album Signer / Publisher | NX Player (Tahap 4 JIT), NX Verify | Mengautentikasi deklarasi metadata album, daftar trek, dan digest audio | `PROPOSED SPECIFICATION` (B-08 unresolved) |
+| 2 | PE-01 Container Packaging Signature | Ed25519 Digital Signature (64 bytes) | `signature` (Go trailer) / `creator_signature` (SDK) | Trailer biner kontainer individual `.nx` (`container.go#L60-L80, L128-L132`) | Byte payload biner kontainer `.nx` (header + chunk data terenkripsi) | Container Creator / Packaging Engine (`container.go`) | Container Unpack Go (`container.go#L110-L160`), NX Player (Tahap 7 JIT) | Mengautentikasi keabsahan struktur kemasan kontainer PE-01 individual | `REPOSITORY-VERIFIED` (PE-01 baseline beku) |
+| 3 | Registry Authority Certificate Signature (Lapisan 1 Genesis) | Ed25519 Digital Signature (64 bytes hex) | `issuer_signature` | Objek Registry Certificate `regCert` (`sdk.ts#L207-L226`) | Canonical string UTF-8 6-field (atau fallback 5-field) via `NexaRegistry.canonicalJcs` | Registry Authority | SDK Nexa (`sdk.ts#L219, L225`), NX Player (Tahap 7 JIT) via `registryPubKey` | Membuktikan keabsahan sertifikat registri dan status aktif trek | `REPOSITORY-VERIFIED` (SDK code aktif) |
+| 4 | Genesis Ownership Certificate Signature (Lapisan 2 Genesis) | Ed25519 Digital Signature (64 bytes hex) | `creator_signature` | Objek embedded ownership certificate `ownCert` (`sdk.ts#L234-L255`) | Canonical JSON string 8-field via `JSON.stringify` | Genesis Creator (kunci privat pembuat asli) | SDK Nexa (`sdk.ts#L255`), NX Player (Tahap 7 JIT) via `creator_public_key` | Membuktikan klaim kepemilikan pencipta asli; relasi 3-way binding unresolved | `REPOSITORY-VERIFIED` (SDK code aktif) |
 
-3. **Objek 3 — Genesis Certificate Signature (Ed25519)**
-   - *Nama Field / Properti*: `issuer_signature` pada registry certificate / `creator_signature` pada embedded ownership certificate (`sdk/typescript/src/sdk.ts#L205-L255`).
-   - *Jenis Objek*: Ed25519 digital signature (RFC 8032).
-   - *Data / Payload Objek*: Payload string representasi kanonikal sertifikat genesis (lapisan 1 JCS 6-field/5-field & lapisan 2 string 8-field).
-   - *Tujuan Objek*: Membuktikan kepemilikan dan rantai asal-usul trek audio genesis oleh pencipta asli.
-   - *Pihak Pembuat*: Genesis Creator / Issuer Authority (`sdk.ts`).
-   - *Pihak Pemverifikasi*: SDK Nexa (`sdk.ts#L219, L255`) / NX Player (Tahap 7 JIT).
-   - *Relasi dengan Objek Lain*: Memvalidasi identitas penerbit sertifikat. Relasi kesamaan identitas 3 kunci ($ownCertPubKey \equiv containerSigKey \equiv genesisPubKey$) secara eksplisit berstatus `UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED` (AUDIT-NEW-10).
-   - *Referensi Sumber*: `sdk/typescript/src/sdk.ts#L205-L255`; NC-05 / AC-10.
+> **Catatan Pemisahan Signature Genesis (AUDIT-NEW-04):** Objek 3 (`issuer_signature`) dan Objek 4 (`creator_signature`) secara tegas **TIDAK DIGABUNG** sebagai satu signature. Keduanya berada pada dua lapisan sertifikat berbeda, ditandatangani oleh dua entitas berbeda (Registry Authority vs Genesis Creator), diverifikasi terhadap dua kunci publik berbeda (`registryPubKey` vs `ownCert.creator_public_key`), dan mengevaluasi dua payload kanonikal yang berbeda.
 
-4. **Objek 4 — Audio Track Binary Payload Hash (SHA-256)**
-   - *Nama Field / Properti*: `sha256` pada array `tracks[]` manifest (`tracks[].sha256` pada §5.1).
-   - *Catatan Otoritatif atas `underlying_cert_id`*: Berdasarkan verifikasi repositori aktual pada `sdk/typescript/src/sdk.ts#L250-L254`, properti `underlying_cert_id` pada Genesis Ownership Certificate adalah string referensi identifier sertifikat registri induk (`certID`), **BUKAN** merupakan digest SHA-256 bitstream audio. Dokumen tidak mengklaim `underlying_cert_id` sebagai audio hash digest.
-   - *Jenis Objek*: SHA-256 cryptographic digest (32 bytes / 64 hex characters).
-   - *Data / Payload Objek*: Bitstream audio mentah biner di dalam kontainer individual `.nx`.
-   - *Tujuan Objek*: Menjamin integritas bitstream audio mentah agar tidak mengalami modifikasi, kerusakan, atau substitusi.
-   - *Pihak Pembuat*: Audio encoder / packaging pipeline.
-   - *Pihak Pemverifikasi*: NX Player (Tahap 8 JIT) dan NX Verify.
-   - *Relasi dengan Objek Lain*: Dicocokkan dengan deklarasi `tracks[].sha256` pada manifest (`ERR_CONTAINER_HASH_MISMATCH` jika tidak cocok).
-   - *Referensi Sumber*: §5.1 Skema Manifest; `sdk/typescript/src/sdk.ts#L250-L254`; NC-05 / NC-09 / AC-09.
+##### B. Inventarisasi Objek Hash SHA-256 Tersimpan / Terdefinisi Normatif
+Dari penelusuran skema database dan spesifikasi manifest, hanya terdapat **2 objek hash SHA-256** yang memiliki representasi field data normatif terverifikasi:
 
-5. **Objek 5 — Canonical Album Manifest Hash (SHA-256)**
-   - *Nama Field / Properti*: `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT` (tidak ada field hash manifes mandiri yang disimpan dalam kontrak JSON manifest maupun DDL).
-   - *Status Ontologis & Bukti Kontrak*: `UNRESOLVED / DESIGNER INTERPRETATION — NOT A SEPARATE STORED CONTRACT OBJECT`. PureEd25519 (RFC 8032) menandatangani payload kanonikal UTF-8 secara langsung; penghitungan SHA-256 terpisah atas byte JCS manifest merupakan langkah komputasi internal atau interpretasi perancang, bukan artefak data independen yang disimpan.
-   - *Data / Payload Objek*: Byte stream hasil serialisasi RFC 8785 JCS atas manifest JSON (status eksklusi signature: `UNRESOLVED / REQUIRES CLARIFICATION (B-08)`).
-   - *Tujuan Objek*: Digest perantara komputasional jika verifikasi tanda tangan menggunakan skema hash-then-sign.
-   - *Pihak Pembuat / Pemverifikasi*: Crypto Engine internal.
-   - *Referensi Sumber*: RFC 8785; RFC 8032; B-08; NC-02.
+| No | Object Identity | Object Type | Field Identifier | Storage / Source | Payload / Input | Producer | Verifier / Consumer | Relation | Evidence Status |
+|:---:|---|---|---|---|---|---|---|---|:---:|
+| 1 | Audio Track Binary Payload Hash | SHA-256 Cryptographic Digest (32 bytes / 64 hex) | `tracks[].sha256` | `album_manifest.json` (§5.1) | Bitstream audio mentah biner di dalam kontainer `.nx` | Audio encoding pipeline | NX Player (Tahap 8a JIT), NX Verify | Menjamin integritas bitstream audio mentah; gagal cocok melempar `ERR_CONTAINER_HASH_MISMATCH` | `PROPOSED SPECIFICATION` (Skema Manifest) |
+| 2 | Album Distribution ZIP Package Hash | SHA-256 Cryptographic Digest (hex string) | `acquired_package_sha256` | Database PostgreSQL tabel `acquisitions` (`schema.postgres.sql#L63`) | Berkas fisik arsip ZIP pembungkus distribusi album secara utuh | Marketplace Distribution Service | Marketplace Server / Transaction Manager | Kolom audit transaksi akuisisi paket album; semantik penulisan baris child diblokir B-05 | `REPOSITORY-VERIFIED` (DDL skema terbukti, semantik diblokir B-05) |
 
-6. **Objek 6 — Container Packaging Hash (SHA-256)**
-   - *Nama Field / Properti*: `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT` (tidak ada field hash kontainer tersendiri pada spesifikasi biner `internal/container/container.go`).
-   - *Status Ontologis & Bukti Kontrak*: `UNRESOLVED / DESIGNER INTERPRETATION — NOT A SEPARATE STORED CONTRACT OBJECT`. Format kontainer biner Go (`container.go#L68-L134`) hanya memuat header ukuran, biner manifest, biner payload, dan 64-byte Ed25519 signature trailer. Tidak ada field hash SHA-256 yang disimpan atau didefinisikan secara mandiri dalam format kontainer PE-01.
-   - *Data / Payload Objek*: Byte stream biner packaging kontainer `.nx`.
-   - *Tujuan Objek*: Digest perantara komputasional jika verifikasi kontainer menggunakan skema hash-then-sign.
-   - *Pihak Pembuat / Pemverifikasi*: Packaging engine internal / Container parser.
-   - *Referensi Sumber*: `internal/container/container.go#L68-L134`; NC-06 / AC-12.
+##### C. Analisis Entitas Komputasional Internal & Interpretasi Desain (Bukan Objek Tersimpan)
+Tiga entitas SHA-256 yang pada dokumen lama dihitung sebagai "Objek 5, 6, dan 7" diidentifikasi secara transparan sebagai **langkah komputasi internal perancang tanpa representasi field kontrak tersimpan**:
 
-7. **Objek 7 — Genesis Certificate Hash (SHA-256)**
-   - *Nama Field / Properti*: `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT / REPOSITORY DDL`.
-   - *Status Ontologis & Bukti Kontrak*: `UNRESOLVED / DESIGNER INTERPRETATION — NOT A SEPARATE STORED CONTRACT OBJECT`. Verifikasi Genesis Certificate pada `sdk/typescript/src/sdk.ts#L219` dan `#L255` mengeksekusi `NexaCrypto.verify` langsung atas UTF-8 canonical string (`canonStr` / `canonGenesisStr`). Tidak ada field hash SHA-256 sertifikat genesis yang disimpan di skema database PostgreSQL (`schema.postgres.sql`) maupun kontrak SDK.
-   - *Data / Payload Objek*: String kanonikal representasi sertifikat genesis.
-   - *Tujuan Objek*: Digest perantara komputasional jika operasi tanda tangan menggunakan digest perantara.
-   - *Pihak Pembuat / Pemverifikasi*: SDK Nexa internal.
-   - *Referensi Sumber*: `sdk/typescript/src/sdk.ts#L205-L255`; `marketplace/db/schema.postgres.sql`; NC-05 / AC-10.
+| Entitas Komputasional | Objek Terkait | Field Identifier Kontrak | Fakta Kode & Repositori Aktual | Status Ontologis |
+|---|---|---|---|:---:|
+| Canonical Manifest Intermediate Hash | Album Manifest | `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT` | Algoritma PureEd25519 (RFC 8032) menandatangani payload kanonikal UTF-8 secara langsung; tidak ada field hash manifes mandiri yang disimpan dalam manifest maupun database. | `UNRESOLVED / DESIGNER COMPUTATIONAL INTERPRETATION` |
+| Container Packaging Intermediate Hash | Kontainer `.nx` | `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT` | Format biner Go (`container.go#L68-L134`) hanya memuat header ukuran, manifest, payload, dan 64-byte trailer signature; tidak ada field hash biner kontainer yang disimpan. | `UNRESOLVED / DESIGNER COMPUTATIONAL INTERPRETATION` |
+| Genesis Certificate Intermediate Hash | Genesis Cert | `FIELD IDENTIFIER NOT VERIFIED IN CONTRACT / DDL` | Verifikasi di `sdk.ts#L219, L255` mengeksekusi `NexaCrypto.verify` langsung atas canonical string UTF-8; tidak ada kolom hash sertifikat genesis di database DDL. | `UNRESOLVED / DESIGNER COMPUTATIONAL INTERPRETATION` |
 
-8. **Objek 8 — Distribution ZIP Archive Package Hash (SHA-256)**
-   - *Nama Field / Properti*: `acquired_package_sha256` pada tabel database `acquisitions` (`marketplace/db/schema.postgres.sql#L63`).
-   - *Jenis Objek*: SHA-256 hash (direpresentasikan sebagai hex string).
-   - *Data / Payload Objek*: Berkas fisik arsip ZIP pembungkus distribusi album secara utuh.
-   - *Tujuan Objek*: Menyimpan hash arsip ZIP paket akuisisi pada pencatatan transaksi marketplace.
-   - *Status Arsitektur*: Semantik penulisan hash arsip ZIP ke baris child acquisition berstatus `BLOCKED BY ARCHITECTURE (B-05)`.
-   - *Pihak Pembuat*: Marketplace Packaging / Distribution Service.
-   - *Pihak Pemverifikasi*: Marketplace Server / Transaction Manager.
-   - *Relasi dengan Objek Lain*: Disimpan pada baris database child acquisition; dependensi B-05 tetap terbuka.
-   - *Referensi Sumber*: `marketplace/db/schema.postgres.sql#L63`; B-05 / NC-09 / AC-16.
+##### D. Status Identifier Referensi `underlying_cert_id`
+Berdasarkan verifikasi repositori aktual pada `sdk/typescript/src/sdk.ts#L250-L254`:
+```typescript
+const certIdMatches = (!ownCert.underlying_cert_id || ownCert.underlying_cert_id === certID);
+```
+Properti `underlying_cert_id` pada Genesis Ownership Certificate terbukti merupakan **string referensi identifier sertifikat registri induk (`certID`)**, **BUKAN** merupakan digest SHA-256 bitstream audio. Status: **`REPOSITORY-VERIFIED (CERTIFICATE IDENTIFIER REFERENCE — NOT AN AUDIO HASH DIGEST)`**.
 
-> **Rekapitulasi Keterbukaan Bukti Kriptografis (AUDIT-NEW-04):**
-> 1. Dari lima nilai hash SHA-256 yang diinventarisasi, **hanya dua hash** yang terbukti memiliki field data normatif terverifikasi: `tracks[].sha256` (Objek 4 pada manifest) dan `acquired_package_sha256` (Objek 8 pada DDL database).
-> 2. Tiga hash lainnya (Objek 5 Manifest Hash, Objek 6 Container Hash, dan Objek 7 Genesis Cert Hash) diklasifikasikan secara transparan sebagai **`UNRESOLVED / DESIGNER INTERPRETATION — NOT A SEPARATE STORED CONTRACT OBJECT`** karena algoritma Ed25519 (PureEdDSA) menandatangani payload kanonikal secara langsung dan tidak ada kolom/field hash mandiri yang didefinisikan dalam kontrak atau skema.
-> 3. Dokumen dilarang keras mengarang nama field fiktif untuk memaksakan keberadaan hash internal tersebut.
-> 4. Status eksklusi signature manifest dari serialisasi JCS tetap berstatus **`UNRESOLVED / REQUIRES CLARIFICATION (B-08)`**.
+##### E. Rekapitulasi Jumlah & Status Otoritatif (AUDIT-NEW-04)
+1. **Jumlah Objek Tanda Tangan Ed25519**: 4 objek (3 `REPOSITORY-VERIFIED` pada kode/SDK aktif + 1 `PROPOSED SPECIFICATION` pada skema manifest).
+2. **Jumlah Objek Hash SHA-256 Tersimpan**: 2 objek (1 `REPOSITORY-VERIFIED` pada DDL PostgreSQL dengan semantik child diblokir B-05 + 1 `PROPOSED SPECIFICATION` pada skema manifest).
+3. **Entitas Komputasi Internal**: 3 entitas komputasional tanpa field kontrak tersimpan.
+4. **Identifier Referensi Non-Hash**: 1 identifier referensi sertifikat (`underlying_cert_id`).
+5. **Ketetapan Tata Kelola**: Dokumen secara tegas **tidak memaksakan angka delapan**. Akurasi inventaris berbasis bukti diutamakan mutlak daripada mempertahankan angka artifisial dokumen historis.
+6. **Status JCS Manifest**: Usulan pengecualian signature manifest dari payload JCS berstatus usulan spesifikasi yang belum disahkan, dan dependensi sirkular B-08 dipertahankan **`UNRESOLVED / REQUIRES CLARIFICATION (B-08)`** tanpa penetapan sepihak.
 
 #### 6.11 Rincian NC-11: Aturan Fallback Offline Registry Terkendali (Spesifikasi Tambahan 7)
 - Fallback ke offline cached registry certificate **HANYA DIIZINKAN** pada kondisi kegagalan transport/konektivitas fisik jaringan: `ECONNREFUSED` (koneksi ditolak), `ETIMEDOUT` (timeout), `ENOTFOUND` (DNS gagal).
@@ -1079,7 +1058,7 @@ Matriks berikut mendokumentasikan keterlacakan dua arah (*Forward & Reverse Trac
 
 | ID NC | ID AC Penguji | Sumber Otoritatif | Bukti Pendukung / Lokasi Kode | Status Kesiapan AC | Status Blocker / Keputusan |
 |:---:|:---:|:---|:---|:---:|:---:|
-| **NC-01** | AC-01, AC-02 | White Paper v5.6 §Manifest; RFC 8259 | §5.1 Skema Manifest; E-02 | AC-01 `[PO DECISION REQUIRED]`; AC-02 `[TEST-PLANNED — BLOCKED BY PROPOSED SPEC]` | AC-01: Pending Konfirmasi PO; AC-02: B-07 / NC-07 (Usulan Flat ZIP) |
+| **NC-01** | AC-01, AC-02 | White Paper v5.6 §Manifest; RFC 8259 | §5.1 Skema Manifest; E-02 | AC-01 `[PO DECISION REQUIRED]`; AC-02 `[TEST-PLANNED — BLOCKED BY PROPOSED SPEC]` | AC-01: Pending Konfirmasi PO; AC-02: B-07 / NC-07 (Validasi Wrapper ZIP Sesuai Keputusan PO & Flat Member Regex) |
 | **NC-02** | AC-03 | IETF RFC 8032; `crypto.ts` | `sdk/typescript/src/crypto.ts#L45`; E-06 | `[BLOCKED BY ARCHITECTURE]` | B-08 (Circular Dependency) |
 | **NC-03** | AC-05, AC-06 | White Paper v5.6 §Parsers; IETF RFC 8785 | RFC 8785 Test Vectors TV-01..TV-08 | AC-05 `[BLOCKED B-01]`; AC-06 `[BLOCKED B-02]` | B-01, B-02 (Strict Parser & JCS - Implementation Modules Pending) |
 | **NC-04** | AC-07, AC-08 | Roadmap v4.8; White Paper v5.6 §Registry | Roadmap v4.8 §Trust Model | AC-07 `[PO DECISION REQUIRED]`; AC-08 `[TEST-PLANNED — SPEC READY]` | AC-07: B-09 / CONF-01; AC-08: Tidak ada |
@@ -1247,7 +1226,7 @@ Berdasarkan bukti faktual dan hasil audit, kesiapan sistem dirinci ke dalam 9 ka
    - *Kelompok 1: 12 AC Spesifikasi Siap Uji (`[TEST-PLANNED — SPECIFICATION READY]`)*: AC-04, AC-08, AC-09, AC-11, AC-12, AC-17, AC-18, AC-19, AC-22, AC-23, AC-24, AC-27 (Spesifikasi fail-closed dan skenario uji terdefinisi lengkap tanpa dependensi usulan atau blocker terbuka; AC-17 dan AC-27 terverifikasi pada skema DDL statis).
    - *Kelompok 2: 12 AC Rencana Uji Terblokir Eksekusi (`[TEST-PLANNED — EXECUTION BLOCKED]`)*:
      - *Sub-Kategori 2a: Modul Implementasi Belum Tersedia (`[IMPLEMENTATION MODULE PENDING]` - 2 AC)*: AC-05 (B-01: Strict JSON Parser belum dikoding), AC-06 (B-02: RFC 8785 JCS Serializer belum dikoding).
-     - *Sub-Kategori 2b: Terblokir Gap Arsitektur, Usulan Spesifikasi & Taksonomi (`[BLOCKED BY ARCHITECTURE / PROPOSED SPEC / TAXONOMY]` - 10 AC)*: AC-02 (B-07/NC-07: Usulan Flat ZIP & Penolakan Direktori), AC-03 (B-08: Circular Dependency Manifest Signing), AC-10 (NC-05/A-05: Kode Error Diskrit Genesis Unresolved), AC-13 (B-07: Batas Kuota Ekstraksi ZIP masih berstatus usulan), AC-14 (B-04/CONF-03: Gap 2PC ke License Daemon), AC-15 (B-04/CONF-03: Gap 2PC / Replay Settlement), AC-16 (B-05: Semantik hash database child acquisition), AC-20 (B-06: Batasan userspace POSIX Safe-Open TOCTOU), AC-21 (B-06: Batasan userspace POSIX post-open descriptor), AC-26 (NC-15: Formalisasi Taksonomi 20 Kode Error berstatus Usulan Spesifikasi).
+     - *Sub-Kategori 2b: Terblokir Gap Arsitektur, Usulan Spesifikasi & Taksonomi (`[BLOCKED BY ARCHITECTURE / PROPOSED SPEC / TAXONOMY]` - 10 AC)*: AC-02 (B-07/NC-07: Validasi Wrapper ZIP, Penerimaan Direktori Sesuai Keputusan PO, dan Pembatasan Flat Member Path Manifest), AC-03 (B-08: Circular Dependency Manifest Signing), AC-10 (NC-05/A-05: Kode Error Diskrit Genesis Unresolved), AC-13 (B-07: Batas Kuota Ekstraksi ZIP masih berstatus usulan), AC-14 (B-04/CONF-03: Gap 2PC ke License Daemon), AC-15 (B-04/CONF-03: Gap 2PC / Replay Settlement), AC-16 (B-05: Semantik hash database child acquisition), AC-20 (B-06: Batasan userspace POSIX Safe-Open TOCTOU), AC-21 (B-06: Batasan userspace POSIX post-open descriptor), AC-26 (NC-15: Formalisasi Taksonomi 20 Kode Error berstatus Usulan Spesifikasi).
    - *Kelompok 3: 3 AC Menunggu Keputusan Resmi Product Owner (`[PO DECISION REQUIRED]`)*: AC-01 (Kebijakan Unknown Fields Manifest Strict vs Permissive), AC-07 (B-09 / CONF-01: Kebijakan Signer UNKNOWN), AC-25 (CONF-02: Hierarki Status Agregat NX Verify).
    *(Rekonsiliasi agregat: 12 + 12 + 3 = 27 AC terbukti 100% konsisten dengan §2.1, §2.3.B, §8, §9, dan Tabel 1.5)*.
 4. **Hal yang Belum Diverifikasi (`NOT VERIFIED — EVIDENCE NOT AVAILABLE`):** Pengujian fisik runtime mobile iOS/Android dan Usage Service cluster.
