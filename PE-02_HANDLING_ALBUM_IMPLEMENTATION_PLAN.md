@@ -14,7 +14,7 @@
 >   - **B-04 / NC-08 / CONF-03:** **`BLOCKED`** (Zero-DDL Constraint & Ketiadaan 2PC Marketplace Transaksi Terdistribusi).
 >   - **B-05 / NC-09:** **`BLOCKED`** (Ketidakpastian Semantik Kolom `acquired_package_sha256` & Child Row Database).
 >   - **B-09 / NC-04 / CONF-01:** **`PO DECISION REQUIRED`** (Kebijakan Otorisasi Pemutaran Album Signer `UNKNOWN`).
->   - **NC-14 / CONF-02:** **`CONFLICT — STOP AND CLARIFY`** (Hierarki Status Agregat NX Verify).
+>   - **NC-14 / CONF-02:** **`PO DECISION APPROVED (OPTION B)`** (Keputusan PO Disahkan: NX Verify Tidak Menampilkan Status Agregat Album; Hasil Verifikasi Individual Member Tetap Menjadi Hasil Utama).
 
 ---
 
@@ -176,23 +176,31 @@ Matriks berikut mendokumentasikan penanganan terhadap 30 temuan audit historis A
 
 ## 2. RINGKASAN READINESS DAN KONTROL PENCEGAHAN AKAR MASALAH (PR/G/I)
 
-### 2.1 Model Multi-Dimensi Kesiapan Acceptance Criteria (27 AC) (DEF-01)
-Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kategori status utama yang saling eksklusif dan mencakup tepat 27 AC tanpa tumpang tindih. Setiap AC memiliki satu klasifikasi status utama, dengan dependensi teknis, usulan spesifikasi, atau blocker arsitektur yang terpetakan secara transparan dan jujur:
+### 2.1 Model Multi-Dimensi Kesiapan Acceptance Criteria (34 AC) (DEF-01)
+Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kategori status utama yang saling eksklusif dan mencakup tepat 34 AC tanpa tumpang tindih. Setiap AC memiliki satu klasifikasi status utama, dengan dependensi teknis, usulan spesifikasi, atau blocker arsitektur yang terpetakan secara transparan dan jujur:
 
 ```
 +--------------------------------------------------------------------------------------------------------------------+
-|                         MATRIKS STATUS ACCEPTANCE CRITERIA REKONSILIASI KANONIKAL (27 AC)                          |
+|                         MATRIKS STATUS ACCEPTANCE CRITERIA REKONSILIASI KANONIKAL (34 AC)                          |
 +--------------------------------------------------------------------+-----------------------------------------------+
-| Kategori Klasifikasi Status Utama (Total Tepat 27 AC)              | Cakupan ID AC & Rincian Ketergantungan        |
+| Kategori Klasifikasi Status Utama (Total Tepat 34 AC)              | Cakupan ID AC & Rincian Ketergantungan        |
 +--------------------------------------------------------------------+-----------------------------------------------+
-| 1. [TEST-PLANNED — SPECIFICATION READY] (11 AC)                    | AC-04, AC-08, AC-11, AC-12, AC-17, AC-18,     |
-|    Skenario uji dan kriteria penerimaan fail-closed terdefinisi     | AC-19, AC-22, AC-23, AC-24, AC-27             |
-|    lengkap pada tingkat spesifikasi teknis rencana dokumen tanpa   |                                               |
-|    terhambat dependensi spesifikasi usulan atau celah arsitektur.  | *Catatan Verifikasi:*                         |
+| 1. [TEST-PLANNED — SPECIFICATION READY] (19 AC)                    | AC-04, AC-08, AC-11, AC-12, AC-17, AC-18,     |
+|    Skenario uji dan kriteria penerimaan fail-closed terdefinisi     | AC-19, AC-22, AC-23, AC-24, AC-25, AC-27,     |
+|    lengkap pada tingkat spesifikasi teknis rencana dokumen tanpa   | AC-28, AC-29, AC-30, AC-31, AC-32, AC-33,     |
+|    terhambat dependensi spesifikasi usulan atau celah arsitektur.  | AC-34                                         |
+|                                                                    | *Catatan Verifikasi & Keputusan PO:*          |
 |                                                                    | - AC-17: Kepatuhan skema statis DDL dipatuhi; |
 |                                                                    |   runtime live DB berstatus NOT VERIFIED.     |
+|                                                                    | - AC-25: Keputusan PO CONF-02 (Pilihan B      |
+|                                                                    |   APPROVED: Tanpa Status Agregat di Verify).  |
 |                                                                    | - AC-27: Batas kolom skema statis dipatuhi;   |
 |                                                                    |   ketiadaan collision hash belum terbukti.    |
+|                                                                    | - AC-28..31: Keputusan PO Alur Studio &       |
+|                                                                    |   Failure Handling Ulangi/Lewati Disahkan.    |
+|                                                                    | - AC-32: Keputusan PO Player Auto-Next Sah.   |
+|                                                                    | - AC-33..34: Keputusan PO Verify Manual Next  |
+|                                                                    |   Desktop & Mobile Lite Disahkan.             |
 +--------------------------------------------------------------------+-----------------------------------------------+
 | 2. [TEST-PLANNED — EXECUTION BLOCKED] (13 AC)                      | Sub-Kategori 2a: [MODUL ENGINE PENDING] (2):  |
 |    Skenario uji terencana, namun eksekusi pengujian terblokir      |   - AC-05 (B-01: Strict JSON Parser Engine)   |
@@ -210,14 +218,14 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 |                                                                    |   - AC-21 (B-06/NC-12: Post-Open Descr)       |
 |                                                                    |   - AC-26 (NC-15: Formalisasi Taksonomi Error)|
 +--------------------------------------------------------------------+-----------------------------------------------+
-| 3. [PO DECISION REQUIRED] (3 AC)                                   | AC-01 (NC-01: Kebijakan Unknown Fields)       |
+| 3. [PO DECISION REQUIRED] (2 AC)                                   | AC-01 (NC-01: Kebijakan Unknown Fields)       |
 |    Kriteria keberhasilan atau penerimaan kontrak secara substantif | AC-07 (NC-04/B-09/CONF-01: Signer UNKNOWN)    |
-|    menunggu keputusan resmi tertulis Product Owner.                | AC-25 (NC-14/CONF-02: Hierarki Status Verify) |
+|    menunggu keputusan resmi tertulis Product Owner.                |                                               |
 +--------------------------------------------------------------------+-----------------------------------------------+
 ```
 
-#### Rekonsiliasi Individual Wajib Seluruh 27 Acceptance Criteria (DEF-01)
-Tabel berikut membuktikan penelusuran individual per AC mencakup seluruh 27 AC tanpa duplikasi, memisahkan kesiapan spesifikasi dari dependensi yang belum selesai:
+#### Rekonsiliasi Individual Wajib Seluruh 34 Acceptance Criteria (DEF-01, Mandat Konsolidasi PO)
+Tabel berikut membuktikan penelusuran individual per AC mencakup seluruh 34 AC tanpa duplikasi, memisahkan kesiapan spesifikasi dari dependensi yang belum selesai:
 
 | ID AC | Kontrak Dasar | Klasifikasi Utama | Dasar Klasifikasi & Sumber Otoritatif | Dependensi Langsung & Blocker Terkait | Status Dependensi | Dimensi & Gate | Hasil Verifikasi Konsistensi |
 |:---:|:---:|:---|:---|:---|:---:|:---:|:---|
@@ -245,9 +253,16 @@ Tabel berikut membuktikan penelusuran individual per AC mencakup seluruh 27 AC t
 | **AC-22** | NC-13 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §JIT Player; §5.2 | Otorisasi JIT 8-tahap Player sebelum pendaftaran buffer trek audio aktif (Stage 8c hanya dieksekusi setelah Stage 8b berhasil; kegagalan 8b menghentikan alur fail-closed sebelum 8c; non-current member dilarang) | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; spesifikasi alur JIT 8-tahap lengkap tanpa otorisasi awal. |
 | **AC-23** | NC-13 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §JIT Player; §5.2 | Otorisasi JIT dieksekusi ulang secara independen saat pengguna berpindah trek | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; tidak ada otorisasi massal atau pembagian token lintas-trek. |
 | **AC-24** | NC-13 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §JIT Player; §5.2 | Satu trek rusak dalam antrean album gagal diputar tanpa mengganggu trek valid | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; isolasi error per trek ditegakkan fail-closed secara mandiri. |
-| **AC-25** | NC-14 | `PO DECISION REQUIRED` | White Paper v5.6 §Verify; CONF-02; §5.3 | CONF-02 (Hierarki status agregat NX Verify saat komposisi anggota campuran) | `PENDING PO/ARCH DECISION` | PO Decision / Gate A Blocker | Konsisten; terpisah penuh dari isu signer UNKNOWN; menunggu keputusan PO. |
+| **AC-25** | NC-14 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §Verify; Keputusan PO CONF-02; §5.3 | Mengikuti Keputusan PO (CONF-02 / NC-14 Pilihan B APPROVED): NX Verify tidak menampilkan status agregat keseluruhan Album; hasil verifikasi setiap berkas `.nx` anggota ditampilkan secara individual; tidak ada pembuatan status agregat baru (`ALBUM_TRUSTED`, `ALBUM_INVALID`) | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; disahkan PO bahwa NX Verify tidak menggunakan status agregat. |
 | **AC-26** | NC-15 | `TEST-PLANNED — BLOCKED BY PROPOSED SPEC` | Error Taxonomy Spec §6.15; Taksonomi 20 Kode Error | NC-15 (Formalisasi taksonomi 20 kode error kanonikal berstatus usulan spesifikasi) | `BLOCKED BY PROPOSED SPEC` | Technical Proposal / Gate B | Konsisten; taksonomi error 20 kode berstatus usulan spesifikasi teknis NC-15. |
 | **AC-27** | NC-16 | `TEST-PLANNED — SPEC READY` | `schema.postgres.sql#L63-L115`; §6.16 | Derivasi matematis formula ID truncated SHA-256 mematuhi batas kolom skema DDL | `CLOSED (STATIC DDL) / OPEN (COLLISION)` | Spec Ready / Gate A Ready (Static) | Konsisten; kepatuhan batas kolom DDL terbukti; bukan jaminan bebas collision. |
+| **AC-28** | NC-01, NC-06 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §Studio; Keputusan PO §2.3.A; §5.4 | NX Studio memproses Album Forge New berisi beberapa file sumber biasa (Image/Doc/Music/Video) secara sekuensial individual; setiap berkas menghasilkan `.nx` mandiri; publikasi via workflow existing; anggota berikutnya diproses hanya setelah anggota saat ini selesai | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; alur sequential forging individual dan publikasi disahkan PO. |
+| **AC-29** | NC-06 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §Studio; Keputusan PO §2.3.B; §5.4 | NX Studio memproses Album Existing `.nx` berisi beberapa berkas `.nx` yang sudah ada secara sekuensial individual via `NXPublishPipeline` existing tanpa forging ulang dan tanpa synthetic Genesis | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; publikasi existing `.nx` tanpa alterasi disahkan PO. |
+| **AC-30** | NC-01 | `TEST-PLANNED — SPEC READY` | Keputusan PO §2.3.C (Larangan Album Campuran); §5.4 | Validasi jenis masukan menolak kombinasi berkas sumber biasa dan existing `.nx` dalam satu Album secara fail-closed sebelum pemrosesan dimulai tanpa silent conversion dan tanpa merusak input | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; pemisahan jenis masukan disahkan PO secara APPROVED. |
+| **AC-31** | NC-01, NC-08 | `TEST-PLANNED — SPEC READY` | Keputusan PO §2.4 (Failure Handling Studio); §5.5 | Kegagalan forging/upload menghentikan proses sementara; pengguna disajikan opsi diskrit "Ulangi" dan "Lewati"; retry upload tidak mengulang forging dan tidak membuat listing duplikat; skip tidak menghapus file sumber; status forging vs upload dibedakan per anggota | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; tindakan Ulangi/Lewati dan pemisahan status disahkan PO. |
+| **AC-32** | NC-13 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §JIT Player; Keputusan PO §2.5; §5.2 | NX Player memutar album secara sekuensial per-anggota; verifikasi dan otorisasi individual per-anggota tanpa pewarisan otorisasi; pre-verifikasi antrean tidak memberi otorisasi; auto-next terpicu konsisten dengan lifecycle player existing setelah anggota saat ini selesai | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; navigasi Auto-Next dan isolasi otorisasi disahkan PO. |
+| **AC-33** | NC-14 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §Verify Desktop; Keputusan PO §2.6, §2.7; §5.3 | NX Verify Desktop memproses anggota album satu per satu secara sekuensial dengan tombol manual "Next"; hasil verifikasi ditampilkan per-anggota tanpa status agregat Album; Full Verify existing (Batch, Export, Refresh) tetap utuh | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; navigasi manual Next dan preservasi Full Verify disahkan PO. |
+| **AC-34** | NC-14 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §Verify Mobile Lite; Keputusan PO §2.6, §2.7; §5.3 | NX Verify Mobile memproses satu anggota per langkah dengan tombol manual "Next"; verifikasi individual tanpa status agregat; aplikasi tetap Verify-Lite tanpa porting fitur Desktop dan tanpa payload rendering | `CLOSED (SPEC READY)` | Spec Ready / Gate A Ready | Konsisten; isolasi Verify-Lite dan navigasi manual Next disahkan PO. |
 
 ---
 
@@ -259,7 +274,7 @@ Sesuai Bagian 2.4 mandat audit, dokumen ini menerapkan 18 kontrol operasional mu
 | 1 | Kontrak sumber kebenaran belum dikunci tetapi Programmer dipaksa memilih interpretasi. | Wajib berhenti (`STOP — INSTRUKSI TIDAK JELAS. TIDAK ADA INTERPRETASI BEBAS`) dan minta keputusan resmi. | `PR`, `I` |
 | 2 | Fakta repositori dicampur dengan desain usulan tanpa penanda status eksplisit. | Wajib beri label eksplisit `[PROPOSED SPECIFICATION]` atau `[REPOSITORY-VERIFIED]` pada setiap klaim. | `R`, `V` |
 | 3 | ID kontrak, blocker, temuan, atau AC dipetakan berdasarkan kemiripan nomor bukan fungsi. | Wajib petakan berdasarkan kesesuaian fungsional dan semantik kontrak (e.g. AC-15 ke NC-08, bukan NC-16). | `P`, `AC`, `NC` |
-| 4 | Klaim readiness global menutupi Acceptance Criteria yang masih terblokir. | Dilarang sweeping claim; seluruh 27 AC wajib mewarisi status dependensi fisik masing-masing. | `PR`, `G` |
+| 4 | Klaim readiness global menutupi Acceptance Criteria yang masih terblokir. | Dilarang sweeping claim; seluruh 34 AC wajib mewarisi status dependensi fisik masing-masing. | `PR`, `G` |
 | 5 | Kontrak spesifikasi dinyatakan `RESOLVED` meskipun kode implementasi belum dibuat. | Status `SPECIFIED` secara tegas bukan `RESOLVED`; modul belum dibuat dilabeli `NOT IMPLEMENTED`. | `G`, `B` |
 | 6 | Pengujian berstatus `[TEST-PLANNED]` dipresentasikan seolah-olah telah lulus. | Dilarang menaikkan `TEST-PLANNED` menjadi `TEST-PASSED` tanpa bukti eksekusi aktual di lingkungan uji. | `V`, `AC` |
 | 7 | Hash manifest, kontainer, audio payload, sertifikat Genesis, dan paket ZIP dipertukarkan. | Wajib susun inventaris kriptografis/hash berbasis bukti faktual (§6.9), membedakan signature diskrit, hash terdefinisi, dan entitas komputasional internal tanpa memaksakan angka agregat yang tidak didukung bukti. | `I`, `NC-09` |
@@ -418,6 +433,34 @@ Tabel berikut menyajikan bukti empiris kode sumber aktual lengkap dengan path ab
 
 ### 5.1 Model Album: Koleksi Kontainer Mandiri & Skema Manifest Lengkap
 Album dalam ekosistem Nexa didefinisikan sebagai **koleksi logis dari berkas kontainer audio tunggal `.nx` yang masing-masing tetap mandiri dan independen**. Album dibungkus dalam arsip fisik ZIP (`.zip`) yang memuat manifest kanonikal `album_manifest.json` dan sejumlah berkas audio `.nx`.
+
+#### Prinsip Dasar Album & Batasan Mutlak Tata Kelola (Keputusan PO: APPROVED)
+Sesuai Keputusan Otoritatif Product Owner untuk PE-02:
+1. **Independensi Mutlak Anggota Album**: Album adalah murni pengelompokan beberapa berkas `.nx` independen. Setiap anggota Album tetap memiliki:
+   - canonical `.nx` bytes dan hash masing-masing;
+   - Container Creator signature masing-masing;
+   - Genesis dan ownership evidence masing-masing;
+   - Registry dan sidecar state masing-masing;
+   - status integrity dan trust masing-masing;
+   - keputusan otorisasi pemutaran (*playback authorization*) masing-masing.
+2. **Larangan Mutlak Desain Struktur Album**:
+   - Album **DILARANG KERAS** menjadi satu berkas `album.nx`;
+   - Album **DILARANG KERAS** menjadi container baru;
+   - Album **DILARANG KERAS** menggantikan atau meniadakan identitas individual berkas `.nx`;
+   - Album **DILARANG KERAS** menciptakan trust bersama atau ownership bersama yang menggantikan bukti individual;
+   - Album **DILARANG KERAS** membuat satu anggota otomatis mewarisi otorisasi anggota lain (*no authorization inheritance*).
+3. **Metadata Album yang Disetujui Product Owner**:
+   - Metadata Album tingkat atas yang disahkan oleh Product Owner adalah **nama Album** dan **artwork Album**.
+   - Representasi teknis metadata tersebut wajib mengikuti kontrak dan arsitektur yang sudah tersedia pada baseline ekosistem Nexa. Perancang dilarang menciptakan field, tabel, API, signature, atau skema baru tanpa dasar kontraktual dan persetujuan formal Otoritas Arsitektur / PO.
+4. **Peta Aplikasi dan Platform Resmi (Keputusan PO: APPROVED)**:
+
+| Aplikasi Nexa | Platform yang Didukung | Cakupan & Batasan Otoritatif Sesuai Keputusan PO |
+|---|---|---|
+| **NX Studio** | **Desktop saja** | Modul Creator, forging file sumber, dan publication pipeline. **TIDAK ADA NX Studio Mobile** (Dilarang keras merumuskan requirement, AC, test, atau implementation task untuk NX Studio Mobile). |
+| **NX Player** | **Desktop** | Universal Trust-Aware Viewer (pemutaran terisolasi just-in-time per-anggota). |
+| **NX Player** | **Mobile** | Universal Player untuk iOS dan Android sesuai baseline yang dibuktikan. |
+| **NX Verify** | **Desktop** | Full Verify (mengevaluasi integritas forensik; mempertahankan fungsi Batch Verification, Export Verification Report, dan manual Registry Refresh). |
+| **NX Verify** | **Mobile** | Verify-Lite (evaluasi integritas ringan per-anggota; dilarang merender payload; tidak memporting fitur Full Verify Desktop ke Mobile). |
 
 > [!IMPORTANT]
 > **CATATAN ARSITEKTUR TENTANG DIVERGENSI IDENTITAS FIELD HASH AUDIO (AUDIT-NEW-01 PO CLARIFICATION):**
@@ -789,20 +832,166 @@ Tabel berikut merinci status dependensi setiap prasyarat terhadap ketiga sub-tah
 > - *Pemisahan Trust vs Integritas*: Signer trust (Tahap 4) mengevaluasi kredibilitas penerbit album; integritas container packaging dan genesis certificate (Tahap 7) mengevaluasi keabsahan struktur kontainer; integritas audio payload (Tahap 8) mengevaluasi keaslian bitstream audio. Penolakan pemutaran pada Tahap 4 (misal signer `UNKNOWN` atau `UNTRUSTED`) TIDAK membatalkan keabsahan verifikasi integritas fisik pada Tahap 5, 7, dan 8 untuk kebutuhan audit/diagnostik.
 > - *Larangan Pre-Otorisasi*: Pra-verifikasi integritas trek berikutnya dalam antrean album **DILARANG KERAS** ditafsirkan sebagai pemberian otorisasi pemutaran lebih awal atau pendaftaran buffer audio sebelum trek tersebut benar-benar aktif diputar oleh pengguna. Setiap trek wajib melalui Tahap 6, 7, dan 8 secara *just-in-time* saat transisi pemutaran terjadi.
 
+#### Navigasi Album NX Player: Pemutaran Sekuensial, Auto-Next Lifecycle, dan Isolasi Otorisasi (Keputusan PO: APPROVED)
+Sesuai Keputusan Otoritatif Product Owner untuk PE-02 (§2.5):
+1. **Preservasi Perilaku Standalone**: Perilaku pemutaran berkas `.nx` mandiri (*standalone*) pada NX Player Desktop dan Mobile tetap 100% identik dengan baseline yang telah disahkan.
+2. **Alur Pemutaran Album Sekuensial & Auto-Next**:
+   - Jika pengguna membuka satu Album, NX Player memproses anggota pertama dalam urutan manifes.
+   - Player mengeksekusi otorisasi JIT 8-tahap sesuai mekanisme existing current Player.
+   - Jika anggota tersebut memenuhi seluruh persyaratan trust, integritas, dan otorisasi lisensi aktif (`canPlay: true`), Player memutar/menampilkan aset tersebut.
+   - Setelah pemrosesan anggota tersebut selesai menurut lifecycle Player yang berlaku (misalnya deteksi event playback ended pada track audio/video), Player otomatis beralih ke anggota berikutnya (**Auto-Next**).
+   - Proses ini berulang secara sekuensial sampai seluruh anggota Album selesai diproses atau dihentikan pengguna.
+3. **Batasan Mutlak Keamanan & Isolasi Otorisasi**:
+   - Setiap anggota Album diverifikasi dan diotorisasi secara mandiri dan individual (*per-member isolated authorization*).
+   - Otorisasi pemutaran anggota saat ini **TIDAK PERNAH** memberikan otorisasi kepada anggota berikutnya.
+   - Background pre-verification (jika diizinkan) **DILARANG KERAS** mengotorisasi anggota berikutnya atau mendaftarkan buffer sebelum anggota menjadi *current member*.
+   - Anggota yang tidak memenuhi syarat (misal korup, lisensi tidak aktif) tetap mengikuti kebijakan fail-closed existing Player tanpa menghentikan ketersediaan trek valid lainnya.
+   - Trust semantics existing dipertahankan: status `UNKNOWN / INCOMPLETE` tidak boleh otomatis diperlakukan sebagai `INVALID`; kegagalan integritas/signature fisik atau pencabutan otoritatif (*authoritative revocation*) tetap memicu hard-block fail-closed.
+   - Dilarang memodifikasi Universal Trust-Aware Viewer, renderer, streaming pipeline, atau memory boundary hanya untuk menambahkan navigasi Album.
+4. **Catatan Pembuktian Trigger Lifecycle & Keterbukaan Celah Non-Audio**:
+   - Trigger perpindahan otomatis Auto-Next wajib dibuktikan konsisten dengan lifecycle Player existing (event `ended` pada HTML5 Audio / Electron / AVPlayer / ExoPlayer).
+   - Kontrak produk Nexa saat ini mendefinisikan lifecycle berbasis durasi untuk media streaming audio/video. Kriteria penyelesaian tampilan untuk jenis payload non-audio (misalnya durasi tonton dokumen atau gambar) belum diatur secara normatif dalam White Paper v5.6. Perancang mencatat kondisi ini sebagai **`GAP SPESIFIKASI LIFECYCLE NON-AUDIO (PO CLARIFICATION REQUIRED)`** dan dilarang mengarang timer sepihak.
 
 ---
 
-### 5.3 NX Verify — Tiga Lapisan Status Terpisah & Batasan Jalur Diagnostik (AUDIT-NEW-01)
+### 5.3 NX Verify — Tiga Lapisan Status Terpisah & Batasan Jalur Diagnostik (AUDIT-NEW-01, CONF-02 PO APPROVED)
 NX Verify mengevaluasi arsip album dalam 3 lapisan status independen tanpa mencampuradukkan diagnostik integritas dengan izin pemutaran:
 1. **Lapisan 1: Album Signer Trust Status**: Mengevaluasi apakah `album_signer_public_key` terdaftar pada Registry resmi (`TRUSTED`, `UNTRUSTED`, atau `UNKNOWN` — B-09 / CONF-01).
 2. **Lapisan 2: Individual Member Integrity Status**: Mengevaluasi keabsahan integritas fisik arsip, bijeksi, kontainer mandiri PE-01, dan digest SHA-256 bitstream audio setiap berkas `.nx` anggota album secara independen (`VALID`, `CORRUPTED`, `TAMPERED`).
-3. **Lapisan 3: Aggregate Album Verify Status**: Menghitung status ringkasan album. **Status hierarki agregat ini berstatus `CONFLICT — STOP AND CLARIFY` (CONF-02)** karena adanya pertentangan antara rumusan spesifikasi asli dan usulan penambahan status sepihak.
+3. **Lapisan 3: Penegasan Ketiadaan Status Agregat Album (CONF-02 / NC-14 Keputusan PO: PILIHAN B — APPROVED)**:
+   Sesuai Keputusan Otoritatif Product Owner (CONF-02 / NC-14 Pilihan B APPROVED), NX Verify **TIDAK MENAMPILKAN** satu status agregat keseluruhan Album. Hasil verifikasi individual setiap berkas `.nx` tetap menjadi hasil utama.
+   Keputusan ini tidak mengubah:
+   - empat canonical verification statuses;
+   - lima internal Multi Registry states;
+   - Local Override semantics;
+   - trust semantics individual file.
+   Dilarang keras menciptakan status baru seperti `ALBUM_TRUSTED`, `ALBUM_INVALID`, atau status agregat sintetis lainnya.
+
+#### Navigasi Album NX Verify: Verifikasi Sekuensial, Manual Next, dan Preservasi Verify Desktop vs Mobile Lite (Keputusan PO: APPROVED)
+Sesuai Keputusan Otoritatif Product Owner untuk PE-02 (§2.6 & §2.7):
+1. **Preservasi Perilaku Standalone**: Perilaku verifikasi berkas `.nx` mandiri (*standalone*) pada NX Verify Desktop dan Mobile tetap 100% identik dengan baseline existing.
+2. **Alur Verifikasi Album Sekuensial & Manual Next**:
+   - Jika pengguna membuka satu Album di NX Verify, sistem memproses anggota pertama.
+   - Verify melakukan verifikasi integritas menggunakan mekanisme existing.
+   - Verify menampilkan hasil verifikasi anggota tersebut secara individual.
+   - Pengguna menekan tombol **Next** secara MANUAL untuk memproses anggota berikutnya.
+   - Proses berulang sampai seluruh anggota Album selesai diverifikasi.
+3. **Batasan Mutlak Verifikasi Album**:
+   - Tombol **Next** hanya berlaku dalam konteks Album.
+   - Perpindahan dilakukan secara **MANUAL** oleh pengguna (tidak ada auto-advance pada Verify).
+   - Setiap anggota diverifikasi sendiri-sendiri secara independen.
+   - Hasil setiap anggota wajib dapat dilihat secara individual.
+   - Tidak boleh ada status agregat keseluruhan Album.
+   - Dilarang menyamarkan anggota yang Invalid, Unknown, Incomplete, atau memiliki konflik.
+   - NX Verify murni diagnostik dan **TIDAK MEMBERIKAN** playback authorization.
+4. **Pemisahan Tegas Fitur Verify Desktop vs Verify Mobile (Lite)**:
+   - **Verify Desktop (Full Verify)**: Tetap Full Verify sesuai White Paper v5.6. Penambahan tombol Next untuk Album tidak boleh menghapus atau mengubah fungsi Full Verify existing, termasuk Batch Verification, Export Verification Report, dan manual Registry Refresh.
+   - **Verify Mobile (Verify-Lite)**: Tetap Verify-Lite sesuai White Paper v5.6. Penambahan tombol Next hanya merupakan navigasi manual untuk berpindah ke anggota Album berikutnya dan menjalankan verifikasi individual ringan. Penambahan tersebut **DILARANG KERAS** ditafsirkan sebagai persetujuan untuk memporting fitur Full Verify Desktop ke Mobile. Dilarang menambahkan: (a) Batch Verification Full Desktop, (b) Export Verification Report, (c) manual Registry Refresh, dan (d) payload rendering pada mobile.
 
 > **Prinsip Operasional Diagnostik Independen vs Larangan Backdoor Playback (AUDIT-NEW-01):**
 > 1. *Kelanjutan Pemeriksaan Saat Signer UNKNOWN/UNTRUSTED*: Ketika Album Signer berstatus `UNKNOWN` atau `UNTRUSTED`, NX Player secara mutlak memblokir otorisasi pemutaran (`canPlay: false`). Namun, pada NX Verify, evaluasi diagnostik integritas fisik (Tahap 1, 2, 3, 5, 6, 7, dan pencocokan digest SHA-256 Tahap 8) **tetap berjalan secara independen** untuk memberikan informasi forensik keutuhan berkas kepada pengguna/auditor pada Lapisan 2.
 > 2. *Larangan Jalur Pemutaran Alternatif (No Backdoor Playback)*: Hasil diagnostik Lapisan 2 yang berstatus `VALID` **DILARANG KERAS** ditafsirkan sebagai pemberian izin pemutaran atau substitusi atas lisensi aktif.
 > 3. *Larangan Dekripsi dan Buffer Registration pada Diagnostik*: Selama pemeriksaan diagnostik di NX Verify, sistem HANYA membaca bitstream terenkripsi untuk menghitung digest SHA-256; sistem **DILARANG** mendekripsi payload audio dan **DILARANG** mendaftarkan buffer ke audio output pipeline.
 > 4. *Status Dekripsi Diagnostik*: Ketiadaan kontrak normatif mengenai batas dekripsi parsial diagnostik dicatat secara eksplisit sebagai **`UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED`** (menunggu keputusan resmi Product Owner / Architecture Board).
+
+---
+
+### 5.4 NX Studio — Dua Jenis Jalur Pemrosesan Album (Forge New vs Select Existing) & Larangan Album Campuran (Keputusan PO: APPROVED)
+Sesuai White Paper v5.6 dan Keputusan Otoritatif Product Owner (§2.3):
+NX Studio mengoperasikan dua jalur pemrosesan Album yang berbeda secara struktural, di mana keduanya bermuara pada shared `NXPublishPipeline`. Perbedaan kedua jalur wajib dipertahankan secara tegas:
+
+#### A. Jalur 1: Album Forge New
+1. **Jenis Masukan**: Beberapa berkas sumber biasa (*raw source files*), meliputi:
+   - Image;
+   - Document;
+   - Music;
+   - Video.
+2. **Perilaku Operasional**:
+   - Setiap berkas sumber diproses secara individual melalui tahapan forging normal.
+   - Setiap forging yang berhasil menghasilkan satu berkas `.nx` tersendiri yang independen.
+   - Hasil berkas `.nx` tersebut dipublikasikan melalui workflow Marketplace existing.
+   - Setelah satu anggota selesai diproses dan dipublikasikan, Studio melanjutkan ke anggota berikutnya.
+   - Proses berlangsung berurutan (sekuensial) sampai semua anggota selesai atau kegagalan ditangani pengguna.
+3. **Larangan Desain**: Dilarang keras menggabungkan beberapa file sumber biasa menjadi satu berkas `.nx`.
+
+#### B. Jalur 2: Album Select Existing `.nx`
+1. **Jenis Masukan**: Beberapa berkas kontainer audio `.nx` yang sudah ada (*existing `.nx` files*).
+2. **Perilaku Operasional**:
+   - Setiap berkas `.nx` diperlakukan sebagai aset independen yang telah sah.
+   - Setiap anggota dipublikasikan melalui `NXPublishPipeline` existing.
+   - Tidak dilakukan forging ulang (*no re-forging*) hanya karena berkas tersebut dikelompokkan menjadi anggota Album.
+   - Setelah satu anggota selesai dipublikasikan, Studio melanjutkan ke anggota berikutnya.
+   - Proses berlangsung berurutan (sekuensial) sampai semua anggota selesai atau kegagalan ditangani pengguna.
+3. **Larangan Desain**: Dilarang keras membuat sertifikat Genesis sintetis (*synthetic Genesis*) untuk existing `.nx` agar publikasi berhasil.
+
+#### C. Larangan Mutlak Album Campuran (Keputusan PO: APPROVED)
+**Keputusan Otoritatif Product Owner: APPROVED — kedua jalur didukung penuh, namun satu Album DILARANG KERAS mencampur kedua jenis masukan.**
+Dengan demikian:
+1. Album Forge New **HANYA** berisi berkas sumber biasa.
+2. Album Existing `.nx` **HANYA** berisi berkas `.nx` yang sudah ada.
+3. Satu Album **DILARANG KERAS** berisi kombinasi berkas sumber biasa dan existing `.nx`.
+4. **Validasi Masukan Pra-Pemrosesan**: Validasi jenis masukan wajib dieksekusi secara ketat SEBELUM workflow pemrosesan Album dimulai.
+5. **Penolakan Fail-Closed Tanpa Mutasi**: Jika komposisi masukan tidak memenuhi aturan jenis tunggal (misal ditemukan campuran sumber biasa dan `.nx`), sistem wajib menolak proses secara fail-closed. Dilarang memindahkan berkas secara diam-diam (*silent moving*), dilarang mengubah jenis masukan secara diam-diam (*silent conversion*), dilarang mereklasifikasi jalur secara sepihak, dan dilarang merusak atau menghapus berkas masukan pengguna.
+
+---
+
+### 5.5 NX Studio — Mekanisme Penanganan Kegagalan (Failure Handling: Ulangi & Lewati) (Keputusan PO: APPROVED)
+Sesuai Keputusan Otoritatif Product Owner (§2.4):
+NX Studio menerapkan dua tindakan diskrit baru untuk menangani kegagalan pemrosesan Album: **Ulangi (Retry)** dan **Lewati (Skip)**. Keduanya berlaku pada tahap spesifik yang mengalami kegagalan, bukan sebagai pengganti keseluruhan workflow:
+
+#### A. Penanganan Kegagalan Tahap Forging (Album Forge New)
+Jika forging anggota Album Forge New mengalami kegagalan:
+1. **Ulangi**:
+   - Mengulangi tahapan forging untuk berkas sumber biasa yang sama.
+   - Sistem **TIDAK BOLEH** berpindah ke berkas berikutnya sebelum pengguna secara eksplisit memilih tindakan.
+2. **Lewati**:
+   - Menandai berkas sumber tersebut sebagai dilewati (*skipped*).
+   - Tidak melakukan upload ke Marketplace untuk berkas yang forging-nya gagal.
+   - **TIDAK MENGHAPUS** berkas sumber asli.
+   - Melanjutkan proses ke anggota berikutnya dalam antrean.
+
+#### B. Penanganan Kegagalan Tahap Upload Pasca-Forging Berhasil (Album Forge New)
+Jika forging berhasil menghasilkan berkas `.nx`, namun tahap upload ke Marketplace gagal:
+1. **Ulangi**:
+   - Mengulangi tahap upload untuk hasil berkas `.nx` yang sudah berhasil dibuat.
+   - **TIDAK MENGULANG FORGING** (menggunakan hasil forging yang sama yang telah tersimpan di storage lokal/staging).
+   - Wajib memanfaatkan mekanisme idempotensi publication pipeline existing; **DILARANG KERAS** menciptakan listing Marketplace duplikat akibat proses pengulangan (retry).
+2. **Lewati**:
+   - Menandai tahap upload anggota tersebut sebagai gagal/dilewati sesuai status yang dibedakan dalam plan.
+   - Melanjutkan proses ke anggota berikutnya dalam antrean.
+   - **TETAP MEMPERTAHANKAN** berkas sumber asli dan hasil berkas `.nx` yang sudah berhasil di-forging di storage lokal.
+
+#### C. Penanganan Kegagalan Tahap Upload pada Album Existing `.nx`
+Untuk Album Existing `.nx` yang gagal dipublikasikan/di-upload:
+1. **Ulangi**:
+   - Mengulangi tahap publication/upload anggota yang gagal melalui jalur `NXPublishPipeline` existing.
+   - Tidak memodifikasi atau mengubah berkas `.nx` sumber.
+2. **Lewati**:
+   - Menandai anggota tersebut dilewati/tidak berhasil dipublikasikan.
+   - Melanjutkan proses ke anggota berikutnya.
+   - **TIDAK MENGHAPUS** berkas `.nx` sumber.
+
+#### D. Aturan Umum dan Batasan Failure Handling
+1. **Larangan Tindakan Otomatis Tanpa Batas**:
+   - Sistem **DILARANG** melakukan auto-retry tanpa batas (*no infinite automatic retry*).
+   - Sistem **DILARANG** melakukan auto-skip (*no automatic skip*).
+   - Proses batch Album wajib berhenti sementara (*pause*) pada titik kegagalan hingga pengguna menentukan pilihan (Ulangi atau Lewati).
+2. **Pemisahan Tegas Status Forging vs Status Upload**:
+   - Status forging dan status upload wajib dibedakan secara terpisah dalam status pelaporan Studio.
+   - Kegagalan pada tahap upload **TIDAK BOLEH** mengubah status forging yang sudah berhasil menjadi gagal.
+   - Tindakan retry wajib mempertahankan hasil pekerjaan yang telah berhasil diselesaikan sebelumnya.
+3. **Idempotensi & Pencegahan Duplikasi Listing**:
+   - Pencegahan duplikasi listing Marketplace wajib menggunakan mekanisme yang sesuai dengan publication pipeline existing.
+   - Perancang dilarang mengarang API baru, idempotency key buatan, field database baru, atau mekanisme transaksi baru tanpa bukti dari repositori. Jika mekanisme existing belum membuktikan dukungan idempotensi penuh, kondisi tersebut dicatat sebagai gap dan asumsi desain dihentikan.
+4. **Target Status Granular per Anggota**:
+   Status pelaporan Studio per anggota wajib membedakan secara tegas minimal 5 kondisi:
+   - `FORGING_SUCCESS` (forging berhasil);
+   - `FORGING_FAILED` (forging gagal);
+   - `PUBLICATION_SUCCESS` (publication/upload berhasil);
+   - `PUBLICATION_FAILED` (publication/upload gagal);
+   - `SKIPPED_BY_USER` (dilewati oleh pengguna).
+5. **Larangan Penyamaran Status Agregat**:
+   Studio **DILARANG KERAS** membuat satu status keberhasilan agregat Album yang menyamarkan atau menutupi kegagalan anggota di dalamnya.
 
 ---
 
@@ -825,7 +1014,7 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
 | **NC-11** | Mekanisme Offline Fallback Registry Terkendali | `SPECIFIED` | `NOT IMPLEMENTED` | `NONE` | Fallback HANYA untuk transport network error; HTTP 5xx/bad sig fail-closed (AC-18, AC-19). |
 | **NC-12** | Filesystem Safe-Open Berbasis Invariant Keamanan (AUDIT-NEW-03) | `SPECIFIED` | `NOT IMPLEMENTED` | `OPEN / BLOCKED BY B-06` | Pembukaan descriptor atomik `O_NOFOLLOW` + `fstatSync` terbukti oleh E-07; verifikasi ganda `lstatSync` dan `dev`/`ino` berstatus gap residu kode desktop; batas userspace POSIX diakui; fail-closed `canPlay: false` (AC-20, AC-21). |
 | **NC-13** | Otorisasi Pemutaran Just-In-Time 8-Tahap Player | `SPECIFIED` | `NOT IMPLEMENTED` | `NONE` | Pra-verifikasi track antrean dilarang memberi otorisasi pemutaran lebih awal (AC-22, 23, 24). |
-| **NC-14** | Rekonsiliasi Status Verify & Hierarki Agregat | `SPECIFIED` | `NOT IMPLEMENTED` | `CONFLICT — STOP AND CLARIFY` | Hierarki status agregat Verify tertahan konflik terbuka CONF-02 (AC-25). |
+| **NC-14** | Rekonsiliasi Status Verify & Ketiadaan Status Agregat Album | `SPECIFIED` | `NOT IMPLEMENTED` | `PO DECISION APPROVED (OPTION B)` | Keputusan PO CONF-02 (Pilihan B APPROVED): NX Verify tidak menampilkan status agregat keseluruhan Album; hasil verifikasi individual setiap berkas `.nx` tetap menjadi hasil utama tanpa agregat semu (AC-25, AC-33, AC-34). |
 | **NC-15** | Taksonomi 20 Kode Error Kanonikal & Fail-Closed | `SPECIFIED` | `NOT IMPLEMENTED` | `PROPOSED SPEC` | Memuat 20 kode terklasifikasi 3 tier; layer & aksi fail-closed jelas (AC-26). |
 | **NC-16** | Derivasi Matematis Identifier Deterministik | `SPECIFIED` | `NOT IMPLEMENTED` | `PROPOSED SPEC` | Formula truncated SHA-256 patuhi batas kolom skema; batas kolom bukan bukti unik (AC-27). |
 
@@ -991,9 +1180,13 @@ Dokumen ini merinci evaluasi operasional atas kerentanan race condition akses be
      2. Penerbitan dokumen resmi *Residual Risk Acceptance* yang ditandatangani oleh **Product Owner / Lead Security Architect**.
    - Sebelum persetujuan risiko resmi tersebut diterbitkan, B-06 tetap berstatus **`OPEN / BLOCKED`**.
 
-#### 6.14 Rincian NC-14: Rekonsiliasi Status NX Verify & Konflik Hierarki Agregat (Temuan 3, CONF-02)
-- Status evaluasi NX Verify memisahkan Lapisan 1 (Signer Trust), Lapisan 2 (Member Integrity), dan Lapisan 3 (Aggregate Status).
-- **Status Konflik (CONF-02)**: Penentuan aturan hierarki status agregat tetap berstatus **`CONFLICT — STOP AND CLARIFY`**. Dilarang menetapkan hierarki baru secara sepihak tanpa keputusan resmi Product Owner.
+#### 6.14 Rincian NC-14: Rekonsiliasi Status NX Verify & Ketiadaan Status Agregat Album (Temuan 3, CONF-02 PO APPROVED)
+- Status evaluasi NX Verify memisahkan Lapisan 1 (Signer Trust) dan Lapisan 2 (Member Integrity).
+- **Resolusi Otoritatif Keputusan PO (CONF-02 / NC-14 — PILIHAN B APPROVED)**:
+  Product Owner secara resmi mengesahkan Pilihan B: **NX Verify tidak perlu dan dilarang menampilkan satu status agregat keseluruhan Album**. Hasil verifikasi setiap berkas `.nx` anggota tetap menjadi hasil utama individual.
+  - Keputusan ini tidak mengubah empat canonical verification statuses, lima internal Multi Registry states, Local Override semantics, dan trust semantics individual file.
+  - Dilarang keras menciptakan status sintetis baru seperti `ALBUM_TRUSTED`, `ALBUM_INVALID`, atau status agregat lainnya.
+  - Navigasi Album pada NX Verify dieksekusi secara sekuensial individual dengan tombol manual "Next" (AC-25, AC-33, AC-34).
 
 #### 6.15 Rincian NC-15: Taksonomi 20 Kode Error Kanonikal & Provenance Status Normatif (DEF-05, DEFECT-02)
 Dokumen ini memetakan taksonomi 20 kode error dengan membedakan secara tegas status provenance normatif masing-masing kode:
@@ -1134,9 +1327,9 @@ Sesuai Bagian II (DEF-02), evaluasi keterlacakan B-03 dipisahkan secara ketat pe
 
 ---
 
-## 8. ACCEPTANCE CRITERIA REGISTER (AC-01 SAMPAI AC-27)
+## 8. ACCEPTANCE CRITERIA REGISTER (AC-01 SAMPAI AC-34)
 
-Tabel berikut merinci seluruh 27 Acceptance Criteria (AC-01 sampai AC-27) secara lengkap dan terpetakan status dependensinya:
+Tabel berikut merinci seluruh 34 Acceptance Criteria (AC-01 sampai AC-34) secara lengkap dan terpetakan status dependensinya:
 
 | ID | Kontrak Dasar | Sumber Otoritatif | Skenario Uji / Kondisi Masukan | Expected Result / Kriteria Keberhasilan | Status Kesiapan Uji | Dependensi Blocker / Governance |
 |:---:|:---:|:---|:---|:---|:---:|:---:|
@@ -1164,9 +1357,16 @@ Tabel berikut merinci seluruh 27 Acceptance Criteria (AC-01 sampai AC-27) secara
 | **AC-22** | NC-13 | White Paper v5.6 §JIT Player | Otorisasi pemutaran trek audio album dieksekusi | Otorisasi JIT memvalidasi lisensi, hash (8a), dan dekripsi (8b) sebelum mendaftarkan buffer trek aktif (8c); Stage 8c hanya dieksekusi setelah 8b berhasil; kegagalan 8b menghentikan alur fail-closed sebelum 8c. | `[TEST-PLANNED — SPEC READY]` | Tidak ada |
 | **AC-23** | NC-13 | White Paper v5.6 §JIT Player | Pengguna berpindah trek audio dalam album | Otorisasi JIT dieksekusi ulang secara independen per trek tanpa otorisasi massal. | `[TEST-PLANNED — SPEC READY]` | Tidak ada |
 | **AC-24** | NC-13 | White Paper v5.6 §JIT Player | Integritas satu trek dalam antrean album rusak | Trek rusak gagal diputar; pemutaran trek valid lainnya tidak terganggu. | `[TEST-PLANNED — SPEC READY]` | Tidak ada |
-| **AC-25** | NC-14 | White Paper v5.6 §Verify; CONF-02 | Verifikasi album dengan anggota valid dan status campuran | Evaluasi status agregat mengikuti aturan resmi yang diputuskan Product Owner / Arsitektur. | `[PO DECISION REQUIRED]` | CONF-02 (Hierarki Status Agregat) |
+| **AC-25** | NC-14 | White Paper v5.6 §Verify; Keputusan PO CONF-02; §5.3 | Verifikasi album dengan anggota valid dan status campuran di NX Verify | Mengikuti Keputusan PO (CONF-02 / NC-14 Pilihan B APPROVED): NX Verify tidak menampilkan status agregat keseluruhan Album; hasil verifikasi setiap berkas `.nx` anggota ditampilkan secara individual; tidak ada pembuatan status agregat baru (`ALBUM_TRUSTED`, `ALBUM_INVALID`) | `[TEST-PLANNED — SPEC READY]` | Keputusan PO CONF-02 / NC-14 Pilihan B APPROVED (Tanpa Status Agregat) |
 | **AC-26** | NC-15 | Error Taxonomy Spec; NC-15 | Skenario kegagalan sistematis di seluruh alur eksekusi | Sistem melempar kode error diskrit kanonikal 1:1 sesuai taksonomi 20 error code. | `[TEST-PLANNED — BLOCKED BY PROPOSED SPEC]` | Dependensi NC-15 (Formalisasi taksonomi 20 kode error kanonikal berstatus usulan spesifikasi teknis) |
 | **AC-27** | NC-16 | `schema.postgres.sql#L63-L115` | Uji kesesuaian panjang formula ID derivasi terhadap skema DDL | Panjang string child acq $\le 128$, ent $\le 128$, provider $\le 64$ karakter. | `[TEST-PLANNED — SPEC READY]` | DDL Skema Aktif (Bukan Bukti Unik)|
+| **AC-28** | NC-01, NC-06 | White Paper v5.6 §Studio; Keputusan PO §2.3.A; §5.4 | NX Studio memproses Album Forge New berisi beberapa file sumber biasa (Image/Doc/Music/Video) | Setiap berkas sumber diproses forging satu per satu secara sekuensial menghasilkan berkas `.nx` mandiri (tidak digabung menjadi satu `.nx`); setiap berkas `.nx` dipublikasikan melalui workflow Marketplace existing; anggota berikutnya diproses hanya setelah anggota saat ini selesai | `[TEST-PLANNED — SPEC READY]` | Keputusan PO §2.3.A (Forge New Sequential Processing) |
+| **AC-29** | NC-06 | White Paper v5.6 §Studio; Keputusan PO §2.3.B; §5.4 | NX Studio memproses Album Existing `.nx` berisi beberapa berkas `.nx` yang sudah ada | Setiap berkas `.nx` dipublikasikan satu per satu secara sekuensial melalui `NXPublishPipeline` existing; tidak dilakukan forging ulang; tidak dibuat synthetic Genesis; berkas sumber `.nx` tidak diubah; anggota berikutnya diproses setelah anggota saat ini selesai | `[TEST-PLANNED — SPEC READY]` | Keputusan PO §2.3.B (Existing .nx Sequential Publication) |
+| **AC-30** | NC-01 | Keputusan PO §2.3.C (Larangan Album Campuran); §5.4 | Pengguna memasukkan kombinasi campuran berkas sumber biasa dan berkas `.nx` yang sudah ada ke dalam satu Album | Validasi jenis masukan menolak proses secara fail-closed sebelum workflow pemrosesan dimulai; masukan tidak dirusak atau dihapus; tidak ada silent conversion atau reklasifikasi jenis masukan sepihak | `[TEST-PLANNED — SPEC READY]` | Keputusan PO §2.3.C (Larangan Album Campuran) |
+| **AC-31** | NC-01, NC-08 | Keputusan PO §2.4 (Failure Handling Studio); §5.5 | Terjadi kegagalan pemrosesan pada tahap forging atau tahap upload di NX Studio | Pemrosesan berhenti sementara pada tahap yang gagal; tidak ada auto-retry tanpa batas atau auto-skip; pengguna disajikan opsi diskrit "Ulangi" dan "Lewati"; jika forging gagal dan dipilih Ulangi: forging file yang sama diulang tanpa lanjut ke file berikutnya; jika forging gagal dan dipilih Lewati: file dilewati tanpa upload dan tanpa menghapus file sumber; jika upload gagal setelah forging berhasil dan dipilih Ulangi: upload berkas `.nx` hasil forging diulang tanpa re-forging dan tanpa membuat listing Marketplace duplikat; jika upload gagal dan dipilih Lewati: tahap upload ditandai gagal/dilewati, lanjut ke anggota berikutnya, berkas sumber dan hasil `.nx` tetap dipertahankan; status forging dan status upload dibedakan secara granular per anggota | `[TEST-PLANNED — SPEC READY]` | Keputusan PO §2.4 (Studio Failure Handling: Ulangi & Lewati) |
+| **AC-32** | NC-13 | White Paper v5.6 §Universal Viewer; Keputusan PO §2.5; §5.2 | Pengguna membuka dan memutar Album pada NX Player (Desktop atau Mobile) | Player memproses anggota satu per satu secara sekuensial; setiap anggota diverifikasi dan diotorisasi secara individual; pemutaran/tampilan hanya terjadi jika anggota memenuhi trust, integrity, dan lisensi aktif; otorisasi anggota saat ini tidak memberikan otorisasi kepada anggota berikutnya; background pre-verification tidak memberikan otorisasi; anggota yang tidak memenuhi syarat mengikuti kebijakan existing (`UNKNOWN/INCOMPLETE` tidak otomatis `INVALID`); setelah lifecycle anggota selesai menurut lifecycle Player existing, Player otomatis beralih ke anggota berikutnya (Auto-Next); renderer, streaming, dan memory boundary existing tidak diubah | `[TEST-PLANNED — SPEC READY]` | Keputusan PO §2.5 (Player Auto-Next & Authorization Isolation) |
+| **AC-33** | NC-14 | White Paper v5.6 §Verify Desktop; Keputusan PO §2.6, §2.7; §5.3 | Pengguna membuka Album pada NX Verify Desktop | Verify memproses anggota pertama dan menampilkan hasil verifikasi individual; pengguna menekan tombol "Next" secara manual untuk beralih ke anggota berikutnya; setiap anggota diverifikasi sendiri-sendiri tanpa status agregat keseluruhan Album (Option B APPROVED); fitur Full Verify Desktop existing (Batch Verification, Export Report, manual Registry Refresh) tetap utuh dan tersedia; Verify tidak memberikan playback authorization | `[TEST-PLANNED — SPEC READY]` | Keputusan PO §2.6 & §2.7 (Verify Desktop Manual Next & No Aggregate Status) |
+| **AC-34** | NC-14 | White Paper v5.6 §Verify Mobile Lite; Keputusan PO §2.6, §2.7; §5.3 | Pengguna membuka Album pada NX Verify Mobile | Verify Mobile memproses satu anggota per langkah; navigasi manual tombol "Next" berpindah ke anggota berikutnya dan menjalankan verifikasi individual; tidak ada status agregat Album; aplikasi tetap beroperasi sebagai Verify-Lite (tanpa porting Batch Verification Full Desktop, tanpa Export Report, tanpa manual Registry Refresh, dan tanpa payload rendering) | `[TEST-PLANNED — SPEC READY]` | Keputusan PO §2.6 & §2.7 (Verify Mobile Lite Manual Next & Lite Isolation) |
 
 ---
 
@@ -1176,20 +1376,20 @@ Matriks berikut mendokumentasikan keterlacakan dua arah (*Forward & Reverse Trac
 
 | ID NC | ID AC Penguji | Sumber Otoritatif | Bukti Pendukung / Lokasi Kode | Status Kesiapan AC | Status Blocker / Keputusan |
 |:---:|:---:|:---|:---|:---:|:---:|
-| **NC-01** | AC-01, AC-02 | White Paper v5.6 §Manifest; RFC 8259 | §5.1 Skema Manifest; E-02 | AC-01 `[PO DECISION REQUIRED]`; AC-02 `[TEST-PLANNED — BLOCKED BY PROPOSED SPEC]` | AC-01: Pending Konfirmasi PO; AC-02: B-07 / NC-07 (Validasi Wrapper ZIP Sesuai Keputusan PO & Flat Member Regex) |
+| **NC-01** | AC-01, AC-02, AC-28, AC-30, AC-31 | White Paper v5.6 §Manifest, §Studio; RFC 8259; Keputusan PO §2.3, §2.4 | §5.1 Skema Manifest; §5.4; §5.5; E-02 | AC-01 `[PO DECISION REQUIRED]`; AC-02 `[TEST-PLANNED — BLOCKED BY PROPOSED SPEC]`; AC-28, AC-30, AC-31 `[TEST-PLANNED — SPEC READY]` | AC-01: Pending Konfirmasi PO; AC-02: B-07 / NC-07; AC-28, AC-30, AC-31: Keputusan PO APPROVED (Jalur Forge New, Larangan Campuran, Studio Failure Handling) |
 | **NC-02** | AC-03 | IETF RFC 8032; `crypto.ts` | `sdk/typescript/src/crypto.ts#L45`; E-06 | `[BLOCKED BY ARCHITECTURE]` | B-08 (Circular Dependency) |
 | **NC-03** | AC-05, AC-06 | White Paper v5.6 §Parsers; IETF RFC 8785 | RFC 8785 Test Vectors TV-01..TV-08 | AC-05 `[BLOCKED B-01]`; AC-06 `[BLOCKED B-02]` | B-01, B-02 (Strict Parser & JCS - Implementation Modules Pending) |
 | **NC-04** | AC-07, AC-08 | Roadmap v4.8; White Paper v5.6 §Registry | Roadmap v4.8 §Trust Model | AC-07 `[PO DECISION REQUIRED]`; AC-08 `[TEST-PLANNED — SPEC READY]` | AC-07: B-09 / CONF-01; AC-08: Tidak ada |
 | **NC-05** | AC-09, AC-10 | White Paper v5.6 §Genesis; `sdk.ts#L205-L255` | §6.9 Inventaris Objek Kriptografis; E-01 | AC-09 `[TEST-PLANNED — BLOCKED BY UNRESOLVED NORMATIVE FIELD IDENTITY]`; AC-10 `[TEST-PLANNED — BLOCKED BY UNRESOLVED TAXONOMY & 3-WAY BINDING]` | `OPEN / BLOCKED BY UNRESOLVED FIELD IDENTITY, GENESIS ERROR CODE & 3-WAY BINDING` |
-| **NC-06** | AC-04, AC-11, AC-12 | White Paper v5.6 §Container; `container.go` | `internal/container/container.go#L110`; E-02 | `[TEST-PLANNED — SPEC READY]` | Baseline Frozen (PE-01) |
+| **NC-06** | AC-04, AC-11, AC-12, AC-28, AC-29 | White Paper v5.6 §Container, §Studio; Keputusan PO §2.3; `container.go` | `internal/container/container.go#L110`; §5.4; E-02 | `[TEST-PLANNED — SPEC READY]` | Baseline Frozen (PE-01); Keputusan PO APPROVED (Forge New & Existing .nx Sequential Processing Tanpa Re-forging & Tanpa Synthetic Genesis) |
 | **NC-07** | AC-02, AC-13 | Proposal B-07 (Acuan Format: APPNOTE; RFC 1951) | §6.7 Batas Keamanan Ekstraksi Arsip ZIP Wrapper (Nilai Kuota Berstatus Usulan B-07) | AC-02 `[TEST-PLANNED — BLOCKED BY PROPOSED SPEC]`; AC-13 `[TEST-PLANNED — EXECUTION BLOCKED BY PROPOSED SPEC]` | B-07 (Menunggu Keputusan Arsitektur Pembekuan Batas Kuota ZIP & Aturan Flat) |
-| **NC-08** | AC-14, AC-15 | `schema.postgres.sql#L63`; `server.js` | `marketplace/server.js#L170`; E-04 | `[BLOCKED BY ARCHITECTURE]` | B-04 / CONF-03 |
+| **NC-08** | AC-14, AC-15, AC-31 | `schema.postgres.sql#L63`; `server.js`; Keputusan PO §2.4 | `marketplace/server.js#L170`; §5.5; E-04 | AC-14, AC-15 `[BLOCKED BY ARCHITECTURE]`; AC-31 `[TEST-PLANNED — SPEC READY]` | AC-14, AC-15: B-04 / CONF-03; AC-31: Keputusan PO APPROVED (Studio Failure Handling: Upload Retry Idempotent Tanpa Duplicate Listing) |
 | **NC-09** | AC-16 | White Paper v5.6 §Marketplace; `schema.postgres.sql#L63` | §6.9 Inventaris Objek Kriptografis; `marketplace/db/schema.postgres.sql#L72`; E-03 | `[BLOCKED BY ARCHITECTURE]` | B-05 (Semantik Hash DB & Inventaris Objek Kriptografis/Hash; Status Bukti Primer Audit Independen: NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE) |
 | **NC-10** | AC-17 | `schema.postgres.sql#L63-L115` | `marketplace/db/schema.postgres.sql#L63`; E-03 | `[TEST-PLANNED — SPEC READY]` | DDL Skema Statis Terverifikasi (Independen B-04; Runtime Live DB `NOT VERIFIED`)|
 | **NC-11** | AC-18, AC-19 | White Paper v5.6 §Registry | White Paper v5.6 §Offline Fallback | `[TEST-PLANNED — SPEC READY]` | Tidak ada |
 | **NC-12** | AC-20, AC-21 | POSIX.1-2017; White Paper v5.6 §Safe-Open | `sdk/typescript/src/fs_safe.ts#L30-L55`; E-07 | AC-20 `[TEST-PLANNED — SPEC READY]`; AC-21 `[TEST-PLANNED — BLOCKED BY B-06]` | B-06 (Batas Safe-Open Filesystem Desktop Terbuka; Residual Gap TOCTOU POSIX) |
-| **NC-13** | AC-22, AC-23, AC-24 | White Paper v5.6 §JIT Player; `main.js` | `player-desktop/main.js#L182, L541`; E-05 | `[TEST-PLANNED — SPEC READY]` | Tidak ada |
-| **NC-14** | AC-25 | White Paper v5.6 §Verify; CONF-02 | §5.3 Tiga Lapisan Status Verify | `[PO DECISION REQUIRED]` | CONF-02 |
+| **NC-13** | AC-22, AC-23, AC-24, AC-32 | White Paper v5.6 §JIT Player, §Universal Viewer; Keputusan PO §2.5; `main.js` | `player-desktop/main.js#L182, L541`; §5.2; E-05 | `[TEST-PLANNED — SPEC READY]` | Keputusan PO APPROVED (Player Auto-Next Lifecycle & Isolasi Otorisasi JIT Per Anggota) |
+| **NC-14** | AC-25, AC-33, AC-34 | White Paper v5.6 §Verify; Keputusan PO §2.6, §2.7 (CONF-02 Pilihan B APPROVED) | §5.3 Tiga Lapisan Status Verify | `[TEST-PLANNED — SPEC READY]` | Keputusan PO CONF-02 / NC-14 Pilihan B APPROVED (Tanpa Status Agregat Album; Verify Desktop Manual Next Tetap Full; Verify Mobile Manual Next Tetap Lite) |
 | **NC-15** | AC-26 | Error Taxonomy Spec; NC-15 | §6.15 Taksonomi 20 Kode Error Kanonikal | `[TEST-PLANNED — BLOCKED BY PROPOSED SPEC]` | Usulan Spesifikasi Teknis NC-15 (Pending Pembekuan Arsitektur) |
 | **NC-16** | AC-27 | `schema.postgres.sql#L63-L115` | §6.16 Derivasi Matematis Identifier | `[TEST-PLANNED — SPEC READY]` | DDL Skema Aktif (Batas Kolom Terverifikasi Statis) |
 
@@ -1233,18 +1433,43 @@ Bagian ini mendokumentasikan keputusan resmi tertulis yang telah disahkan oleh P
      - Level 5: Standar internasional yang relevan (sepanjang tidak bertentangan).
      - Level 6: Temuan audit historis, bukti pendukungnya, proposal yang belum disetujui, dan interpretasi teknis.
    - Sumber lebih rendah dilarang mengubah ketentuan sumber lebih tinggi; keputusan PO PE-02 tidak mengubah baseline frozen Sprint 16/PE-01; pertentangan otoritatif wajib ditangani via Stop-and-Clarify.
+4. **Prinsip Dasar Album, Peta Platform & Larangan Album Campuran (Keputusan PO: APPROVED)**:
+   - Album adalah pengelompokan beberapa berkas `.nx` independen. Setiap anggota mempertahankan canonical `.nx` bytes dan hash masing-masing, Creator signature masing-masing, Genesis dan ownership evidence masing-masing, Registry dan sidecar state masing-masing, status integrity/trust masing-masing, dan keputusan playback authorization masing-masing.
+   - Album dilarang: menjadi satu file `album.nx`, menjadi container baru, menggantikan identitas individual file `.nx`, menciptakan trust atau ownership bersama yang menggantikan bukti individual, atau membuat satu anggota otomatis mewarisi otorisasi anggota lain.
+   - Metadata Album yang disetujui terbatas pada nama dan artwork Album, direpresentasikan mengikuti kontrak dan arsitektur yang sudah tersedia tanpa menciptakan field/tabel/API/schema baru tanpa dasar dan otorisasi.
+   - Peta aplikasi dan platform: NX Studio Desktop saja (Creator, forging, dan publication; dilarang membuat requirement/AC/test untuk NX Studio Mobile); NX Player Desktop & Mobile; NX Verify Desktop (Full) & Verify Mobile (Lite).
+   - Dua jenis Album yang terpisah: (a) Album Forge New memproses berkas sumber biasa (Image, Doc, Music, Video) secara sekuensial individual, menghasilkan berkas `.nx` tersendiri dan dipublikasikan ke Marketplace tanpa menggabungkan sumber menjadi satu `.nx`; (b) Album Existing `.nx` memproses berkas `.nx` yang sudah ada satu per satu melalui `NXPublishPipeline` existing tanpa re-forging dan tanpa synthetic Genesis.
+   - Larangan Album Campuran: Satu Album dilarang keras mencampur berkas sumber biasa dengan berkas `.nx` yang sudah ada. Validasi jenis masukan ditegakkan secara fail-closed sebelum workflow dimulai tanpa silent conversion dan tanpa merusak input.
+5. **Mekanisme Failure Handling Studio: Ulangi & Lewati (Keputusan PO: APPROVED)**:
+   - NX Studio menyediakan dua tindakan diskrit pada tahap yang gagal: **Ulangi** dan **Lewati**.
+   - Forging gagal: Ulangi mengulang forging file sumber yang sama tanpa lanjut ke file berikutnya; Lewati menandai file dilewati tanpa upload dan tanpa menghapus file sumber, lalu lanjut ke anggota berikutnya.
+   - Upload gagal setelah forging berhasil: Ulangi mengulang tahap upload untuk berkas `.nx` yang sudah berhasil di-forging tanpa re-forging dan tanpa membuat listing Marketplace duplikat; Lewati menandai upload gagal/dilewati, mempertahankan file sumber dan hasil `.nx`, lalu lanjut ke anggota berikutnya.
+   - Upload existing `.nx` gagal: Ulangi mengulang upload via jalur existing tanpa mengubah file sumber; Lewati menandai anggota dilewati/gagal dipublikasikan tanpa menghapus file sumber, lalu lanjut ke anggota berikutnya.
+   - Ketentuan umum: tidak ada auto-retry tanpa batas atau auto-skip; proses batch berhenti sementara saat gagal; status forging dan status upload dibedakan secara granular (5 status diskrit: `FORGING_SUCCESS`, `FORGING_FAILED`, `PUBLICATION_SUCCESS`, `PUBLICATION_FAILED`, `SKIPPED_BY_USER`); tidak ada status agregat keberhasilan Album yang menyamarkan kegagalan anggota.
+6. **Navigasi Album NX Player (Auto-Next) & NX Verify (Manual Next) (Keputusan PO: APPROVED)**:
+   - NX Player (Desktop & Mobile): Memproses anggota pertama, memverifikasi secara individual, melakukan play/view jika memenuhi trust/integrity/authorization; setelah lifecycle anggota selesai menurut lifecycle Player existing, Player otomatis beralih ke anggota berikutnya (Auto-Next); otorisasi dieksekusi secara just-in-time per anggota tanpa pewarisan otorisasi dan tanpa otorisasi via background pre-verification; renderer, streaming, dan memory boundary existing tetap dipertahankan.
+   - NX Verify Desktop: Memproses anggota secara sekuensial, menampilkan hasil verifikasi individual; pengguna menekan tombol "Next" secara manual untuk beralih ke anggota berikutnya; fitur Full Verify Desktop (Batch Verification, Export Report, manual Registry Refresh) tetap utuh dan tersedia; Verify tidak memberikan playback authorization.
+   - NX Verify Mobile: Beroperasi strictly sebagai Verify-Lite; navigasi manual "Next" hanya memproses satu anggota per langkah tanpa status agregat dan tanpa memporting fitur Desktop (tanpa batch verification desktop, tanpa export report, tanpa registry refresh manual, dan tanpa payload rendering).
+7. **Ketiadaan Status Agregat Album di NX Verify (CONF-02 / NC-14 Pilihan B — PO APPROVED)**:
+   - Keputusan PO: PILIHAN B APPROVED. NX Verify tidak menampilkan status agregat keseluruhan Album.
+   - Hasil verifikasi setiap berkas `.nx` tetap menjadi hasil utama.
+   - Empat canonical verification statuses, lima internal Multi-Registry states, Local Override semantics, dan trust semantics individual file tetap utuh. Dilarang keras menciptakan status agregat baru seperti `ALBUM_TRUSTED` atau `ALBUM_INVALID`.
 
 ### 10.4 Kebutuhan Klarifikasi Terbuka Product Owner / Arsitektur (AUDIT-NEW-10 — PO CLARIFY)
 1. **Relasi Identitas 3-Way Identity Binding (AUDIT-NEW-10 — PO CLARIFY)**:
    - *Status Tata Kelola*: **`UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED`**.
    - *Fakta*: Relasi identitas $ownCertPubKey \equiv containerSigKey \equiv genesisPubKey$ belum memiliki dasar kontrak normatif yang membuktikan apakah ketiga kunci publik tersebut wajib sama atau boleh berbeda.
    - *Ketentuan Dokumen*: Dokumen secara tegas melarang menyatakan relasi kesamaan kunci sebagai invariant yang terbukti, dan melarang menyatakan ketiganya wajib berbeda. Pemisahan peran tiga signature (Album Signer, Container Creator, Genesis Creator) tetap dipertahankan. Isu ini dicatat sebagai klarifikasi terbuka yang menunggu penetapan resmi tertulis dari Product Owner / Architecture Board.
+2. **Definisi Selesai Lifecycle Player untuk Payload Non-Audio (PO / Arsitektur CLARIFY)**:
+   - *Status Tata Kelola*: **`OPEN — STOP AND CLARIFY`**.
+   - *Fakta*: White Paper v5.6 dan implementasi `player-desktop/main.js` mendefinisikan lifecycle pemutaran audio/media (`onEnded` event) sebagai pemicu alami Auto-Next. Namun, untuk payload non-audio (e.g. berkas dokumen PDF atau gambar statis), repositori existing belum mendefinisikan trigger otomatis kapan viewing dianggap selesai.
+   - *Ketentuan Dokumen*: Sesuai prinsip Stop-and-Clarify, penentuan pemicu Auto-Next untuk payload non-audio ditahan sampai PO/Arsitektur memberikan definisi operasional eksplisit tanpa asumsi sepihak programmer.
 
 ---
 
 ## 11. KONFLIK MATERIAL DAN STOP-AND-CLARIFY
 
-Tiga konflik material berikut tetap dipertahankan terbuka secara transparan dan menjadi penghalang kelulusan Gate A:
+Daftar konflik material dan status resolusinya dicatat secara transparan sebagai gerbang evaluasi Gate A:
 
 ```
 +----------------------------------------------------------------------------------------------------+
@@ -1255,13 +1480,20 @@ Tiga konflik material berikut tetap dipertahankan terbuka secara transparan dan 
 | CONF-01 | Kebijakan Otorisasi Album Signer | Product Owner               | AC-07 tertahan status   |
 |         | UNKNOWN (Roadmap v4.8 vs usulan) | (PO Mandate)                | PO DECISION REQUIRED    |
 +---------+----------------------------------+-----------------------------+-------------------------+
-| CONF-02 | Hierarki Status Agregat NX Verify| Product Owner / Arsitektur  | NC-14 dan AC-25 tertahan|
-|         | (Status asli vs status tambahan) | (Architecture Board)        | CONFLICT-STOP & CLARIFY |
+| CONF-02 | Hierarki Status Agregat NX Verify| Product Owner               | SELESAI / APPROVED      |
+|         | (Status asli vs status tambahan) | (PO Mandate: PILIHAN B)     | Pilihan B: Tanpa agregat|
+|         |                                  |                             | AC-25, AC-33, 34 READY  |
 +---------+----------------------------------+-----------------------------+-------------------------+
 | CONF-03 | Gap Transaksi Terdistribusi non- | Otoritas Arsitektur / DBA   | NC-08, AC-14, dan AC-15 |
 |         | 2PC vs Kendala Skema Zero-DDL    | (Architecture & Database)   | tertahan status BLOCKED |
 +---------+----------------------------------+-----------------------------+-------------------------+
 ```
+
+> **Catatan Status Resolusi Konflik:**
+> 1. **CONF-02 (Status Agregat NX Verify)**: Telah resmi diselesaikan oleh Product Owner melalui pengesahan **PILIHAN B (APPROVED)**. NX Verify tidak menampilkan status agregat Album; verifikasi individual per anggota menjadi hasil utama; status AC-25, AC-33, dan AC-34 berstatus `[TEST-PLANNED — SPEC READY]`.
+> 2. **CONF-01 (Album Signer UNKNOWN)**: Tetap terbuka sebagai blocker Gate A dengan status `PO DECISION REQUIRED` (menunggu keputusan PO atas Opsi A/B/C).
+> 3. **CONF-03 (Gap Transaksi Terdistribusi Marketplace)**: Tetap terbuka sebagai blocker arsitektur dengan status `BLOCKED BY ARCHITECTURE` (menunggu solusi arsitektur yang patuh Zero-DDL).
+> 4. **Gap Terbuka Tambahan (§10.4.2)**: Ketiadaan definisi selesai lifecycle Player untuk payload non-audio dicatat sebagai `OPEN — STOP AND CLARIFY` tanpa asumsi sepihak programmer.
 
 ---
 
@@ -1290,12 +1522,12 @@ Evaluasi 7 dimensi Preservation Gate disajikan secara objektif dengan membedakan
 - **G-02 (Empirical Evidence Verification)**: `CONDITIONALLY MET` (Bukti dibatasi pada inspeksi kode statis di server Linux; pengujian fisik mobile dilabeli `NOT VERIFIED`).
 - **G-03 (Repository Verified Ledger Integrity)**: `CONDITIONALLY MET` (Evidence Ledger §4.4 memuat path, baris, dan raw snippets dari kode lokal; E-07 dibatasi pada `O_NOFOLLOW` + `fstat` riil; status database live dan runtime mobile belum diverifikasi independen).
 - **G-04 (Preservation Gate Synchronization)**: `CONDITIONALLY MET` (Diselaraskan dengan evaluasi konservatif D-01 s.d. D-07 pada §12.1; kesimpulan preservasi berstatus PARTIAL; pengujian runtime fisik berstatus NOT VERIFIED).
-- **G-05 (Readiness Conclusion Cross-Check)**: `CONDITIONALLY MET` (Diselaraskan dengan disposisi kesiapan pada §13.1 dan register otoritatif §8; mengakui celah dan blocker yang masih terbuka; seluruh rekapitulasi AC konsisten 11 Spec Ready + 13 Execution Blocked + 3 PO Decision Required; diakui adanya ambiguitas rasio kompresi B-07 serta celah pengujian AC Register untuk batas payload 2 GiB [REQ-B03-05] dan batas 50 track manifest [REQ-B03-06] pada cakupan B-03).
-- **G-06 (Normative Contract & Acceptance Consistency)**: `CONDITIONALLY MET` (16 NC dan 27 AC terpetakan dua arah; ketergantungan blocker teknis B-01, B-02, B-06, B-08, gap spesifikasi usulan B-07, dan status unresolved 3-Way Identity Binding NC-05 dicatat eksplisit).
+- **G-05 (Readiness Conclusion Cross-Check)**: `CONDITIONALLY MET` (Diselaraskan dengan disposisi kesiapan pada §13.1 dan register otoritatif §8; mengakui celah dan blocker yang masih terbuka; seluruh rekapitulasi AC konsisten 19 Spec Ready + 13 Execution Blocked + 2 PO Decision Required [total tepat 34 AC]; diakui adanya ambiguitas rasio kompresi B-07 serta celah pengujian AC Register untuk batas payload 2 GiB [REQ-B03-05] dan batas 50 track manifest [REQ-B03-06] pada cakupan B-03).
+- **G-06 (Normative Contract & Acceptance Consistency)**: `CONDITIONALLY MET` (16 NC dan 34 AC terpetakan dua arah; ketergantungan blocker teknis B-01, B-02, B-06, B-08, gap spesifikasi usulan B-07, dan status unresolved 3-Way Identity Binding NC-05 dicatat eksplisit).
 - **G-07 (Governance Lock & Single File Output)**: `MET` (Pengecualian prasyarat administratif corrective revision count untuk mandat koreksi AUDIT-NEW-01..10 telah disahkan secara resmi oleh Product Owner melalui PO Governance Override; riwayat revisi historis tidak diubah atau direkayasa; tidak ada klaim REV4 atau cycle baru; satu berkas kanonikal dipertahankan tanpa artefak tambahan; implementasi kode PE-02 tetap NOT AUTHORIZED).
 - **G-08 (Zero Implementation Authorization)**: `MET` (Implementasi kode PE-02 tetap secara sah `NOT AUTHORIZED`).
 - **G-09 (Zero Mutation & Clean Repo State)**: `CONDITIONALLY MET WITH DISCLOSURE` (Nol mutasi kode tracked; keberadaan 2 berkas dokumen untracked di `docs/` dicatat transparan; inspeksi kebersihan repositori dibatasi pada tingkat direktori root dan tidak diklaim sebagai jaminan kebersihan rekursif).
-- **G-10 (Adversarial Plan Audit & Contradiction Filter)**: `NOT PASSED — REQUIRES TARGETED CORRECTIONS / OPEN MATERIAL GAPS ACKNOWLEDGED` (Mengakui secara jujur bahwa kontradiksi material CONF-01 s.d. CONF-03, circular dependency B-08, dan blocker B-04, B-05, B-06, B-07, B-09 belum diselesaikan).
+- **G-10 (Adversarial Plan Audit & Contradiction Filter)**: `NOT PASSED — REQUIRES TARGETED CORRECTIONS / OPEN MATERIAL GAPS ACKNOWLEDGED` (Mengakui secara jujur bahwa kontradiksi material CONF-01 dan CONF-03 [CONF-02 telah disahkan PO via Pilihan B], circular dependency B-08, dan blocker B-04, B-05, B-06, B-07, B-09 belum diselesaikan).
 
 ---
 
@@ -1309,10 +1541,10 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 | Parameter Evaluasi Kualitas Plan (Gate A)          | Hasil Evaluasi Substantif                    |
 +----------------------------------------------------+----------------------------------------------+
 | 1. Seluruh 16 NC terdefinisi dengan acuan sumber   | MEMENUHI SYARAT                              |
-| 2. Seluruh 27 AC memiliki expected result terukur  | MEMENUHI SYARAT (AC-01 bersyarat PO)         |
+| 2. Seluruh 34 AC memiliki expected result terukur  | MEMENUHI SYARAT (AC-01 bersyarat PO)         |
 | 3. Traceability dua arah NC <-> AC terbukti        | MEMENUHI SYARAT                              |
 | 4. Bukti Evidence Ledger terverifikasi di server   | MEMENUHI SYARAT (Klaim dibatasi kode statis) |
-| 5. Seluruh konflik material (CONF-01..03) selesai  | GAGAL (Konflik terbuka menahan kelulusan)   |
+| 5. Seluruh konflik material (CONF-01..03) selesai  | GAGAL (CONF-01 & 03 terbuka menahan kelulusan|
 | 6. Konsistensi status antar-register bebas cacat   | GAGAL (Kontrak kriptografi B-08 terblokir)   |
 +----------------------------------------------------+----------------------------------------------+
 | STATUS AKHIR GATE A                                | NOT PASSED — REQUIRES TARGETED CORRECTIONS   |
@@ -1339,17 +1571,17 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 Berdasarkan bukti faktual dan hasil audit, kesiapan sistem dirinci ke dalam 9 kategori kesiapan:
 1. **Hal yang Telah Diinspeksi pada Repositori Lokal Programmer (`[LOCAL CODE INSPECTED / AUDITOR INDEPENDENT VERIFICATION PENDING]`):** Kepatuhan skema DDL berkas `schema.postgres.sql` (bukan bukti database runtime live), engine packaging Go `container.go`, modul kriptografi Ed25519 SDK `crypto.ts`, handler scheme NX Player `main.js`, ketiadaan 2PC di Marketplace server `server.js`, dan status git commit `fc08a5c...` pada tracked files. (Catatan audit: bagi auditor independen luar yang belum memiliki akses repositori whisnu/nexa, status bukti berkas-berkas ini diklasifikasikan sebagai `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`).
 2. **Hal yang Berstatus Spesifikasi Konseptual (`SPECIFIED — PENDING IMPL`):** Skema lengkap manifest album (valid JSON Schema Draft 7, batas 199 track), serializer RFC 8785 JCS, invariant Safe-Open, taksonomi 20 error code, dan formula derivasi ID.
-3. **Inventaris dan Klasifikasi Kesiapan Seluruh Acceptance Criteria (Total Tepat 27 AC) (DEFECT-01):**
-   Seluruh 27 AC terpetakan secara lengkap dan eksklusif berdasarkan register otoritatif §8 (setiap AC berada tepat di satu kelompok utama tanpa penghitungan ganda):
-   - *Kelompok 1: 11 AC Spesifikasi Siap Uji (`[TEST-PLANNED — SPECIFICATION READY]`)*: AC-04, AC-08, AC-11, AC-12, AC-17, AC-18, AC-19, AC-22, AC-23, AC-24, AC-27 (Spesifikasi fail-closed dan skenario uji terdefinisi lengkap tanpa dependensi usulan atau blocker terbuka; AC-17 dan AC-27 terverifikasi pada skema DDL statis).
+3. **Inventaris dan Klasifikasi Kesiapan Seluruh Acceptance Criteria (Total Tepat 34 AC) (DEFECT-01):**
+   Seluruh 34 AC terpetakan secara lengkap dan eksklusif berdasarkan register otoritatif §8 (setiap AC berada tepat di satu kelompok utama tanpa penghitungan ganda):
+   - *Kelompok 1: 19 AC Spesifikasi Siap Uji (`[TEST-PLANNED — SPECIFICATION READY]`)*: AC-04, AC-08, AC-11, AC-12, AC-17, AC-18, AC-19, AC-22, AC-23, AC-24, AC-25, AC-27, AC-28, AC-29, AC-30, AC-31, AC-32, AC-33, AC-34 (Spesifikasi fail-closed dan skenario uji terdefinisi lengkap tanpa dependensi usulan atau blocker terbuka; AC-25, AC-33, AC-34 memenuhi Keputusan PO CONF-02 Pilihan B APPROVED; AC-28 s.d. AC-32 memenuhi Keputusan PO §2.3 s.d. §2.5; AC-17 dan AC-27 terverifikasi pada skema DDL statis).
    - *Kelompok 2: 13 AC Rencana Uji Terblokir Eksekusi (`[TEST-PLANNED — EXECUTION BLOCKED]`)*:
      - *Sub-Kategori 2a: Modul Implementasi Belum Tersedia (`[IMPLEMENTATION MODULE PENDING]` - 2 AC)*: AC-05 (B-01: Strict JSON Parser belum dikoding), AC-06 (B-02: RFC 8785 JCS Serializer belum dikoding).
      - *Sub-Kategori 2b: Terblokir Gap Arsitektur, Usulan Spesifikasi, Taksonomi & Identitas Field (`[BLOCKED BY ARCHITECTURE / PROPOSED SPEC / TAXONOMY / NORMATIVE FIELD IDENTITY]` - 11 AC)*: AC-02 (B-07/NC-07: Validasi Wrapper ZIP, Penerimaan Direktori Sesuai Keputusan PO, dan Pembatasan Flat Member Path Manifest), AC-03 (B-08: Circular Dependency Manifest Signing), AC-09 (NC-05/NEW-01: Finalisasi spesifikasi uji terblokir keputusan normatif identitas field manifest audio), AC-10 (NC-05/A-05: Kode Error Diskrit Genesis Unresolved), AC-13 (B-07: Batas Kuota Ekstraksi ZIP masih berstatus usulan), AC-14 (B-04/CONF-03: Gap 2PC ke License Daemon), AC-15 (B-04/CONF-03: Gap 2PC / Replay Settlement), AC-16 (B-05: Semantik hash database child acquisition), AC-20 (B-06: Batasan userspace POSIX Safe-Open TOCTOU), AC-21 (B-06: Batasan userspace POSIX post-open descriptor), AC-26 (NC-15: Formalisasi Taksonomi 20 Kode Error berstatus Usulan Spesifikasi).
-   - *Kelompok 3: 3 AC Menunggu Keputusan Resmi Product Owner (`[PO DECISION REQUIRED]`)*: AC-01 (Kebijakan Unknown Fields Manifest Strict vs Permissive), AC-07 (B-09 / CONF-01: Kebijakan Signer UNKNOWN), AC-25 (CONF-02: Hierarki Status Agregat NX Verify).
-   *(Rekonsiliasi agregat: 11 + 13 + 3 = 27 AC terbukti 100% konsisten dengan §1.5, §2.1, §2.3.B, §8, dan §9)*.
+   - *Kelompok 3: 2 AC Menunggu Keputusan Resmi Product Owner (`[PO DECISION REQUIRED]`)*: AC-01 (Kebijakan Unknown Fields Manifest Strict vs Permissive), AC-07 (B-09 / CONF-01: Kebijakan Signer UNKNOWN).
+   *(Rekonsiliasi agregat: 19 + 13 + 2 = 34 AC terbukti 100% konsisten dengan §1.5, §2.1, §2.3.B, §8, dan §9)*.
 4. **Hal yang Belum Diverifikasi (`NOT VERIFIED — EVIDENCE NOT AVAILABLE`):** Pengujian fisik runtime mobile iOS/Android dan Usage Service cluster.
 5. **Rangkuman Ketergantungan Blocker Teknis & Arsitektur:** Blocker B-01 s.d. B-08 tetap terbuka secara transparan (B-01 dan B-02 menunggu pengkodean modul; B-04, B-05, B-06, B-08 menunggu keputusan arsitektur; B-07 menunggu pembekuan spesifikasi kuota ZIP).
-6. **Rangkuman Ketergantungan Keputusan Otoritatif PO:** Keputusan PO tetap ditunggu untuk menyelesaikan CONF-01 (Signer UNKNOWN Opsi A/B/C), CONF-02 (Hierarki Status Agregat NX Verify), dan CONF-03 (Model Transaksi Terdistribusi Non-2PC).
+6. **Rangkuman Ketergantungan Keputusan Otoritatif PO:** Keputusan PO tetap ditunggu untuk menyelesaikan CONF-01 (Signer UNKNOWN Opsi A/B/C) dan CONF-03 (Model Transaksi Terdistribusi Non-2PC); sementara CONF-02 telah diselesaikan secara definitif melalui pengesahan Pilihan B (tanpa status agregat Album).
 8. **Kualifikasi Kelulusan Gate:** Gate A berstatus **`NOT PASSED — REQUIRES TARGETED CORRECTIONS / OPEN MATERIAL CONFLICTS REMAIN`**; Gate B berstatus **`BLOCKED`**.
 9. **Status Otorisasi Implementasi PE-02:** **`NOT AUTHORIZED`** (Dilarang keras memulai implementasi kode atau migrasi database).
 
