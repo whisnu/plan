@@ -531,8 +531,8 @@ Dokumen ini secara ketat membedakan field universal Album yang berlaku umum dari
    - `created_at`: Waktu pembuatan manifest dalam format ISO 8601 UTC (RFC 3339).
    - `title`: Nama/judul Album yang disahkan secara eksplisit oleh Product Owner (string 1..255).
    - Kumpulan anggota `.nx` independen adalah konsep produk PE-02; **nama array JSON, bentuk objek anggota, dan pemetaan dari draf audio `tracks[]` belum ditetapkan sebagai kontrak normatif**. Tidak ada nama array universal yang boleh diasumsikan atau dipilih sampai keputusan PO/Architecture Authority.
-     - `file_name`: Pola nama berkas strictly flat `^[a-zA-Z0-9_-]+\.nx$` tanpa path separator/subdirektori (PO APPROVED; case-insensitive unique via ASCII case-folding).
-     - `title`: Judul atau nama anggota item (string 1..255).
+     - **Semantik nama berkas member (bukan nama field JSON yang disahkan):** pola strictly flat `^[a-zA-Z0-9_-]+\.nx$` tanpa path separator/subdirektori; keputusan PO menyetujui aturan nama/keunikan case-insensitive via ASCII case-fold, bukan identifier field.
+     - **Semantik judul/nama tampilan member (bukan nama field JSON yang disahkan):** rentang usulan 1..255; keberadaan dan representasi sebagai field manifest belum disahkan.
    - *Field Deklarasi Kriptografis Universal (Status: PROPOSED SPECIFICATION)*: `album_signer_public_key`, `album_signer_signature`, `canonical_algorithm`, `signature_algorithm` (berstatus usulan yang menghadapi circular dependency B-08 dan belum memiliki kontrak identitas/lifecycle B-09).
    - *Field Metadata Tambahan Universal (Status: PROPOSED SPECIFICATION)*: `album_id`, `artist`, `total_tracks` / `total_members`, `release_date` (usulan perancang, belum disahkan PO).
 2. **Field Khusus Tipe Payload (Payload-Specific Fields)**:
@@ -1905,7 +1905,7 @@ Bagian ini mengonsolidasikan enam temuan audit terbaru dan **mengesampingkan red
 
 ### Acceptance Criteria Koreksi Dokumen (untuk audit ulang)
 1. Tidak ada field proposed/unresolved dipaksakan menjadi required normative schema field.
-2. Hanya `members[]` disebut sebagai koleksi universal; tidak ada klaim bahwa `tracks[]` adalah alias yang disahkan.
+2. Redaksi historis sebelumnya pernah menyebut `members[]` sebagai koleksi universal; pernyataan tersebut telah dikoreksi pada §5.1 dan tidak lagi berlaku. Nama array/path JSON tetap unresolved.
 3. Schema audio, video, document, image, unknown-field behavior, dan metadata persistence diberi status yang jujur; tidak ada klaim universal schema lengkap.
 4. Album Signer tidak menjadi global playback gate; empat signature tetap terpisah; identitas/lifecycle signer tidak direka.
 5. B-08 tetap blocked sampai Architecture Authority memilih signature scope dan representation; AC-03 tidak berstatus ready.
