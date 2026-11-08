@@ -2103,6 +2103,18 @@ Bagian ini mengonsolidasikan enam temuan audit terbaru dan **mengesampingkan red
 
 **Disposisi:** Gate A tetap NOT PASSED; Gate B tetap BLOCKED; PE-02 Implementation tetap NOT AUTHORIZED; Sprint 16 CLOSED / FINAL ACCEPTED / FROZEN; PE-01 CLOSED / FROZEN; Sprint 17 NOT STARTED; Product Enhancement Window OPEN / NOT FROZEN.
 
+## 13.10 KOREKSI KONSISTENSI STATUS DAN PROVENANCE EVIDENCE LEDGER — 2026-11-08
+
+**Ruang lingkup:** Koreksi terarah atas tiga temuan konsistensi baru dari audit plan. ID berikut menggunakan prefiks `AUDIT-PLAN` dan **berbeda dari FINDING-01 sampai FINDING-03 historis yang telah CLOSED**. Koreksi hanya menyentuh traceability status dan kualifikasi bukti; tidak mengubah kontrak produk, keputusan PO, atau blocker substantif.
+
+1. **AUDIT-PLAN-01 — AC-20 / NC-12:** Status AC-20 pada traceability §9 diselaraskan menjadi `TEST-PLANNED — EXECUTION BLOCKED BY B-06`, konsisten dengan AC Register §8 dan klasifikasi Execution Blocked §13.1. AC-21 tetap Execution Blocked oleh B-06. Tidak ada perubahan pada mitigasi Safe-Open atau penerimaan residual risk.
+2. **AUDIT-PLAN-02 — AC-25 / NC-14:** Traceability §9 kini memisahkan AC-25 `TEST-PLANNED — SPEC READY` dari AC-33/AC-34 `TEST-PLANNED — EXECUTION BLOCKED BY UNRESOLVED MEMBERSHIP AUTHENTICITY / CONF-01`. Keputusan PO CONF-02 Pilihan B tetap disahkan; CONF-01/B-09 tidak dipindahkan atau ditutup.
+3. **AUDIT-PLAN-03 — Evidence Ledger / Gate A:** §12.3 kini menyatakan bahwa Evidence Ledger terdokumentasi dalam plan secara bersyarat, sementara bukti sumber primer belum diverifikasi independen. Redaksi ini tidak mengubah status G-01 sampai G-03 dan tidak mengklaim audit independen atas repository `whisnu/nexa`.
+
+**Verifikasi pascakoreksi:** File kanonikal pada `whisnu/plan:main` telah di-fetch ulang setelah commit. Ketiga redaksi koreksi ditemukan pada §9 dan §12.3. Jumlah AC tetap 34; agregat tetap 12 Spec Ready + 20 Execution Blocked + 2 PO Decision Required.
+
+**Disposisi:** Ketiga temuan konsistensi dokumen ini dikoreksi pada artefak kanonikal yang sama. Gate A tetap `NOT PASSED`; Gate B tetap `BLOCKED`; PE-02 Implementation tetap `NOT AUTHORIZED`; Sprint 16 dan PE-01 tetap `CLOSED / FROZEN`; Sprint 17 tetap `NOT STARTED`. Koreksi ini bukan persetujuan Gate A, bukan penutupan blocker substantif, dan bukan otorisasi implementasi.
+
 ## 14. MANDATORY CLOSING DECLARATIONS (DEF-09)
 
 **Batas provenance wajib:** Bagian ini memuat campuran fakta yang dapat diverifikasi langsung dari file kanonikal GitHub `whisnu/plan:main` dan deklarasi historis Programmer tentang lingkungan lokal `whisnu/nexa`. Setiap klaim mengenai host lokal, working tree, commit lokal, `git diff`, `git status`, `ls`, DDL lokal, staging path, atau file untracked di bawah ini adalah **`REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`**, kecuali bukti primer independen secara eksplisit tersedia. Kehadiran teks deklarasi dalam plan bukan bukti bahwa perintah tersebut dijalankan atau bahwa hasilnya benar.
