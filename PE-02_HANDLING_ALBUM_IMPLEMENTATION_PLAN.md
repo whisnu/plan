@@ -1668,9 +1668,10 @@ Keputusan resmi mengenai eksistensi Album Signer dan penggunaan deklarasi manife
 > **Status Tata Kelola:** CONF-01 tetap `PO DECISION REQUIRED` pada AC-07 (B-09 / NC-04), tetapi tidak lagi dirumuskan sebagai pilihan global playback. AC-07 menguji batas penggunaan deklarasi manifest saat signer `UNKNOWN` serta lifecycle signer yang belum memiliki kontrak. AC-25 tetap khusus untuk keputusan CONF-02.
 
 ### 10.2 Pembekuan Parameter Kuota Ekstraksi ZIP & Rekonsiliasi Celah Pengujian (B-07, NC-07, REQ-B03-04..06)
-1. **Rasio Dekompresi ZIP Bomb (REQ-B03-04)**: Keputusan resmi Otoritas Arsitektur diperlukan untuk membekukan apakah ambang batas rasio kompresi menggunakan nilai ketat usulan B-07 (**10:1**) atau referensi pembanding eksternal (**100:1**) yang belum diverifikasi secara normatif (standar eksternal PKWARE APPNOTE dan RFC 1951 tidak memuat ambang rasio keamanan tersebut). Sampai keputusan ini diterbitkan, kedua nilai murni kandidat usulan dan tidak ada nilai tunggal yang berlaku sebagai aturan normatif operasional.
-2. **Batas Ukuran Dekompresi Wrapper (4 GB Desimal) & Celah Pengujian Kontainer 2 GiB (REQ-B03-05)**: Keputusan resmi Otoritas Arsitektur diperlukan untuk membekukan kuota total ekstraksi akumulatif pembungkus ZIP pada **4 GB desimal** ($4 \times 10^9$ bytes), terpisah dari batas payload kontainer individual **2 GiB** ($2 \times 1024^3 = 2.147.483.648$ bytes) pada baseline `container.go#L106`. Selain itu, diperlukan keputusan Product Owner / Arsitektur mengenai penambahan kriteria uji / AC penguji formal untuk batas payload 2 GiB individual kontainer `.nx`, karena AC-11 dan AC-12 pada AC Register murni menguji ekstraksi mandiri dan pemenuhan invariant packaging PE-01 tanpa cakupan batas ukuran payload 2 GiB.
-3. **Celah Pengujian Batas 50 Member Manifest (REQ-B03-06)**: Keputusan Product Owner / Arsitektur diperlukan untuk menentukan apakah batas panduan UI 50 track pada White Paper v5.6 diwajibkan menjadi aturan skema yang ditegakkan dengan penambahan Acceptance Criteria baru (kriteria penerimaan baru), ataukah batas maksimum tetap mengacu pada `maxItems: 199` skema manifest JSON §5.1.
+1. **Rasio Dekompresi ZIP Bomb (REQ-B03-04)**: Architecture Authority menetapkan nilai berdasarkan threat model, benchmark payload Nexa yang sah, serta hard cap absolut per-entry dan kumulatif. Rasio 10:1 dan 100:1 tetap kandidat, bukan standar normatif; jangan memilih salah satunya hanya karena angka tersebut pernah muncul dalam draf.
+2. **Batas Ukuran Wrapper dan Payload Individual (REQ-B03-05)**: Architecture Authority menetapkan batas compressed wrapper dan expanded cumulative wrapper berdasarkan pengujian resource. Batas payload individual .nx 2 GiB adalah klaim baseline implementasi yang masih harus diverifikasi independen pada source. Tambahkan acceptance coverage eksplisit untuk batas payload individual; jangan memetakan pengujian tersebut secara keliru ke AC-11/12 jika keduanya tidak mengujinya.
+3. **Batas 50 Member vs 200 Physical ZIP Entries (REQ-B03-06)**: Pisahkan batas UI/produk jumlah member dari jumlah entry fisik ZIP. Architecture Authority menyusun dampak teknis dan batas resource. Product Owner hanya perlu menetapkan apakah batas 50 member merupakan batas produk wajib atau sekadar panduan UX; nilai 200 physical entries tidak boleh dipakai sebagai pengganti batas jumlah member.
+4. **Status**: Semua nilai numerik tetap PROPOSED sampai threat model, benchmark, coverage AC, dan keputusan otoritas terkait selesai. Ini bukan permintaan agar PO merancang parameter teknis.
 
 ### 10.3 Keputusan Product Owner yang Telah Disahkan (Mandat AUDIT-NEW — PO APPROVED)
 Bagian ini mendokumentasikan keputusan resmi tertulis yang telah disahkan oleh Product Owner untuk ruang lingkup PE-02:
@@ -1717,15 +1718,17 @@ Bagian ini mendokumentasikan keputusan resmi tertulis yang telah disahkan oleh P
    - Hasil verifikasi setiap berkas `.nx` tetap menjadi hasil utama.
    - Empat canonical verification statuses, lima internal Multi-Registry states, Local Override semantics, dan trust semantics individual file tetap utuh. Dilarang keras menciptakan status agregat baru seperti `ALBUM_TRUSTED` atau `ALBUM_INVALID`.
 
-### 10.4 Kebutuhan Klarifikasi Terbuka Product Owner / Arsitektur (AUDIT-NEW-10 — PO CLARIFY)
-1. **Relasi Identitas 3-Way Identity Binding (AUDIT-NEW-10 — PO CLARIFY)**:
-   - *Status Tata Kelola*: **`UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED`**.
-   - *Fakta*: Relasi identitas $ownCertPubKey \equiv containerSigKey \equiv genesisPubKey$ belum memiliki dasar kontrak normatif yang membuktikan apakah ketiga kunci publik tersebut wajib sama atau boleh berbeda.
-   - *Ketentuan Dokumen*: Dokumen secara tegas melarang menyatakan relasi kesamaan kunci sebagai invariant yang terbukti, dan melarang menyatakan ketiganya wajib berbeda. Pemisahan peran tiga signature (Album Signer, Container Creator, Genesis Creator) tetap dipertahankan. Isu ini dicatat sebagai klarifikasi terbuka yang menunggu penetapan resmi tertulis dari Product Owner / Architecture Board.
-2. **Definisi Selesai Lifecycle Player untuk Payload Non-Audio (PO / Arsitektur CLARIFY)**:
-   - *Status Tata Kelola*: **`OPEN — STOP AND CLARIFY`**.
-   - *Fakta*: White Paper v5.6 mendefinisikan prinsip navigasi Album sekuensial (Auto-Next). Pada kode implementasi aktual, `player-desktop/renderer.js#L652-L655` memiliki listener `ended` pada `audioEngine` yang memanggil `playNextLibraryAsset()` untuk memutar berkas berikutnya pada antrean GUI pustaka desktop lokal, namun BUKAN kontrak transisi multi-anggota Album platform yang disahkan. Pada `videoEngine`, tidak ditemukan listener `ended`. Pada dokumen dan gambar, tidak ada durasi alami. Bukti primer menunjukkan belum ada kontrak pemicu Auto-Next Album multi-member yang disahkan untuk payload mana pun.
-   - *Ketentuan Dokumen*: Sesuai prinsip Stop-and-Clarify, penentuan pemicu transisi Auto-Next Album untuk seluruh tipe payload ditahan sampai PO/Arsitektur memberikan definisi operasional eksplisit tanpa asumsi sepihak programmer. AC-32 berstatus `[TEST-PLANNED — EXECUTION BLOCKED BY UNRESOLVED MULTI-PAYLOAD AUTO-NEXT LIFECYCLE CONTRACT]`.
+### 10.4 Klarifikasi Teknis Tersisa — Bukan Delegasi Desain kepada PO (AUDIT-NEW-10)
+1. **Relasi Identitas 3-Way Identity Binding**:
+   - **Status:** UNRESOLVED — NORMATIVE CONTRACT NOT VERIFIED.
+   - Relasi identitas $ownCertPubKey \equiv containerSigKey \equiv genesisPubKey$ belum memiliki dasar kontrak normatif yang membuktikan apakah ketiga kunci publik tersebut wajib sama atau boleh berbeda.
+   - Architecture Authority harus menelusuri sumber normatif dan alur key binding yang benar-benar berlaku. Sampai bukti tersebut ditemukan, plan melarang menyatakan ketiganya harus sama maupun harus berbeda. Product Owner hanya diminta menetapkan semantik produk jika hasil analisis menunjukkan dampak pada identitas/kepemilikan yang terlihat oleh pengguna.
+2. **Lifecycle Auto-Next Multi-Payload**:
+   - **Status:** REPOSITORY VERIFICATION REQUIRED; AC-32 tetap EXECUTION BLOCKED.
+   - Keputusan PO yang telah disahkan adalah prinsip Auto-Next setelah lifecycle member selesai menurut lifecycle Player existing. Pekerjaan teknis berikutnya adalah memetakan completion signal pada setiap viewer/platform dan menentukan adapter yang tidak mengubah renderer, streaming, memory boundary, atau current-member authorization.
+   - Laporan historis tentang audio ended, videoEngine, serta document/image lifecycle belum diverifikasi independen oleh Auditor. Jangan memperlakukannya sebagai fakta source sampai repository dapat diperiksa.
+   - Jika viewer tidak menyediakan completion signal yang kompatibel dengan perilaku Auto-Next yang disahkan, Architecture Authority menyusun alternatif teknis dan dampaknya. PO hanya diminta memutuskan jika alternatif tersebut mengubah perilaku UX yang telah disahkan. Dilarang membuat timeout/duration palsu atau event universal tanpa dasar.
+   - AC-32 tetap blocked sampai lifecycle per payload/platform dibuktikan dan acceptance criteria dapat diuji.
 
 ---
 
