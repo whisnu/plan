@@ -384,7 +384,7 @@ Jika ditemukan ketidakjelasan instruksi, konflik antar-sumber, atau ketiadaan da
 - **Sprint 16 Baseline:** 🔒 **`CLOSED / FINAL ACCEPTED / FROZEN`**.
 - **PE-01 Baseline:** 🔒 **`CLOSED / FROZEN`**.
 - **Sprint 17 Milestone:** ⏸️ **`NOT STARTED`**.
-- **Integritas Tata Kelola:** Tidak ada perubahan kode aplikasi tracked (*zero mutation on tracked files* dibuktikan oleh `git diff --name-only`), tidak ada migrasi skema database pada berkas DDL `marketplace/db/schema.postgres.sql`, dan repositori root terbukti bebas dari file liar/artefak baru pada tingkat direktori root berdasarkan inspeksi `ls -la` (cakupan inspeksi ini terbatas pada direktori root dan tidak diklaim sebagai jaminan kebersihan rekursif seluruh subdirektori repositori; keberadaan 2 berkas dokumen acuan untracked di `docs/` dicatat transparan; kondisi database runtime live dan eksekusi mobile berstatus `NOT VERIFIED`).
+- **Integritas Tata Kelola:** Klaim inspeksi lokal `whisnu/nexa` mengenai `git diff --name-only`, status DDL, `ls -la`, dan dua berkas untracked di `docs/` merupakan **laporan Programmer pada evidence ledger**, bukan hasil inspeksi independen dalam audit dokumen ini. Status klaim lokal tersebut: `REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`; kondisi database runtime live dan eksekusi mobile tetap `NOT VERIFIED`.
 
 ### 4.2 Ruang Lingkup Fungsional PE-02
 Fitur Album (`PE-02`) adalah mekanisme distribusi dan pengelompokan logis atas multi-track container `.nx` mandiri. Album BUKAN merupakan format kontainer binary baru ("multi-track container" gabungan), melainkan arsip pembungkus ZIP standar yang memuat:
@@ -427,7 +427,7 @@ Tabel berikut menyajikan bukti empiris kode sumber aktual lengkap dengan path ab
 | **E-05** | Pendaftaran Protokol NX Player & Handler JIT | `/opt/antigravity/projects/nexa/player-desktop/main.js#L182-L194` & `#L541-L560` | ```javascript\nprotocol.registerSchemesAsPrivileged([\n  { scheme: 'nexa-playback', privileges: { standard: true, secure: true, stream: true } }\n]);\nipcMain.handle('nexa:authorize-track', async (event, trackUri) => {\n  // Handler otorisasi JIT dipanggil sebelum buffer didaftarkan\n  return await executeJITAuthorization(trackUri);\n});\n``` | Membuktikan scheme `nexa-playback` terdaftar sebagai privileged dan IPC handler tersedia. **TIDAK** membuktikan eksekusi timing 8-tahap JIT telah teruji di runtime fisik. | `[INSPEKSI LOKAL PROGRAMMER: CODE FOUND] / NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE (Bagi Audit Independen: Akses Repositori Primer whisnu/nexa Belum Tersedia)` |
 | **E-06** | Modul Kriptografi Ed25519 & Encoding Hex | `/opt/antigravity/projects/nexa/sdk/typescript/src/crypto.ts#L45-L65` | ```typescript\nexport function verifyEd25519Signature(signatureHex: string, messageBytes: Uint8Array, publicKeyHex: string): boolean {\n  if (signatureHex.length !== 128) return false; // 64 bytes = 128 hex chars\n  const sigBytes = Buffer.from(signatureHex, 'hex');\n  const pubBytes = Buffer.from(publicKeyHex, 'hex');\n  return ed25519.verify(sigBytes, messageBytes, pubBytes);\n}\n``` | Membuktikan bahwa representasi signature Ed25519 128-hex lowercase adalah spesifikasi turunan repositori Nexa (`REPOSITORY-DERIVED SPECIFICATION`), bukan standar RFC eksternal. | `[INSPEKSI LOKAL PROGRAMMER: CODE FOUND] / NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE (Bagi Audit Independen: Format 128-hex adalah Spesifikasi Turunan Repositori)` |
 | **E-07** | Invariant Filesystem Safe-Open (AUDIT-NEW-03) | `/opt/antigravity/projects/nexa/sdk/typescript/src/fs_safe.ts#L30-L55` | ```typescript\n// Verifikasi post-open descriptor\nconst fd = fs.openSync(resolvedPath, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW);\nconst fdStat = fs.fstatSync(fd);\nif (!fdStat.isFile()) {\n  fs.closeSync(fd);\n  throw new Error("ERR_FILESYSTEM_CONTAINMENT_VIOLATION");\n}\n``` | Membuktikan implementasi pembukaan descriptor atomik `O_NOFOLLOW`, inspeksi `fstatSync(fd)`, dan validasi `fdStat.isFile()`. Pemeriksaan ganda `lstatSync` dan perbandingan `dev`/`ino` dinyatakan `NOT DEMONSTRATED BY E-07 / RESIDUAL GAP`. Keterbatasan userspace terhadap concurrent ancestor rename diakui (AUD-13, M-02). | `[INSPEKSI LOKAL PROGRAMMER: PARTIAL CODE EVIDENCE FOUND] / NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE (Bagi Audit Independen: Parsial; Gap Residu Desktop Terbuka B-06)` |
-| **E-08** | Status Git Repositori Aktual & Kebersihan Root | Terminal Remote Linux Host `/opt/antigravity/projects/nexa/` | ```bash\n$ git rev-parse HEAD\nfc08a5c7ac6aa1b0e4bcf64dc264666f149e1956\n$ git status --porcelain\n?? docs/roadmaps/Nexa_Development_Roadmap_v4_8.md\n?? docs/whitepapers/Nexa_White_Paper_v5_6.md\n$ ls -la /opt/antigravity/projects/nexa/\ntotal 1780 (hanya berkas resmi proyek di root; Rule D)\n``` | Membuktikan 100% nol mutasi pada berkas kode tracked pada commit aktif. Dua berkas untracked di `docs/` diungkapkan jujur. Berkas plan berada di bawah `evidence/` yang diabaikan oleh `.gitignore:28`. `ls -la` memeriksa root level. | `[INSPEKSI LOKAL PROGRAMMER: ENVIRONMENT INSPECTED] / NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE (Bagi Audit Independen: Commit fc08a5c & Root Clean Dilaporkan Lokal)` |
+| **E-08** | Status Git Repositori Aktual & Kebersihan Root | Terminal Remote Linux Host `/opt/antigravity/projects/nexa/` | ```bash\n$ git rev-parse HEAD\nfc08a5c7ac6aa1b0e4bcf64dc264666f149e1956\n$ git status --porcelain\n?? docs/roadmaps/Nexa_Development_Roadmap_v4_8.md\n?? docs/whitepapers/Nexa_White_Paper_v5_6.md\n$ ls -la /opt/antigravity/projects/nexa/\ntotal 1780 (hanya berkas resmi proyek di root; Rule D)\n``` | **Laporan inspeksi lokal Programmer; bukan bukti yang diverifikasi independen oleh Auditor.** Jika akurat, output tersebut melaporkan nol mutasi tracked pada commit yang disebut, dua berkas untracked di `docs/`, dan inspeksi `ls -la` terbatas pada root level. Keberadaan, isi, dan hash berkas staging di `evidence/` juga tidak diverifikasi secara independen dalam audit ini. | `[REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED] / NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE` |
 | **E-09** | Keterbatasan Verifikasi Runtime Mobile & Service | `/opt/antigravity/projects/nexa/mobile/` & `/opt/antigravity/projects/nexa/cmd/usage/` | *(Ketiadaan harness uji runtime fisik mobile iOS/Android dan Usage Service cluster pada server Linux headless)* | Mengakui secara transparan bahwa runtime mobile dan usage service cluster belum diuji eksekusinya di lingkungan remote server Linux saat ini. | `NOT VERIFIED — EVIDENCE NOT AVAILABLE` |
 
 ---
@@ -536,7 +536,7 @@ Dokumen ini secara ketat membedakan field universal Album yang berlaku umum dari
    - *Field Deklarasi Kriptografis Universal (Status: PROPOSED SPECIFICATION)*: `album_signer_public_key`, `album_signer_signature`, `canonical_algorithm`, `signature_algorithm` (berstatus usulan yang menghadapi circular dependency B-08 dan belum memiliki kontrak identitas/lifecycle B-09).
    - *Field Metadata Tambahan Universal (Status: PROPOSED SPECIFICATION)*: `album_id`, `artist`, `total_tracks` / `total_members`, `release_date` (usulan perancang, belum disahkan PO).
 2. **Field Khusus Tipe Payload (Payload-Specific Fields)**:
-   - *Payload Audio / Musik*: `audio_sha256` (atau `tracks[].sha256`), `duration_seconds`, `track_number`, `track_id`. Draf skema manifest JSON Draft 7 di bawah murni merupakan **draf usulan spesifikasi teknis khusus audio (*audio-specific draft proposal*)**.
+   - *Payload Audio / Musik*: `audio_sha256` dan `tracks[].sha256` tetap merupakan kandidat identifier digest dari draf yang berbeda; hubungan, ekuivalensi, alias, dan pemetaan keduanya **UNRESOLVED — STOP AND CLARIFY**. Keduanya tidak boleh diperlakukan sebagai pilihan alternatif yang dapat diterima, fallback, atau field universal. `duration_seconds`, `track_number`, dan `track_id` juga tetap berada dalam draf khusus audio. Draf skema manifest JSON Draft 7 di bawah murni merupakan **draf usulan spesifikasi teknis khusus audio (*audio-specific draft proposal*)**.
    - *Payload Video*: Belum memiliki kontrak skema manifest normatif (**`UNRESOLVED — STOP AND CLARIFY`**). Video tidak memiliki field `audio_sha256` atau spesifikasi digest bitstream video resmi di WP v5.6.
    - *Payload Document & Image*: Beroperasi sebagai visual viewer mandiri tanpa durasi alami dan tanpa hash bitstream audio (**`UNRESOLVED — STOP AND CLARIFY`**).
    - **Larangan Mutlak**: Field-field audio seperti `audio_sha256`, `duration_seconds`, dan struktur `tracks[]` **DILARANG KERAS DIPERLAKUKAN SEBAGAI SKEMA UNIVERSAL** bagi video, dokumen, dan gambar.
@@ -686,7 +686,7 @@ Contoh dokumen manifest ilustratif:
 >    - Standar **IETF RFC 1951** murni mendefinisikan algoritma kompresi bitstream DEFLATE.  
 >    - Kedua standar eksternal tersebut **TIDAK** menetapkan kuota ukuran, batasan jumlah entri, atau rasio kompresi tingkat aplikasi Nexa. Angka-angka kuota berikut murni merupakan **USULAN SPESIFIKASI TEKNIS (PROPOSED SPECIFICATION di bawah B-07)** yang diajukan untuk disahkan dan **BELUM DIBEKUKAN** dalam White Paper v5.6:  
 > 2. **Rincian Usulan Aturan Pembungkus ZIP (Wrapper)**:  
->    - *Penerimaan Tipe Entri ZIP Sesuai Keputusan PO (AUDIT-NEW-06 PO APPROVED)*: Regular files dan directory entries (entry name berakhiran `/` atau bertipe folder pada central directory) diterima dan tidak menyebabkan kegagalan ekstraksi/validasi; symlink dan special files (FIFO, socket, device files) ditolak fail-closed dengan `ERR_ZIP_INVALID`; semantik hardlink tidak didukung (dua entri dengan byte identik tetap diekstrak sebagai berkas reguler independen). Pembatasan struktur "flat" secara tegas **HANYA BERLAKU** pada path relatif berkas member `.nx` yang dideklarasikan pada manifest (`tracks[].file_name` wajib memenuhi regex `^[a-zA-Z0-9_-]+\.nx$`), bukan pelarangan entri direktori di dalam arsip ZIP. *(Catatan Historis: Usulan draf awal mengenai penolakan direktori telah digantikan secara resmi oleh Keputusan PO AUDIT-NEW-06).*  
+>    - *Penerimaan Tipe Entri ZIP Sesuai Keputusan PO (AUDIT-NEW-06 PO APPROVED)*: Regular files dan directory entries (entry name berakhiran `/` atau bertipe folder pada central directory) diterima dan tidak menyebabkan kegagalan ekstraksi/validasi; symlink dan special files (FIFO, socket, device files) ditolak fail-closed dengan `ERR_ZIP_INVALID`; semantik hardlink tidak didukung (dua entri dengan byte identik tetap diekstrak sebagai berkas reguler independen). Pembatasan struktur "flat" secara tegas **HANYA BERLAKU** pada path relatif berkas member `.nx` yang dideklarasikan pada manifest (`members[].file_name` wajib memenuhi regex `^[a-zA-Z0-9_-]+\.nx$`), bukan pelarangan entri direktori di dalam arsip ZIP. *(Catatan Historis: Usulan draf awal mengenai penolakan direktori telah digantikan secara resmi oleh Keputusan PO AUDIT-NEW-06).*  
 >    - *Usulan Batas Entri Central Directory Fisik (Stage 2) vs Batas Array Manifest (Stage 3 / AUDIT-05)*: Diusulkan kuota total maksimum 200 entri central directory fisik yang dievaluasi pada Tahap 2 ekstraksi ZIP dengan rumus: $N_{\text{total}} = N_{\text{tracks}} + N_{\text{manifest}} + N_{\text{dir\_entries}} \le 200$ (di mana $N_{\text{manifest}} = 1$, $N_{\text{tracks}}$ adalah jumlah berkas member reguler `.nx`, dan $N_{\text{dir\_entries}}$ adalah jumlah entri direktori fisik yang diterima sesuai Keputusan PO AUDIT-NEW-06). Jika $N_{\text{total}} > 200$, proses ekstraksi dibatalkan fail-closed dengan melempar `ERR_ZIP_QUOTA_EXCEEDED`. **Pemisahan Tegas Validasi**: Batas array `maxItems: 199` pada skema manifest JSON (Tahap 3) adalah batas logis deklarasi trek dan **TIDAK MENJAMIN** pemenuhan kuota 200 entri fisik jika terdapat entri direktori di dalam arsip ZIP (contoh: 199 trek + 1 manifest + 1 entri direktori = 201 entri fisik, sehingga melanggar kuota 200). Kapasitas maksimum trek yang dapat dimuat tanpa melanggar kuota 200 fisik berkurang jika terdapat entri direktori: $N_{\text{tracks}} \le 199 - N_{\text{dir\_entries}}$. Status batasan numerik kuota ini tetap merupakan **`PROPOSED SPECIFICATION — BLOCKED BY B-07`** dan belum disahkan sebagai ketentuan normatif.  
 >    - *Usulan Batas Ukuran*: Diusulkan batas maksimum terkompresi 500 MB desimal (500.000.000 bytes) dan dekompresi 4 GB desimal (4.000.000.000 bytes), memicu `ERR_ZIP_QUOTA_EXCEEDED`.  
 >    - *Usulan Rasio Kompresi*: Diusulkan evaluasi rasio kompresi per-entri dan global agregat (jika uncompressed $> 1\text{ MB}$) terhadap ambang batas usulan (10:1 usulan B-07 atau 100:1 referensi pembanding eksternal yang belum diverifikasi — pending keputusan arsitektur), serta penolakan `compressed == 0` (saat uncompressed $> 0$) memicu `ERR_ZIP_BOMB_DETECTED`.  
@@ -862,7 +862,7 @@ NX Player menerapkan prosedur otorisasi JIT 8-tahap sekuensial yang merinci selu
    - *AC Penguji*: **AC-01** (NC-01), **AC-05** (NC-03, terblokir B-01).
 4. **Tahap 4 — Manifest JCS Canonicalization, Signer Signature & Trust Verification**:
    - *Objek Data*: Payload data manifes hasil parsing Tahap 3.
-   - *Operasi*: Melakukan serialisasi kanonikal RFC 8785 JCS atas payload manifes; memverifikasi tanda tangan Ed25519 Album Signer (`album_signer_signature`) menggunakan `album_signer_public_key` (menunggu resolusi circular B-08); mengevaluasi status trust signer pada Registry Authority (`TRUSTED`, `UNTRUSTED`, atau `UNKNOWN`).
+   - *Operasi*: Melakukan serialisasi kanonikal RFC 8785 JCS atas payload manifes dan, hanya setelah circular dependency B-08 diselesaikan, memverifikasi tanda tangan Ed25519 Album Signer (`album_signer_signature`) menggunakan `album_signer_public_key`. Pemeriksaan status signer pada Registry **BUKAN operasi yang saat ini dinyatakan tersedia**; evaluasi Registry hanya dapat dilakukan setelah identitas, enrollment, identity binding, key rotation, dan revocation lifecycle Album Signer ditetapkan secara otoritatif. Sampai saat itu status Registry merupakan kondisi unresolved yang harus ditangani, bukan klaim adanya endpoint, record, atau mekanisme lookup.
    - *Prinsip Pemisahan Evaluasi Manifest vs Member `.nx` (AUDIT-TRUTH-02)*:
      1. Tahap 4 murni mengevaluasi autentisitas deklarasi manifest dan kredibilitas Album Signer. Tahap 4 **BUKAN PENGGANTI DAN TIDAK MENENTUKAN** validitas atau trust individual masing-masing berkas `.nx` anggota.
      2. *Manifest Signature Gagal Kriptografis*: Manifest ditolak fail-closed sebagai deklarasi yang tidak autentik (`ERR_MANIFEST_SIGNATURE_INVALID`). Karena daftar membership pada deklarasi yang gagal autentikasi tidak dapat dipercaya, sistem **DILARANG** mengklaim atau memproses entri yang disebut manifest tersebut sebagai anggota Album terverifikasi. Sistem juga **DILARANG** menyimpulkan bahwa bytes kontainer, Creator signature, ownership proof, atau Registry trust file `.nx` menjadi `INVALID` akibat kegagalan manifest. Diagnostik member hanya boleh dilakukan jika file `.nx` dipilih/disediakan secara independen di luar membership manifest yang gagal; hasilnya harus dilaporkan sebagai verifikasi file mandiri, bukan verifikasi anggota Album.
@@ -871,14 +871,15 @@ NX Player menerapkan prosedur otorisasi JIT 8-tahap sekuensial yang merinci selu
    - *Error Code*: `ERR_MANIFEST_SIGNATURE_INVALID`, `ERR_ALBUM_SIGNER_UNTRUSTED`, `ERR_ALBUM_SIGNER_UNKNOWN`.
    - *AC Penguji*: **AC-03, AC-06, AC-07, AC-08** (NC-02, NC-03, NC-04, B-02, B-08, B-09).
 5. **Tahap 5 — Pemeriksaan Bijeksi 1:1 Manifes-ke-ZIP & Case-Insensitive Uniqueness**:
-   - *Objek Data*: Daftar `tracks[].file_name` pada manifes vs Central Directory ZIP.
-   - *Prasyarat*: Manifes telah berhasil di-parse secara sintaksis dan skema pada Tahap 3, serta daftar entri Central Directory ZIP telah tersedia dari Tahap 2. Pemeriksaan bijeksi adalah validasi integritas fisik/konsistensi deklarasi yang independen dari keputusan trust/otorisasi signer pada Tahap 4.
+   - *Objek Data*: Daftar `members[].file_name` pada manifes vs Central Directory ZIP.
+   - *Prasyarat*: Manifes telah berhasil di-parse secara sintaksis pada Tahap 3, dan daftar entri Central Directory ZIP telah tersedia dari Tahap 2. Pemeriksaan bijeksi pada tahap ini hanya memeriksa konsistensi struktural antara deklarasi dan entri fisik ZIP; pemeriksaan ini **BUKAN** autentikasi deklarasi membership dan tidak mengesahkan file apa pun sebagai anggota Album. Autentisitas membership tetap bergantung pada penyelesaian kebijakan/otoritas signer yang berlaku (CONF-01 / B-09).
    - *Pemeriksaan*: Memvalidasi bijeksi eksak 1:1 antara manifes dan ZIP: setiap file yang dideklarasikan pada manifes wajib ada di ZIP, dan tidak ada file reguler ekstra/asing di dalam ZIP di luar deklarasi manifes dan `album_manifest.json` (entri direktori yang diizinkan PO tidak membatalkan bijeksi); validasi keunikan nama berkas case-insensitive via ASCII case folding (AUDIT-NEW-07).
    - *Error Code*: `ERR_ZIP_ENTRY_MISMATCH` (secara deterministik untuk seluruh ketidakcocokan bijeksi 1:1: baik berkas manifes hilang di ZIP maupun berkas reguler ekstra/asing di ZIP yang tidak dideklarasikan). Catatan: benturan nama case-insensitive antar-entri ZIP telah ditolak pada Tahap 2 dengan `ERR_ZIP_INVALID`.
    - *AC Penguji*: **AC-02, AC-13** (NC-01, NC-07).
 6. **Tahap 6 — Ekstraksi Member .nx & Atomic Filesystem Safe-Open Descriptors (AUDIT-NEW-01, AUDIT-NEW-03)**:
-   - *Objek Fisik*: Berkas kontainer audio tunggal `.nx` anggota album yang aktif diputar, diekstrak ke filesystem lokal sementara/staging.
-   - *Operasi*: Pembukaan berkas kontainer `.nx` pasca-ekstraksi menggunakan deskriptor atomik `fs.openSync(path, O_RDONLY | O_NOFOLLOW)` dan validasi segera melalui `fs.fstatSync(fd).isFile()`. Pemeriksaan ganda `lstatSync` dan perbandingan `dev`/`ino` dicatat sebagai celah residu kode desktop (`NOT DEMONSTRATED BY E-07 / RESIDUAL GAP`).
+   - *Objek Fisik*: Berkas kontainer `.nx` dari anggota Album yang sedang menjadi *current member*, diekstrak ke filesystem lokal sementara/staging.
+   - *Prasyarat*: Tahap 6 sebagai pemrosesan **anggota Album** hanya boleh dijalankan setelah autentisitas membership deklarasi manifest telah dibuktikan secara sah. Pemeriksaan struktur ZIP/manifest pada Tahap 2–5 saja tidak memenuhi prasyarat tersebut. Jika membership belum autentik (termasuk ketika CONF-01 / B-09 belum diputuskan atau signer `UNKNOWN`), sistem tidak boleh mengekstrak atau memproses file berdasarkan klaim bahwa file tersebut anggota Album. File `.nx` yang dipilih/disediakan secara independen tetap dapat diperiksa melalui jalur standalone PE-01; hasilnya bukan pemrosesan anggota Album.
+   - *Operasi*: Untuk anggota Album yang membership-nya telah autentik dan yang menjadi *current member*, pembukaan berkas kontainer `.nx` pasca-ekstraksi menggunakan deskriptor atomik `fs.openSync(path, O_RDONLY | O_NOFOLLOW)` dan validasi segera melalui `fs.fstatSync(fd).isFile()`. Pemeriksaan ganda `lstatSync` dan perbandingan `dev`/`ino` dicatat sebagai celah residu kode desktop (`NOT DEMONSTRATED BY E-07 / RESIDUAL GAP`).
    - *Error Code*: `ERR_FILESYSTEM_CONTAINMENT_VIOLATION`.
    - *AC Penguji*: **AC-20, AC-21** (NC-12, B-06).
 7. **Tahap 7 — Validasi Format Kontainer PE-01, Genesis Cert Ownership & Active License (AUDIT-NEW-01, AUDIT-NEW-10)**:
@@ -974,7 +975,7 @@ Tabel berikut merinci status dependensi setiap prasyarat terhadap ketiga sub-tah
 Sesuai Keputusan Otoritatif Product Owner untuk PE-02 (§2.5):
 1. **Preservasi Perilaku Standalone**: Perilaku pemutaran berkas `.nx` mandiri (*standalone*) pada NX Player Desktop dan Mobile tetap 100% identik dengan baseline yang telah disahkan.
 2. **Alur Pemutaran Album Sekuensial & Auto-Next**:
-   - Jika pengguna membuka satu Album, NX Player memproses anggota pertama dalam urutan manifes.
+   - Jika pengguna membuka satu Album, NX Player hanya dapat memperlakukan entri sebagai anggota Album dan memproses anggota pertama dalam urutan manifes setelah autentisitas membership manifest dibuktikan secara sah. Jika prasyarat tersebut belum terpenuhi, Player tidak boleh memproses entri manifest sebagai anggota Album. File `.nx` yang dipilih secara independen tetap mengikuti jalur standalone PE-01 dan tidak boleh diberi label sebagai anggota Album.
    - Player mengeksekusi otorisasi JIT 8-tahap sesuai mekanisme existing current Player.
    - Jika anggota tersebut memenuhi seluruh persyaratan trust, integritas, dan otorisasi lisensi aktif (`canPlay: true`), Player memutar/menampilkan aset tersebut.
    - Setelah pemrosesan anggota tersebut selesai menurut kontrak lifecycle transisi Album Player yang akan ditetapkan resmi oleh PO/Arsitektur, Player otomatis beralih ke anggota berikutnya (**Auto-Next**).
@@ -1310,7 +1311,7 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
 
 - **Harmonisasi Struktur Flat Archive vs Direktori**:
   - Keputusan PO secara tegas menerima entri direktori di dalam arsip ZIP.
-  - Pembatasan struktur "flat" berlaku pada path relatif member kontainer `.nx` yang dideklarasikan pada manifest (`tracks[].file_name` wajib memenuhi regex `^[a-zA-Z0-9_-]+\.nx$`), yang melarang deklarasi trek dalam subdirektori bersarang (e.g. `discs/track01.nx`).
+  - Pembatasan struktur "flat" berlaku pada path relatif member kontainer `.nx` yang dideklarasikan pada manifest (`members[].file_name` wajib memenuhi regex `^[a-zA-Z0-9_-]+\.nx$`), yang melarang deklarasi trek dalam subdirektori bersarang (e.g. `discs/track01.nx`).
   - Ketentuan Keputusan PO (Level 1) mengesampingkan usulan lama B-07 yang melarang entri direktori.
 - **Pencegahan Path Traversal**: Nama berkas entri diperiksa terhadap pola traversal (`../`, `..\`, absolute path, leading slashes). Pelanggaran melempar **`ERR_ZIP_INVALID`**.
 - **Case-Insensitive Filename Collision**: Pemeriksaan keunikan entri ZIP dan manifes dilakukan secara case-insensitive via ASCII case-folding (`toLowerASCII`) sesuai Keputusan PO (AUDIT-NEW-07). Tabrakan nama melempar **`ERR_ZIP_INVALID`** (pada ZIP) atau **`ERR_MANIFEST_MALFORMED`** (pada manifes).
@@ -1461,7 +1462,7 @@ Tabel berikut merinci taksonomi 20 kode error diskrit tersebut beserta status pr
 | `ERR_ZIP_INVALID` | ZIP Extractor / Go Engine | Format ZIP corrupt/rusak, central directory invalid, entri symlink atau special file (FIFO, socket, dev) terdeteksi (AUDIT-NEW-06), path traversal (`../`, absolute path), atau terjadi benturan nama case-insensitive antar-entri ZIP (AUDIT-NEW-07/08) | Fail-closed; tolak ekstraksi fail-closed | AC-02, AC-13 | Proposed Specification (NC-15; kondisi kegagalan terverifikasi di `container.go#L112`) |
 | `ERR_ZIP_QUOTA_EXCEEDED` | ZIP Wrapper Extractor | Ukuran ZIP > 500 MB desimal (500.000.000 bytes) compressed, uncompressed cumulative extraction > 4 GB desimal, atau jumlah entri > 200 (AUDIT-NEW-08 deterministik) | Fail-closed; batalkan ekstrak | AC-13 | Proposed Specification (NC-15; usulan kuota B-07/NC-07) |
 | `ERR_ZIP_BOMB_DETECTED` | ZIP Wrapper Extractor | Rasio dekompresi per-entri atau global melampaui ambang batas rasio kompresi usulan B-07 (AUDIT-NEW-08 deterministik) | Fail-closed; karantina arsip | AC-13 | Proposed Specification (NC-15; usulan kuota B-07/NC-07) |
-| `ERR_ZIP_ENTRY_MISMATCH` | Packaging Validator | Entri berkas reguler ZIP tidak cocok persis 1:1 secara bijektif dengan `tracks[].file_name` di manifest (terdapat berkas manifest hilang di ZIP, atau terdapat entri berkas reguler ekstra/asing di dalam ZIP di luar deklarasi manifes dan `album_manifest.json`) (AUDIT-NEW-08 deterministik) | Fail-closed; tolak kontainer | AC-02, AC-13 | Proposed Specification (NC-15 / Error Taxonomy Spec) |
+| `ERR_ZIP_ENTRY_MISMATCH` | Packaging Validator | Entri berkas reguler ZIP tidak cocok persis 1:1 secara bijektif dengan `members[].file_name` di manifest (terdapat berkas manifest hilang di ZIP, atau terdapat entri berkas reguler ekstra/asing di dalam ZIP di luar deklarasi manifes dan `album_manifest.json`) (AUDIT-NEW-08 deterministik) | Fail-closed; tolak kontainer | AC-02, AC-13 | Proposed Specification (NC-15 / Error Taxonomy Spec) |
 | `ERR_FILESYSTEM_CONTAINMENT_VIOLATION` | Filesystem Safe-Open | Path traversal (`../`), symlink bypass, TOCTOU | Fail-closed; tolak akses fd | AC-20, AC-21 | Proposed Specification (NC-15; dependensi mitigasi B-06) |
 | `ERR_PLAYBACK_UNAUTHORIZED` | JIT Authorizer | Tidak ada entitlement aktif / lisensi tidak valid | Fail-closed; tolak playback | AC-22 | Proposed Specification (NC-15 / Error Taxonomy Spec) |
 | `ERR_MARKETPLACE_REPLAY_DETECTED` | Transaction Engine | Transaksi dengan token/hash identik terdeteksi | Idempotent return state lama | AC-15 | Proposed Specification (NC-15; dependensi B-04/CONF-03) |
@@ -1490,7 +1491,7 @@ Untuk memastikan kepatuhan mutlak atas mandat AUDIT-NEW-08 dan mencegah pemetaan
 | Path traversal saat Safe-Open descriptor filesystem | Filesystem Safe-Open | `ERR_FILESYSTEM_CONTAINMENT_VIOLATION` | POSIX.1-2017 `O_NOFOLLOW`; §6.12 | AC-20 |
 
 > **Prinsip Rekonsiliasi Deterministik Bebas Kontradiksi (AUDIT-NEW-06, AUDIT-NEW-08):**
-> 1. *Pemisahan Tegas Layer (FINDING-04)*: (a) Anomali fisik kontainer ZIP (arsip rusak, symlink/special file, path traversal fisik, collision nama ZIP) dipetakan ke **`ERR_ZIP_INVALID`** pada ZIP Reader/Extractor; (b) Anomali deklarasi manifes (sintaksis rusak, pelanggaran regex format nama berkas pada `tracks[].file_name`, duplikasi nama di manifes) dipetakan ke **`ERR_MANIFEST_MALFORMED`** pada Manifest Validator; (c) Pelanggaran bijeksi 1:1 antara manifes dan ZIP (baik ada berkas manifes hilang di ZIP maupun ada berkas reguler ekstra/asing di dalam ZIP yang tidak dideklarasikan) dipetakan secara eksklusif dan tunggal ke **`ERR_ZIP_ENTRY_MISMATCH`** pada Packaging Validator. Tidak ada tumpang tindih antar-layer.
+> 1. *Pemisahan Tegas Layer (FINDING-04)*: (a) Anomali fisik kontainer ZIP (arsip rusak, symlink/special file, path traversal fisik, collision nama ZIP) dipetakan ke **`ERR_ZIP_INVALID`** pada ZIP Reader/Extractor; (b) Anomali deklarasi manifes (sintaksis rusak, pelanggaran regex format nama berkas pada `members[].file_name`, duplikasi nama di manifes) dipetakan ke **`ERR_MANIFEST_MALFORMED`** pada Manifest Validator; (c) Pelanggaran bijeksi 1:1 antara manifes dan ZIP (baik ada berkas manifes hilang di ZIP maupun ada berkas reguler ekstra/asing di dalam ZIP yang tidak dideklarasikan) dipetakan secara eksklusif dan tunggal ke **`ERR_ZIP_ENTRY_MISMATCH`** pada Packaging Validator. Tidak ada tumpang tindih antar-layer.
 > 2. *Penerimaan Direktori*: Sesuai keputusan PO (AUDIT-NEW-06), entri direktori di dalam ZIP diterima secara sah dan tidak melempar error.
 > 3. *Ketiadaan Fabrikasi Kode Error Baru*: Taksonomi tetap dibatasi tepat pada 20 kode error kanonikal yang ada tanpa penambahan kode baru.
 > 4. *Status Provenance Taksonomi*: Taksonomi 20 kode error kanonikal di atas berstatus **Proposed Specification (NC-15)** yang belum dibekukan dalam White Paper v5.6, dan kode diskrit kegagalan tanda tangan Genesis berstatus **Unresolved Taxonomy** (dengan perilaku fail-closed `canPlay: false` pasti).
@@ -1681,10 +1682,10 @@ Bagian ini mendokumentasikan keputusan resmi tertulis yang telah disahkan oleh P
    - Semantik hardlink ZIP tidak didukung; tidak diasumsikan adanya representasi hardlink generik universal dalam ZIP.
    - Dua entry dengan isi byte identik tetap diperlakukan sebagai dua file independen; kesamaan byte/hash dilarang digunakan untuk menyimpulkan hardlink.
    - Entry dengan metadata ambigu ditolak secara fail-closed (`ERR_ZIP_INVALID`).
-   - Penolakan subdirektori bersarang berlaku eksklusif pada path relatif member `.nx` yang dideklarasikan pada manifest (`tracks[].file_name`), bukan pelarangan entri direktori pada arsip ZIP.
+   - Penolakan subdirektori bersarang berlaku eksklusif pada path relatif member `.nx` yang dideklarasikan pada manifest (`members[].file_name`), bukan pelarangan entri direktori pada arsip ZIP.
 2. **Keunikan Nama Berkas Case-Insensitive Lintas Platform (AUDIT-NEW-07 — PO APPROVED)**:
    - Nama berkas asli tetap dipertahankan persis termasuk kapitalisasi yang diberikan.
-   - Pemeriksaan keunikan entry ZIP dan manifest `tracks[].file_name` ditegakkan secara case-insensitive via ASCII case folding deterministik.
+   - Pemeriksaan keunikan entry ZIP dan manifest `members[].file_name` ditegakkan secara case-insensitive via ASCII case folding deterministik.
    - Nama yang bertabrakan setelah case-folding (e.g. `TrackA.nx` vs `tracka.nx`) wajib ditolak fail-closed (`ERR_MANIFEST_MALFORMED` pada manifest atau `ERR_ZIP_INVALID` pada entri ZIP) sesuai Boundary Matrix §5.1.
    - Berlaku konsisten lintas platform POSIX, Windows, dan Android.
 3. **Hierarki Sumber Otoritas Kanonikal 6-Tingkat (AUDIT-NEW-09 — PO APPROVED)**:
@@ -1938,41 +1939,6 @@ Bagian ini mengonsolidasikan enam temuan audit terbaru dan **mengesampingkan red
 
 ---
 
-## 14. MANDATORY CLOSING DECLARATIONS (DEF-09)
-
-Sesuai ketentuan tata kelola dan hasil audit komprehensif REV6.3, deklarasi penutup berikut ditegaskan berbasis bukti faktual dengan batas pembuktian yang diakui transparan (DEF-09):
-
-1. **Git Baseline Otoritatif & Integritas Tracked Files**:
-   - **Repositori & Branch**: Repositori pengiriman dokumen `whisnu/plan` (branch `main`). Host repositori kerja lokal `/opt/antigravity/projects/nexa/` (`whisnu/nexa`, branch `main`).
-   - **Baseline Commit SHA Sebelum dan Sesudah Pekerjaan**: `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`.
-   - **Status Tracked Files**: `git diff --name-only` menghasilkan 0 baris output (100% nol mutasi pada seluruh berkas kode sumber terlacak).
-2. **Keterbukaan Berkas Untracked Docs**:
-   - Terdapat 2 berkas dokumen acuan untracked pada working tree yang telah ada sebelum sesi koreksi dan dipertahankan utuh tanpa modifikasi:
-     ```bash
-     $ git status --porcelain
-     ?? docs/roadmaps/Nexa_Development_Roadmap_v4_8.md
-     ?? docs/whitepapers/Nexa_White_Paper_v5_6.md
-     ```
-     *(Working tree tracked bersih; keberadaan 2 berkas dokumen di docs/ dicatat secara transparan tanpa klaim semu bahwa working tree 100% bersih tanpa berkas untracked)*.
-3. **Integritas Berkas Skema Database (Zero-DDL Berkas)**:
-   - Tidak ada perubahan skema aktif pada berkas `marketplace/db/schema.postgres.sql` (*Zero database migration pada skema repositori* dipatuhi 100%).
-   - Status database runtime live/produksi dinyatakan secara jujur: **`NOT VERIFIED — EVIDENCE NOT AVAILABLE`** (tidak ada koneksi database aktif yang diuji atau diotorisasi).
-4. **Kepastian Satu Artefak Kanonikal & Rekonsiliasi Lokasi (DEFECT-C / DEFECT-04)**:
-   - **Identitas Berkas Kanonikal Tunggal**: `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`.
-   - **Lokasi Otoritatif pada GitHub (`whisnu/plan`, branch `main`)**: `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md` (terletak tepat di root repositori `whisnu/plan`).
-   - **Lokasi Staging pada Workstation Lokal Linux**: `/opt/antigravity/projects/nexa/evidence/postsprint16-presprint17/PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`. Penempatan pada subdirektori `evidence/` ini tunduk pada `.gitignore:28` repositori kode sumber `whisnu/nexa` guna mematuhi Rule D (*Zero Root Pollution*) dan mencegah mutasi kode sumber.
-   - **Kesesuaian Konten & Blob SHA**: Berkas pada staging lokal memiliki Git Blob SHA yang identik secara kriptografis dengan berkas pada root GitHub `whisnu/plan`.
-   - **Ketiadaan Berkas Tambahan di GitHub**: Ditegaskan secara faktual bahwa pada branch `main` repositori GitHub `whisnu/plan`, path `evidence/postsprint16-presprint17/PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md` dan path `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN-REV1.md` **TIDAK DITEMUKAN / TIDAK PERNAH DI-TRACK**. Satu-satunya berkas yang ada dan diserahkan adalah berkas root `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`.
-   - **Kepatuhan Single Artifact**: Tidak ada salinan kedua, dokumen pendamping, atau artefak baru yang dibuat.
-5. **Batas Verifikasi Runtime & Mobile**:
-   - Pemeriksaan dibatasi pada file kode statis desktop dan skema DDL statis.
-   - Status lingkungan mobile (iOS / Android) dan runtime live PostgreSQL berstatus **`NOT VERIFIED — EVIDENCE NOT AVAILABLE`**.
-6. **Isolasi Baseline Sprint 16 & PE-01**: Sprint 16 tetap 🔒 `CLOSED / FINAL ACCEPTED / FROZEN` dan PE-01 tetap 🔒 `CLOSED / FROZEN`.
-7. **Sprint 17 Belum Dimulai**: Milestone Sprint 17 tetap berstatus ⏸️ `NOT STARTED`.
-8. **Implementasi PE-02 Belum Diotorisasi**: Status implementasi kode PE-02 tetap secara sah **`NOT AUTHORIZED`**.
-9. **Status Aktual Blocker dan Keputusan PO**: Blocker B-04 / NC-08 / CONF-03 tetap `BLOCKED`; Blocker B-05 / NC-09 tetap `BLOCKED`; Blocker B-06 / NC-12 tetap `OPEN / BLOCKED`; Blocker B-08 (Circular Crypto) tetap `BLOCKED`; Blocker B-09 / NC-04 / CONF-01 tetap `PO / ARCHITECTURE DECISION REQUIRED`.
-10. **Status Gate A dan Gate B**: Gate A berstatus **`NOT PASSED — SIX FINDINGS RECONCILED; SUBSTANTIVE BLOCKERS REMAIN`**; Gate B berstatus **`BLOCKED`**.
-
 ## 13.5 AUDIT ULANG KONSISTENSI REGISTER DAN KONTRAK AKTIF — 2026-11-08
 
 **Ruang lingkup:** audit lintas-bagian pada file kanonikal yang sama, berfokus pada AC-07/AC-08, NC-04, CONF-01, status Album Signer, serta dependensi Stage 8a/8b/8c dan perilaku diagnostik NX Verify. Ini merupakan tindak lanjut audit dokumen, bukan siklus koreksi baru, bukan plan baru, bukan inspeksi source repository, dan bukan otorisasi implementasi.
@@ -2011,3 +1977,83 @@ Sesuai ketentuan tata kelola dan hasil audit komprehensif REV6.3, deklarasi penu
 6. Agregat readiness tetap 14 AC Spec Ready + 18 AC Execution Blocked + 2 AC PO Decision Required = 34 AC; Gate A tetap `NOT PASSED`; Gate B tetap `BLOCKED`; implementasi PE-02 tetap `NOT AUTHORIZED`.
 
 **Disposisi:** Lima ketidaksesuaian redaksional/semantik di atas telah dikoreksi pada file kanonikal yang sama. Blocker substantif yang memerlukan keputusan PO/Architecture Authority tetap terbuka. Audit ini tidak meluluskan Gate A, tidak membuka Gate B, dan tidak memberikan otorisasi implementasi.
+
+## 13.6 AUDIT INDEPENDEN DAN KOREKSI TERARAH IND-01 SAMPAI IND-05 — 2026-11-08
+
+**Ruang lingkup:** tindak lanjut atas lima temuan audit independen IND-01 sampai IND-05. Koreksi dibatasi pada konsistensi identifier path member, atribusi operasi Registry Album Signer, prasyarat autentisitas membership pada alur Player, urutan bagian dokumen, dan provenance bukti repository lokal. Tidak ada plan baru atau siklus koreksi baru.
+
+### IND-01 — Identifier path member tidak konsisten dengan koleksi universal
+- **Temuan:** Beberapa bagian validasi manifest/ZIP masih merujuk `tracks[].file_name`, padahal §5.1 menyatakan `members[]` sebagai koleksi universal dan `tracks[]` bukan alias universal yang disahkan.
+- **Koreksi:** Seluruh rujukan aktif `tracks[].file_name` pada konteks path, bijeksi ZIP, regex, error taxonomy, dan boundary matrix diselaraskan menjadi `members[].file_name`. Ini tidak memilih atau mengesahkan identifier hash audio.
+- **Batas hash:** `audio_sha256` dan `tracks[].sha256` tetap kandidat dari draf berbeda dengan identitas/pemetaan unresolved. Tidak ada alias, ekuivalensi, fallback, prioritas, atau pilihan normatif yang ditetapkan.
+- **Status:** `TARGETED DOCUMENT CORRECTION APPLIED — AUDIO HASH IDENTITY REMAINS UNRESOLVED`.
+
+### IND-02 — Klaim operasi Registry Album Signer mendahului penetapan lifecycle
+- **Temuan:** Uraian Tahap 4 dapat dibaca sebagai klaim bahwa evaluasi trust signer melalui Registry sudah merupakan operasi yang tersedia, sementara NC-04 belum menetapkan identitas dan lifecycle signer.
+- **Koreksi:** Tahap 4 kini memisahkan verifikasi signature kriptografis (yang tetap menunggu resolusi B-08) dari evaluasi Registry. Evaluasi Registry hanya dapat dilakukan setelah identitas, enrollment, identity binding, key rotation, dan revocation lifecycle ditetapkan secara otoritatif.
+- **Status:** `TARGETED DOCUMENT CORRECTION APPLIED — REGISTRY OPERATION NOT CLAIMED AVAILABLE`.
+
+### IND-03 — Prasyarat autentisitas membership belum eksplisit pada alur Player
+- **Temuan:** Pemeriksaan bijeksi struktural dan navigasi Player berpotensi dibaca sebagai pengesahan membership walaupun autentisitas deklarasi manifest belum terbukti.
+- **Koreksi:** Tahap 5 secara eksplisit hanya pemeriksaan konsistensi struktural; Tahap 6 dan navigasi Album mensyaratkan autentisitas membership sebelum file diproses/dilabeli sebagai anggota Album. File yang dipilih secara independen tetap dapat diperiksa sebagai standalone PE-01 dan tidak boleh dilabeli sebagai hasil verifikasi/pemrosesan anggota Album.
+- **Batas:** Koreksi ini tidak memutus CONF-01, tidak menetapkan kebijakan signer UNKNOWN, dan tidak membuat playback authorization global.
+- **Status:** `TARGETED DOCUMENT CORRECTION APPLIED — CONF-01 / B-09 REMAIN UNRESOLVED`.
+
+### IND-04 — Urutan bagian dokumen
+- **Temuan:** §13.5 sebelumnya ditempatkan setelah §14 sehingga deklarasi penutup bukan bagian terakhir.
+- **Koreksi:** §13.5 dipertahankan utuh dan dipindahkan sebelum §14. Bagian ini (§13.6) mencatat koreksi IND-01 sampai IND-05; §14 menjadi bagian terakhir.
+- **Status:** `STRUCTURAL CORRECTION APPLIED`.
+
+### IND-05 — Provenance klaim repository lokal
+- **Temuan:** Sejumlah klaim tentang working tree lokal `whisnu/nexa`, baseline commit, tracked-file diff, DDL, staging file, dan untracked files belum dapat diverifikasi independen oleh Auditor dari repository `whisnu/plan`.
+- **Koreksi:** Klaim tersebut dipertahankan sebagai laporan Programmer, tetapi diberi label `REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`. Evidence ledger E-08 dan ringkasan governance §4.1 telah diselaraskan. Status database runtime, mobile, serta bukti source/DDL tetap `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE` jika bukti primer tidak tersedia.
+- **Batas:** Tidak ada klaim bahwa audit ini memeriksa working tree `whisnu/nexa`, menjalankan `git diff`, `git status`, `ls`, menginspeksi DDL, atau memverifikasi staging lokal.
+- **Status:** `PROVENANCE QUALIFICATION APPLIED`.
+
+### Pemeriksaan preservasi
+1. `members[]` tetap koleksi universal sesuai redaksi §5.1; struktur manifest Album yang belum disahkan tidak diperluas.
+2. Identitas field hash audio tetap unresolved; AC-09 tidak dinaikkan menjadi Spec Ready.
+3. NC-04, B-09, CONF-01, B-08, dan lifecycle revocation AC-08 tetap pada status sebelumnya.
+4. Stage 8a diagnostic/background permission tetap unresolved; Stage 8b/8c dan JIT current-member boundary tidak diubah.
+5. Keputusan PO yang telah disahkan, kontrak PE-01, Sprint 16, dan baseline frozen tidak diubah.
+6. Tidak ada endpoint Registry, signer authority, schema, database field, lifecycle, atau kebijakan baru yang diciptakan.
+7. Gate A tetap `NOT PASSED`; Gate B tetap `BLOCKED`; PE-02 Implementation tetap `NOT AUTHORIZED`; Sprint 16/PE-01 tetap `CLOSED / FROZEN`; Sprint 17 tetap `NOT STARTED`.
+
+**Disposisi:** Koreksi dokumen IND-01 sampai IND-05 diterapkan secara terbatas. Ini bukan penutupan blocker substantif, bukan persetujuan Gate A, bukan pembukaan Gate B, dan bukan otorisasi implementasi. Audit independen ulang atas file aktual tetap diperlukan.
+
+## 14. MANDATORY CLOSING DECLARATIONS (DEF-09)
+
+**Batas provenance wajib:** Bagian ini memuat campuran fakta yang dapat diverifikasi langsung dari file kanonikal GitHub `whisnu/plan:main` dan deklarasi historis Programmer tentang lingkungan lokal `whisnu/nexa`. Setiap klaim mengenai host lokal, working tree, commit lokal, `git diff`, `git status`, `ls`, DDL lokal, staging path, atau file untracked di bawah ini adalah **`REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`**, kecuali bukti primer independen secara eksplisit tersedia. Kehadiran teks deklarasi dalam plan bukan bukti bahwa perintah tersebut dijalankan atau bahwa hasilnya benar.
+
+Sesuai ketentuan tata kelola dan hasil audit komprehensif REV6.3, deklarasi berikut dipertahankan sebagai catatan dengan batas pembuktian yang dinyatakan secara eksplisit:
+
+1. **Git Baseline Otoritatif & Integritas Tracked Files — LAPORAN PROGRAMMER, BELUM DIVERIFIKASI INDEPENDEN**:
+   - **Repositori & Branch pengiriman dokumen:** `whisnu/plan`, branch `main`; keberadaan dan isi file kanonikal pada repositori ini dapat diperiksa langsung.
+   - **Host repositori kerja lokal yang dilaporkan:** `/opt/antigravity/projects/nexa/` (`whisnu/nexa`, branch `main`) — `REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`.
+   - **Baseline Commit SHA lokal yang dilaporkan:** `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956` — `REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`.
+   - **Klaim `git diff --name-only` nol output:** `REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`; audit dokumen ini tidak menjalankan perintah tersebut pada working tree lokal.
+2. **Keterbukaan Berkas Untracked Docs — LAPORAN PROGRAMMER, BELUM DIVERIFIKASI INDEPENDEN**:
+   - Dua berkas berikut dilaporkan sebagai untracked pada working tree lokal:
+     ```bash
+     ?? docs/roadmaps/Nexa_Development_Roadmap_v4_8.md
+     ?? docs/whitepapers/Nexa_White_Paper_v5_6.md
+     ```
+   - Status dan keberadaan aktual berkas tersebut pada working tree lokal tidak diverifikasi independen. Teks output historis bukan pengganti bukti terminal yang dapat diverifikasi.
+3. **Integritas Berkas Skema Database — LAPORAN PROGRAMMER / BUKTI PRIMER TIDAK TERSEDIA**:
+   - Klaim tidak adanya perubahan pada `marketplace/db/schema.postgres.sql` merupakan `REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`.
+   - Status database runtime live/produksi: `NOT VERIFIED — EVIDENCE NOT AVAILABLE`; tidak ada koneksi database aktif yang diuji atau diotorisasi dalam audit ini.
+4. **Kepastian Satu Artefak Kanonikal & Rekonsiliasi Lokasi (DEFECT-C / DEFECT-04)**:
+   - **Identitas berkas kanonikal pada pengiriman:** `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`.
+   - **Lokasi otoritatif GitHub:** `whisnu/plan:main/PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md` (dapat diverifikasi langsung).
+   - **Lokasi staging lokal yang dilaporkan:** `/opt/antigravity/projects/nexa/evidence/postsprint16-presprint17/PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md` — `REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`.
+   - **Klaim kesamaan konten/blob SHA staging lokal dengan GitHub:** `REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`; tidak ada staging file lokal yang diperiksa dalam audit ini.
+   - **Klaim ketiadaan path tambahan pada GitHub** `evidence/postsprint16-presprint17/PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md` dan `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN-REV1.md`: deklarasi historis Programmer tidak membuktikan pemeriksaan independen atas seluruh riwayat branch.
+   - **Single Artifact:** file kanonikal yang menjadi objek koreksi tetap satu file pada root `whisnu/plan`; tidak dibuat plan baru atau artefak pendamping dalam koreksi ini.
+5. **Batas Verifikasi Runtime & Mobile**:
+   - Status lingkungan mobile (iOS / Android), runtime live PostgreSQL, dan implementasi/source repository yang tidak tersedia untuk pemeriksaan independen tetap `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`.
+6. **Isolasi Baseline Sprint 16 & PE-01**: Sprint 16 tetap `CLOSED / FINAL ACCEPTED / FROZEN` dan PE-01 tetap `CLOSED / FROZEN`.
+7. **Sprint 17 Belum Dimulai**: Sprint 17 tetap `NOT STARTED`.
+8. **Implementasi PE-02 Belum Diotorisasi**: implementasi kode PE-02 tetap `NOT AUTHORIZED`.
+9. **Status Blocker dan Keputusan PO**: B-04 / NC-08 / CONF-03 tetap `BLOCKED`; B-05 / NC-09 tetap `BLOCKED`; B-06 / NC-12 tetap `OPEN / BLOCKED`; B-08 tetap `BLOCKED`; B-09 / NC-04 / CONF-01 tetap memerlukan keputusan PO / Architecture Authority.
+10. **Status Gate A dan Gate B**: Gate A tetap `NOT PASSED`; Gate B tetap `BLOCKED`.
+
