@@ -907,7 +907,7 @@ NX Player menerapkan prosedur otorisasi JIT 8-tahap sekuensial yang merinci selu
      - *Prasyarat Mutlak*: Keberhasilan verifikasi digest 8a **DAN** validasi Genesis Certificate 7b **DAN** status otorisasi lisensi pemutaran aktif pengguna terverifikasi sah pada Tahap 7c (*active entitlement / valid user license*).
      - *Larangan Dekripsi Otomatis*: Dekripsi payload audio **TIDAK BOLEH** dianggap otomatis sebagai kelanjutan dari keberhasilan digest. Dekripsi **DILARANG KERAS** dilakukan hanya karena berkas berhasil diekstrak, Safe-Open berhasil, manifes valid, atau digest cocok.
      - *Pemisahan Kondisi Pemblokiran Dekripsi & Kebijakan Signer UNKNOWN (FINDING-03)*:
-        1. *Kondisi Hard-Block Definitif*: Dekripsi payload **DILARANG KERAS** dan dihentikan fail-closed (`canPlay: false`) dalam kondisi: (a) verifikasi digest 8a gagal/mismatch, (b) validasi kontainer PE-01 7a gagal/corrupt, (c) validasi sertifikat Genesis 7b gagal, (d) ketiadaan active license yang sah pada Tahap 7c (`ERR_PLAYBACK_UNAUTHORIZED`), atau (e) dalam mode diagnostic-only (NX Verify). Status Album Signer `UNTRUSTED`/`REVOKED` tidak ditambahkan sebagai global member playback gate; AC-08 mengatur autentisitas/revocation deklarasi manifest, bukan status trust atau otorisasi standalone member.
+        1. *Kondisi Hard-Block Definitif*: Dekripsi payload **DILARANG KERAS** dan dihentikan fail-closed (`canPlay: false`) dalam kondisi: (a) verifikasi digest 8a gagal/mismatch, (b) validasi kontainer PE-01 7a gagal/corrupt, (c) validasi sertifikat Genesis 7b gagal, (d) ketiadaan active license yang sah pada Tahap 7c (`ERR_PLAYBACK_UNAUTHORIZED`), atau (e) dalam mode diagnostic-only (NX Verify). Status Album Signer `UNTRUSTED`/`REVOKED` tidak ditambahkan sebagai global member playback gate. AC-07 mengatur keputusan autentisitas/provenance membership saat signer `UNKNOWN`; AC-08 secara terpisah mencatat kebutuhan evaluasi revocation signer dan tetap terblokir sampai Registry revocation lifecycle ditetapkan. Keduanya tidak mengubah status trust atau otorisasi standalone setiap member.
         2. *Signer UNKNOWN*: Status `UNKNOWN` tidak membuktikan signer `INVALID` dan tidak mengubah trust atau otorisasi mandiri setiap member. CONF-01 hanya memutuskan apakah deklarasi manifest dapat mengautentikasi membership Album serta dasar identitas/lifecycle signer. Sampai diputuskan, membership manifest tidak boleh diasumsikan autentik. Playback tetap mengikuti otorisasi JIT per member berdasarkan kontrak PE-01; tidak ada kebijakan global allow/block yang ditetapkan melalui CONF-01.
       - *Batasan Dekripsi Jalur Diagnostik NX Verify vs Kebijakan Dekripsi Diagnostik Lebih Luas*:
         - *Jalur Diagnostik NX Verify*: Pemeriksaan digest dapat membaca bitstream terenkripsi sesuai tahapan yang ditentukan, namun jalur diagnostik tersebut DILARANG melakukan dekripsi payload audio, DILARANG melakukan buffer registration, dan hasil digest TIDAK PERNAH memberikan playback authorization.
@@ -968,7 +968,7 @@ Tabel berikut merinci status dependensi setiap prasyarat terhadap ketiga sub-tah
 > *Prinsip Diagnostik Terpisah (NX Verify vs Playback Authorization)*: Status Album Signer `UNKNOWN`, `UNTRUSTED`, atau `REVOKED` tidak boleh secara otomatis menyebabkan seluruh informasi diagnostik integritas fisik tidak tersedia di NX Verify, apabila pemeriksaan file mandiri masih dapat dilakukan secara aman dan independen. Namun, tanpa autentisitas membership, hasil tersebut tidak boleh dilabeli sebagai hasil verifikasi anggota Album. Namun demikian, hasil diagnostik integritas fisik yang valid tersebut **TIDAK BOLEH** dianggap sebagai bukti bahwa member album tersebut *trusted* atau memiliki izin pemutaran (*playback authorization*).
 >
 > - *Pemisahan Trust vs Integritas*: Signer trust (Tahap 4) mengevaluasi kredibilitas penerbit album; integritas container packaging dan genesis certificate (Tahap 7) mengevaluasi keabsahan struktur kontainer; integritas audio payload (Tahap 8) mengevaluasi keaslian bitstream audio. Status signer pada Tahap 4 (misal signer `UNTRUSTED`, `REVOKED`, atau `UNKNOWN`) TIDAK membuktikan member `.nx` `INVALID`; namun, tanpa deklarasi membership yang autentik, hasil pemeriksaan file yang diperoleh secara independen harus dilaporkan sebagai verifikasi standalone, bukan hasil verifikasi anggota Album.
-> - *Larangan Pre-Otorisasi*: Pra-verifikasi integritas trek berikutnya dalam antrean album **DILARANG KERAS** ditafsirkan sebagai pemberian otorisasi pemutaran lebih awal atau pendaftaran buffer audio sebelum trek tersebut benar-benar aktif diputar oleh pengguna. Setiap trek wajib melalui Tahap 6, 7, dan 8 secara *just-in-time* saat transisi pemutaran terjadi.
+> - *Larangan Pre-Otorisasi*: Pra-verifikasi integritas trek berikutnya dalam antrean Album **TIDAK PERNAH** memberikan otorisasi pemutaran, dekripsi, atau pendaftaran buffer. Izin menjalankan pemeriksaan diagnostik Stage 8a terhadap anggota antrean tetap `UNRESOLVED` sebagaimana §5.2 dan matriks dependensi; dokumen ini tidak menyatakan tindakan tersebut `ALLOWED` maupun melarangnya secara sepihak. Untuk setiap anggota yang menjadi *current member*, seluruh prasyarat otorisasi dan tahapan playback yang relevan wajib dievaluasi ulang secara JIT; Stage 8b/8c hanya untuk current member sesuai kontrak di atas.
 
 #### Navigasi Album NX Player: Pemutaran Sekuensial, Auto-Next Lifecycle, dan Isolasi Otorisasi (Keputusan PO: APPROVED)
 Sesuai Keputusan Otoritatif Product Owner untuk PE-02 (§2.5):
@@ -1013,13 +1013,13 @@ Sesuai Keputusan Otoritatif Product Owner untuk PE-02 (§2.5):
 
 ### 5.3 NX Verify — Tiga Lapisan Status Terpisah & Batasan Jalur Diagnostik (AUDIT-NEW-01, CONF-02 PO APPROVED)
 NX Verify mengevaluasi arsip album dalam 3 lapisan status independen tanpa mencampuradukkan diagnostik integritas dengan izin pemutaran:
-1. **Lapisan 1: Album Signer Trust Status**: Mengevaluasi apakah `album_signer_public_key` terdaftar pada Registry resmi (`TRUSTED`, `UNTRUSTED`, atau `UNKNOWN` — B-09 / CONF-01).
+1. **Lapisan 1: Album Signer Trust / Provenance Status**: Status registrasi/trust `album_signer_public_key` pada Registry resmi hanya dapat dievaluasi apabila mekanisme Registry untuk identitas dan lifecycle Album Signer telah ditetapkan secara otoritatif. Mekanisme tersebut saat ini `UNRESOLVED — REGISTRY MECHANISM NOT ESTABLISHED BY PRODUCT CONTRACT` (NC-04 / B-09); karena itu, penyebutan `TRUSTED`, `UNTRUSTED`, `REVOKED`, atau `UNKNOWN` di sini adalah kategori kondisi yang perlu ditangani, bukan klaim bahwa endpoint, record, atau lifecycle Registry Album Signer telah tersedia.
    - *Batasan Mutlak Layer 1 (AUDIT-TRUTH-03)*: Status Album Signer pada Lapisan 1 **DILARANG DIJADIKAN SEBAGAI GERBANG GLOBAL (GLOBAL GATE)** yang menentukan validitas atau otorisasi seluruh member `.nx`.
-   - Pemeriksaan member `.nx` pada Lapisan 2 tetap berlangsung secara mandiri dan individual.
-   - Hasil pemeriksaan manifest tidak boleh menyembunyikan, menimpa, atau menggantikan status verifikasi setiap member `.nx`.
-   - Status `UNKNOWN / INCOMPLETE` **DILARANG KERAS DITAMPILKAN ATAU DIPERLAKUKAN SEBAGAI `INVALID`**.
+   - Pemeriksaan integritas mandiri pada Lapisan 2 hanya dapat dijalankan terhadap file `.nx` yang dipilih/disediakan secara independen dan aman. Jika autentisitas manifest/membership belum terbukti (CONF-01), file dari daftar manifest tidak boleh otomatis diperlakukan sebagai anggota Album yang sah; hasil pemeriksaannya, bila sumber file tersedia secara independen, harus dilaporkan sebagai verifikasi standalone.
+   - Hasil pemeriksaan manifest tidak boleh menyembunyikan, menimpa, atau menggantikan status verifikasi setiap member yang membership-nya telah dibuktikan secara sah.
+   - Status `UNKNOWN / INCOMPLETE` wajib dipertahankan dan ditampilkan sebagai kondisi ketidakpastian sesuai empat status kanonikal Nexa (`Trust Unknown` / `Verification Incomplete`); status tersebut **DILARANG KERAS** dipetakan atau diperlakukan sebagai `INVALID`.
 2. **Lapisan 2: Evaluasi Integritas Fisik Anggota & Kategori Diagnostik Internal (PE02-R63-AUD-05)**:
-   Mengevaluasi keabsahan integritas fisik kontainer mandiri PE-01 setiap berkas `.nx` anggota album secara independen (berlaku universal untuk ke-4 tipe payload: Music, Video, Document, dan Image), serta pencocokan hash bitstream audio (khusus payload audio).
+   Mengevaluasi integritas fisik kontainer mandiri PE-01 untuk file `.nx` yang membership-nya telah dibuktikan secara sah atau yang disediakan secara independen untuk pemeriksaan standalone. Cakupan format payload yang relevan adalah Music, Video, Document, dan Image; pencocokan hash bitstream audio hanya berlaku untuk payload audio dan tetap tunduk pada unresolved field identity serta dependensi Stage 8a. Pemeriksaan standalone tidak boleh dilabeli sebagai verifikasi anggota Album.
    - *Pemisahan Tegas Kategori Diagnostik Internal vs Status Kanonikal*:  
      Istilah diagnostik seperti `VALID`, `CORRUPTED`, dan `TAMPERED` pada lapisan ini adalah **murni kategori temuan diagnostik internal / penanda forensik lokal**, dan **DILARANG KERAS** diperlakukan sebagai status verifikasi kanonikal baru atau pengganti status kanonikal Nexa.
    - *Kepatuhan Mutlak pada Empat Status Kanonikal Nexa*:  
@@ -1972,3 +1972,42 @@ Sesuai ketentuan tata kelola dan hasil audit komprehensif REV6.3, deklarasi penu
 8. **Implementasi PE-02 Belum Diotorisasi**: Status implementasi kode PE-02 tetap secara sah **`NOT AUTHORIZED`**.
 9. **Status Aktual Blocker dan Keputusan PO**: Blocker B-04 / NC-08 / CONF-03 tetap `BLOCKED`; Blocker B-05 / NC-09 tetap `BLOCKED`; Blocker B-06 / NC-12 tetap `OPEN / BLOCKED`; Blocker B-08 (Circular Crypto) tetap `BLOCKED`; Blocker B-09 / NC-04 / CONF-01 tetap `PO / ARCHITECTURE DECISION REQUIRED`.
 10. **Status Gate A dan Gate B**: Gate A berstatus **`NOT PASSED — SIX FINDINGS RECONCILED; SUBSTANTIVE BLOCKERS REMAIN`**; Gate B berstatus **`BLOCKED`**.
+
+## 13.5 AUDIT ULANG KONSISTENSI REGISTER DAN KONTRAK AKTIF — 2026-11-08
+
+**Ruang lingkup:** audit lintas-bagian pada file kanonikal yang sama, berfokus pada AC-07/AC-08, NC-04, CONF-01, status Album Signer, serta dependensi Stage 8a/8b/8c dan perilaku diagnostik NX Verify. Ini merupakan tindak lanjut audit dokumen, bukan siklus koreksi baru, bukan plan baru, bukan inspeksi source repository, dan bukan otorisasi implementasi.
+
+### AUDIT-REG-01 — AC-07, AC-08, dan NC-04 sebelumnya tercampur dalam atribusi fungsi
+- **Temuan:** Pada uraian Stage 8b sebelumnya, AC-08 disebut mengatur autentisitas/revocation deklarasi manifest secara bersamaan. Ini mengaburkan pembagian register: AC-07/CONF-01 untuk autentisitas provenance membership saat signer `UNKNOWN`; AC-08 untuk revocation signer dan lifecycle Registry yang belum ditetapkan.
+- **Koreksi:** Uraian Stage 8b kini membedakan AC-07 dan AC-08 secara eksplisit. Register AC-07 tetap `PO DECISION REQUIRED`; AC-08 tetap `TEST-PLANNED — EXECUTION BLOCKED BY UNRESOLVED REGISTRY REVOCATION LIFECYCLE`.
+- **Status:** `TARGETED DOCUMENT CORRECTION APPLIED`.
+
+### AUDIT-REG-02 — Batas diagnostik Stage 8a dan pre-verification belum konsisten pada ringkasan JIT
+- **Temuan:** Satu kalimat larangan pre-otorisasi dapat dibaca sebagai kewajiban bahwa seluruh Stage 6/7/8 hanya berjalan ketika transisi playback, padahal izin diagnostik Stage 8a untuk anggota antrean secara eksplisit masih unresolved. Ini berisiko mengubah unresolved permission menjadi larangan kategoris.
+- **Koreksi:** Redaksi kini menegaskan bahwa Stage 8a background diagnostic permission tetap `UNRESOLVED`; tidak dinyatakan `ALLOWED` atau `NOT ALLOWED`. Larangan yang sudah pasti tetap mutlak: background pre-verification tidak memberi otorisasi playback, tidak melakukan Stage 8b, dan tidak mendaftarkan buffer Stage 8c. Anggota current member tetap menjalani evaluasi otorisasi JIT.
+- **Status:** `TARGETED DOCUMENT CORRECTION APPLIED`.
+
+### AUDIT-REG-03 — NX Verify mengasumsikan membership Album dan mengaburkan verifikasi standalone
+- **Temuan:** Redaksi Lapisan 2 sebelumnya menyatakan pemeriksaan setiap member Album berlangsung independen tanpa mensyaratkan autentisitas membership. Ini tidak konsisten dengan CONF-01 dan Finding-05: manifest yang signer-nya `UNKNOWN` atau signature-nya invalid tidak dapat menjadi bukti membership yang autentik.
+- **Koreksi:** Pemeriksaan member Album hanya dapat dilabeli sebagai hasil anggota Album jika membership dibuktikan secara sah. File yang disediakan/dipilih secara independen masih dapat diperiksa sebagai standalone sesuai PE-01; hasilnya tidak boleh dilabeli sebagai verifikasi anggota Album.
+- **Status:** `TARGETED DOCUMENT CORRECTION APPLIED`.
+
+### AUDIT-REG-04 — Semantik `UNKNOWN / INCOMPLETE` bertentangan dengan empat status kanonikal
+- **Temuan:** Redaksi sebelumnya melarang status `UNKNOWN / INCOMPLETE` ditampilkan, sementara bagian yang sama dan White Paper mempertahankan `Trust Unknown` / `Verification Incomplete` sebagai status kanonikal yang harus dapat ditampilkan.
+- **Koreksi:** Redaksi kini mewajibkan status ketidakpastian dipertahankan dan ditampilkan sebagai `Trust Unknown` / `Verification Incomplete`, serta melarang pemetaannya menjadi `INVALID`.
+- **Status:** `MATERIAL DOCUMENT DEFECT — TARGETED CORRECTION APPLIED`.
+
+### AUDIT-REG-05 — Klaim lookup Registry Album Signer belum dibatasi oleh ketiadaan lifecycle
+- **Temuan:** Kalimat awal Lapisan 1 NX Verify dapat dibaca sebagai kontrak operasional bahwa public key Album Signer sudah dapat diperiksa pada Registry, sementara NC-04 §6.4 secara eksplisit menyatakan mekanisme pendaftaran, identity binding, rotation, dan revocation belum terbukti/ditetapkan.
+- **Koreksi:** Lapisan 1 kini menyatakan evaluasi Registry hanya dapat dilakukan setelah mekanisme identitas dan lifecycle Album Signer ditetapkan secara otoritatif. Kategori status yang disebut merupakan kondisi yang perlu ditangani, bukan klaim tersedianya endpoint, record, atau lifecycle.
+- **Status:** `TARGETED DOCUMENT CORRECTION APPLIED`.
+
+### Pemeriksaan preservasi setelah koreksi
+1. AC-07 tetap `PO DECISION REQUIRED`; AC-08 tetap `EXECUTION BLOCKED`; NC-04 tetap `PARTIALLY SPECIFIED / GAP UNRESOLVED`; CONF-01 tetap terbuka.
+2. Opsi A/B/C tidak dihidupkan kembali sebagai kebijakan. Penyebutannya yang tersisa hanya catatan historis yang secara eksplisit menyatakan bukan kerangka keputusan aktif, serta pernyataan bahwa opsi tersebut telah dihapus.
+3. AC-22 tetap terblokir parsial oleh prasyarat JIT, izin diagnostik Stage 8a, identitas field hash, dan autentisitas membership manifest; CONF-01 bukan gerbang playback global.
+4. Stage 8b tetap memerlukan digest 8a yang cocok, Genesis 7b sah, dan lisensi aktif 7c; Stage 8c tetap hanya setelah Stage 8b berhasil dan hanya untuk current member.
+5. Tidak ada endpoint Registry, signer authority, schema, database field, atau lifecycle baru yang diciptakan. Tidak ada perubahan pada keputusan PO positif, PE-01, atau Sprint 16.
+6. Agregat readiness tetap 14 AC Spec Ready + 18 AC Execution Blocked + 2 AC PO Decision Required = 34 AC; Gate A tetap `NOT PASSED`; Gate B tetap `BLOCKED`; implementasi PE-02 tetap `NOT AUTHORIZED`.
+
+**Disposisi:** Lima ketidaksesuaian redaksional/semantik di atas telah dikoreksi pada file kanonikal yang sama. Blocker substantif yang memerlukan keputusan PO/Architecture Authority tetap terbuka. Audit ini tidak meluluskan Gate A, tidak membuka Gate B, dan tidak memberikan otorisasi implementasi.
