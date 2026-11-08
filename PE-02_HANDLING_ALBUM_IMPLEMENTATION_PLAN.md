@@ -54,6 +54,7 @@ Sesuai Keputusan Product Owner yang Telah Disahkan (AUDIT-NEW-09 PO APPROVED), s
 > 4. Temuan audit, usulan spesifikasi, atau interpretasi teknis (Level 6) mempertahankan status asalnya dan tidak otomatis menjadi ketentuan normatif.
 > 5. Jika terjadi pertentangan antara dua sumber otoritatif pada tingkat yang sama atau ambiguitas material yang belum diselesaikan sumber normatif, Programmer **wajib menghentikan penetapan kontrak** (`CONFLICT — STOP AND CLARIFY`) dan meminta penetapan resmi tertulis dari Product Owner. Dilarang keras menyelesaikan konflik melalui asumsi, ekstrapolasi sepihak, atau tebakan bebas.
 > 6. Seluruh bagian dokumen ini yang merujuk pada hierarki otoritas (termasuk §3.1 dan §10.3) secara hierarkis tunduk penuh pada ketentuan kanonikal Bagian 1.2 ini.
+> 7. **Kualifikasi ruang lingkup rujukan White Paper/Roadmap untuk PE-02:** White Paper v5.6 dan Roadmap v4.8 adalah sumber Product Truth, tetapi keduanya tidak memuat spesifikasi Album ZIP, Album Manifest, Album Signer, atau lifecycle signer Album. Rujukan White Paper ke manifest, container, Creator signature, Genesis, Registry, JIT Player, Verify, dan Studio hanya menjadi dasar bagi kontrak Nexa yang memang didefinisikan di sana—terutama perilaku standalone .nx, trust/evidence, dan baseline aplikasi—dan **tidak boleh diperluas otomatis** menjadi kontrak Album. Roadmap v4.8 mencatat PE-02 sebagai NOT READY — BLOCKED (V5-REV1), Product Enhancement Window OPEN / NOT FROZEN, dan implementasi NOT AUTHORIZED; status itu tidak dapat dinaikkan oleh isi plan ini. Setiap ketentuan Album-spesifik harus ditandai secara eksplisit sebagai (a) keputusan PO PE-02 yang benar-benar telah disahkan, (b) proposal teknis, atau (c) unresolved/blocked. Kutipan White Paper/Roadmap yang hanya mendukung perilaku member .nx tidak boleh ditulis seolah-olah sumber tersebut mengesahkan desain Album.
 
 ### 1.3 Rekonstruksi Historis Temuan Awal sampai REV6 dan REV22 (Bagian 2.2)
 Sesuai Bagian 2.2, riwayat audit merupakan fondasi pengambilan keputusan yang tidak boleh dihapus atau disederhanakan menjadi ringkasan sepihak. Matriks berikut mendokumentasikan evolusi historis dan risiko yang wajib dicegah secara operasional pada REV6:
@@ -1806,7 +1807,7 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 | 2. Seluruh 34 AC memiliki expected result terukur  | MEMENUHI SYARAT PARSIAL (AC-01/28/29/32 gap) |
 | 3. Traceability dua arah NC <-> AC terbukti        | MEMENUHI SYARAT STRUKTURAL; SEMANTIC GAPS REMAIN                              |
 | 4. Bukti Evidence Ledger terverifikasi di server   | MEMENUHI SYARAT (Klaim dibatasi kode statis) |
-| 5. Penyelesaian konflik material (CONF-01, 02, 03) | GAGAL (CONF-01 & 03 terbuka; CONF-02 selesai)|
+| 5. Penyelesaian konflik material dan batas sumber Product Truth | GAGAL (CONF-01 & 03 terbuka; CONF-02 selesai; kontrak Album tidak ditetapkan White Paper/Roadmap) |
 | 6. Konsistensi status antar-register bebas cacat   | GAGAL (Kontrak kriptografi B-08 terblokir)   |
 +----------------------------------------------------+----------------------------------------------+
 | STATUS AKHIR GATE A                                | NOT PASSED — SIX FINDINGS RECONCILED; SUBSTANTIVE BLOCKERS REMAIN   |
@@ -1850,7 +1851,7 @@ Berdasarkan bukti faktual dan hasil audit, kesiapan sistem dirinci ke dalam 8 ka
 ### 13.2 Disposisi Kesiapan Dokumen Resmi
 Status kesiapan resmi dokumen ditetapkan sebagai:
 
-**`REQUIRES TARGETED CORRECTIONS (WITH OPEN MATERIAL CONFLICTS, STRUCTURAL BLOCKERS, AND PENDING PO DECISION) / NOT READY FOR IMPLEMENTATION — BLOCKED`**
+**`NOT READY — PRODUCT-TRUTH SOURCE BOUNDARY / ALBUM-SPECIFIC CONTRACT ATTRIBUTION REQUIRES TARGETED RECONCILIATION; IMPLEMENTATION BLOCKED`**
 
 ---
 
@@ -1912,6 +1913,30 @@ Bagian ini mengonsolidasikan enam temuan audit terbaru dan **mengesampingkan red
 10. Gate A `NOT PASSED`, Gate B `BLOCKED`, PE-02 Implementation `NOT AUTHORIZED`, Sprint 16/PE-01 `CLOSED / FROZEN`, Sprint 17 `NOT STARTED`.
 
 **Disposisi setelah rekonsiliasi:** Dokumen telah diperbarui secara terarah, tetapi blocker substantif belum seluruhnya terselesaikan hanya dengan perubahan redaksi. Gate A tetap `NOT PASSED` sampai audit independen memverifikasi konsistensi seluruh bagian dan otoritas terkait menetapkan keputusan yang menjadi kewenangannya. Tidak ada otorisasi implementasi yang diberikan.
+
+## 13.4 AUDIT INDEPENDEN PRODUCT-TRUTH SOURCE BOUNDARY — 2026-11-08
+
+**Ruang lingkup:** pemeriksaan White Paper v5.6 dan Roadmap v4.8 dari Library terhadap atribusi sumber, klaim kontrak, register AC/NC, serta status governance dalam file kanonikal PE-02 pada GitHub whisnu/plan:main. Pemeriksaan ini bersifat audit dokumen; bukan inspeksi source repository whisnu/nexa, bukan runtime test, dan bukan bukti implementasi.
+
+### AUDIT-PT-01 — Rujukan sumber member .nx berisiko dibaca sebagai pengesahan kontrak Album
+- **Status:** `MATERIAL DOCUMENT DEFECT — TARGETED CORRECTION APPLIED`.
+- White Paper v5.6 mendefinisikan baseline ekosistem, batas authority, container/manifest, Creator/Genesis ownership, Registry, JIT Player, Verify, dan Studio. Namun, tidak ditemukan spesifikasi normatif untuk ZIP wrapper Album, Album Manifest, Album Signer, identitas Album multi-member, atau lifecycle signer Album.
+- Roadmap v4.8 secara eksplisit mempertahankan PE-02 `NOT READY — BLOCKED (V5-REV1)`, Product Enhancement Window `OPEN / NOT FROZEN`, PE-02 implementation `NOT AUTHORIZED`, dan Sprint 17 `NOT STARTED`. Roadmap bukan sumber persetujuan desain Album.
+- Karena itu, rujukan dalam AC/NC ke White Paper §Manifest, §Registry, §JIT Player, §Verify, atau §Studio hanya mendukung bagian kontrak Nexa yang benar-benar dinyatakan dalam White Paper. Rujukan tersebut tidak membuktikan Album-specific extension. Keputusan PO PE-02 yang telah disahkan tetap berlaku pada ruang lingkupnya; proposal teknis dan keputusan yang belum disahkan tetap non-normatif.
+- **Koreksi diterapkan:** §1.2 kini memuat kualifikasi ruang lingkup rujukan White Paper/Roadmap dan kewajiban mengklasifikasikan setiap ketentuan Album-spesifik sebagai keputusan PO, proposal, atau unresolved. §12.3 dan §13.2 kini secara eksplisit mempertimbangkan gap atribusi sumber tersebut.
+
+### AUDIT-PT-02 — Status roadmap tidak boleh disamakan dengan status koreksi plan
+- **Status:** `PASS — STATUS BOUNDARY PRESERVED`.
+- Koreksi pada dokumen PE-02 tidak mengubah Roadmap v4.8, tidak menutup Product Enhancement Window, tidak meluluskan Gate A secara otomatis, dan tidak mengotorisasi implementasi.
+- Status tetap: Gate A `NOT PASSED`; Gate B `BLOCKED`; PE-02 implementation `NOT AUTHORIZED`; Sprint 16/PE-01 `CLOSED / FROZEN`; Sprint 17 `NOT STARTED`.
+
+### Batas audit dan keputusan
+- Audit ini tidak menyelesaikan CONF-01, B-08, B-04/CONF-03, B-05, B-06, B-07, NC-01, NC-04, atau ketergantungan JIT Stage 8a yang masih unresolved.
+- Tidak ada kontrak Album baru, signer authority, Registry endpoint, schema, database field, atau lifecycle yang ditambahkan.
+- Tidak ada perubahan pada keputusan PO yang sudah disahkan atau baseline PE-01/Sprint 16.
+- **Disposisi:** koreksi atribusi Product Truth telah diterapkan pada dokumen yang sama. Gate A tetap `NOT PASSED` karena blocker substantif dan keputusan otoritatif yang belum selesai; Gate B tetap `BLOCKED`. Implementasi PE-02 tetap `NOT AUTHORIZED`.
+
+---
 
 ## 14. MANDATORY CLOSING DECLARATIONS (DEF-09)
 
