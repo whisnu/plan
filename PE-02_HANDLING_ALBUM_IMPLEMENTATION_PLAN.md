@@ -2722,7 +2722,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
   ```
 - **Akar Konflik Internal & Falsifikasi:**
   - Kutipan lama pada §4.4 E-03 terbukti merupakan draf sintetik ringkas dari audit awal yang menggunakan nama kolom fiktif (`acquired_id`, `user_id`, `item_id`, `provider`) dan secara keliru memotong baris 112 dari tabel `entitlements`.
-  - Berkas DDL asli repositori membuktikan **100% faktual bahwa kolom `acquired_package_sha256 VARCHAR(64)` secara eksplisit ada pada kedua tabel: `acquisitions` (Line 72) dan `entitlements` (Line 112)**. Tidak ada kontradiksi di dalam berkas sumber repositori `whisnu/nexa`.
+  - Hasil inspeksi Programmer melaporkan bahwa kolom `acquired_package_sha256 VARCHAR(64)` ada pada kedua tabel: `acquisitions` (Line 72) dan `entitlements` (Line 112). Kutipan DDL utuh dicantumkan di atas. Disposisi ini adalah verifikasi Programmer atas DDL statis pada commit yang disebut, bukan verifikasi live database atau inspeksi independen Auditor.
 - **Bukti Source Producer (Commit `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`):**
   - Producer 1 (`marketplace/server.js:L3853`):
     `UPDATE acquisitions SET state = 'ACQUISITION_COMPLETED', acquired_storage_object_id = $1, acquired_package_sha256 = $2, updated_at = $3 WHERE acquisition_id = $4`
