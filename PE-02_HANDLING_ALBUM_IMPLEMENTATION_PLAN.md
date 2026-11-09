@@ -10,10 +10,12 @@
 > - **PE-01 Baseline:** 🔒 **`CLOSED / FROZEN`** (Tidak Boleh Diubah)
 > - **Sprint 17 Milestone:** ⏸️ **`NOT STARTED`** (Belum Dimulai)
 > - **Blocker Struktural & Ketidakpastian Kriptografi Kritis:**
->   - **Kriptografi Manifest (Circular Dependency — B-08):** **`BLOCKED — REQUIRES CLARIFICATION`** (`album_signer_signature` berada di dalam payload yang dikanonisasi JCS).
->   - **B-04 / NC-08 / CONF-03:** **`BLOCKED`** (Zero-DDL Constraint & Ketiadaan 2PC Marketplace Transaksi Terdistribusi).
->   - **B-05 / NC-09:** **`BLOCKED`** (Ketidakpastian Semantik Kolom `acquired_package_sha256` & Child Row Database).
->   - **B-09 / NC-04 / CONF-01:** **`PO DECISION REQUIRED`** (Autentisitas manifest/membership saat signer `UNKNOWN`; identitas dan lifecycle signer belum ditetapkan).
+>   - **B-04 / NC-08 / CONF-03:** **`BLOCKED — PSV REQUIRED FIRST`** (PSV workflow Marketplace, transaksi, Zero-DDL, dan side effect eksternal; eskalasi hanya jika pertanyaan normatif tetap tersisa).
+>   - **B-05 / NC-09:** **`BLOCKED — PSV REQUIRED FIRST`** (PSV schema/DDL, producer-consumer, byte-domain, persistence, dan child mapping).
+>   - **B-06 / NC-12:** **`OPEN / BLOCKED — PSV REQUIRED FIRST`** (PSV Safe-Open per platform dan adversarial tests sebelum penilaian residual risk).
+>   - **B-07 / NC-07:** **`PROPOSED / BLOCKED — PSV REQUIRED FIRST`** (PSV parser/extractor, streaming quota enforcement, dan test; parameter normatif tetap menunggu pembekuan otoritas).
+>   - **B-08 / NC-02:** **`BLOCKED — PSV REQUIRED FIRST`** (PSV signed-content, signature envelope, canonicalization, dan verification path; eskalasi arsitektur jika kontrak tetap tidak menentukan).
+>   - **B-09 / NC-04 / CONF-01:** **`PO DECISION REQUIRED AFTER PSV`** (PSV signer/membership dan lifecycle terlebih dahulu; keputusan normatif autentisitas membership/identitas/lifecycle hanya untuk hal yang tetap belum ditetapkan).
 >   - **NC-14 / CONF-02:** **`PO DECISION APPROVED (OPTION B)`** (Keputusan PO Disahkan: NX Verify Tidak Menampilkan Status Agregat Album; Hasil Verifikasi Individual Member Tetap Menjadi Hasil Utama).
 
 ---
@@ -1651,7 +1653,7 @@ Matriks berikut mendokumentasikan keterlacakan dua arah (*Forward & Reverse Trac
 ## 10. KEPUTUSAN PRODUCT OWNER YANG MASIH DIPERLUKAN
 
 ### 10.1 Kebijakan Album Signer `UNKNOWN`, Kebutuhan Entitas Signer & Lifecycle Key (NC-04, B-09, CONF-01, AUDIT-TRUTH-02)
-Keputusan resmi mengenai eksistensi Album Signer dan penggunaan deklarasi manifest yang signer-nya `UNKNOWN` merupakan kewenangan eksklusif Product Owner dan Otoritas Arsitektur. **CONF-01 bukan pilihan kebijakan playback global.**
+Keputusan normatif mengenai eksistensi/otoritas Album Signer dan penggunaan deklarasi manifest yang signer-nya `UNKNOWN` berada pada Product Owner dan Otoritas Arsitektur sesuai domain kewenangan. Penetapan tersebut tidak menjadi prasyarat untuk PSV atas implementasi signer, membership, dan lifecycle yang tersedia. **CONF-01 bukan pilihan kebijakan playback global.**
 
 1. **Evaluasi Kebutuhan Entitas Album Signer**:
    - Jika dipertahankan melalui keputusan PO/Arsitektur, fungsinya dibatasi murni pada autentisitas deklarasi manifest dan daftar anggota.
@@ -1669,12 +1671,12 @@ Keputusan resmi mengenai eksistensi Album Signer dan penggunaan deklarasi manife
    - Integritas kontainer dan tanda tangan Creator setiap member tetap independen dari status signer manifest.
    - Tidak boleh menciptakan Registry endpoint, record sintetis, revocation list, key lifecycle, atau mekanisme fallback yang belum memiliki dasar kontrak.
 
-> **Status Tata Kelola:** CONF-01 tetap `PO DECISION REQUIRED` pada AC-07 (B-09 / NC-04), tetapi tidak lagi dirumuskan sebagai pilihan global playback. AC-07 menguji batas penggunaan deklarasi manifest saat signer `UNKNOWN` serta lifecycle signer yang belum memiliki kontrak. AC-25 tetap khusus untuk keputusan CONF-02.
+> **Status Tata Kelola:** CONF-01 tetap `PO DECISION REQUIRED` pada AC-07 (B-09 / NC-04), tetapi status keputusan ini tidak menunda PSV Programmer atas implementasi signer/membership dan lifecycle yang tersedia. Setelah PSV, PO/Architecture Authority hanya diminta menetapkan kebijakan atau kontrak yang memang belum ditentukan. CONF-01 bukan pilihan global playback. AC-07 menguji batas penggunaan deklarasi manifest saat signer `UNKNOWN` serta lifecycle signer yang belum memiliki kontrak. AC-25 tetap khusus untuk keputusan CONF-02.
 
 ### 10.2 Pembekuan Parameter Kuota Ekstraksi ZIP & Rekonsiliasi Celah Pengujian (B-07, NC-07, REQ-B03-04..06)
-1. **Rasio Dekompresi ZIP Bomb (REQ-B03-04)**: Architecture Authority menetapkan nilai berdasarkan threat model, benchmark payload Nexa yang sah, serta hard cap absolut per-entry dan kumulatif. Rasio 10:1 dan 100:1 tetap kandidat, bukan standar normatif; jangan memilih salah satunya hanya karena angka tersebut pernah muncul dalam draf.
-2. **Batas Ukuran Wrapper dan Payload Individual (REQ-B03-05)**: Architecture Authority menetapkan batas compressed wrapper dan expanded cumulative wrapper berdasarkan pengujian resource. Batas payload individual .nx 2 GiB adalah klaim baseline implementasi yang masih harus diverifikasi independen pada source. Tambahkan acceptance coverage eksplisit untuk batas payload individual; jangan memetakan pengujian tersebut secara keliru ke AC-11/12 jika keduanya tidak mengujinya.
-3. **Batas 50 Member vs 200 Physical ZIP Entries (REQ-B03-06)**: Pisahkan batas UI/produk jumlah member dari jumlah entry fisik ZIP. Architecture Authority menyusun dampak teknis dan batas resource. Product Owner hanya perlu menetapkan apakah batas 50 member merupakan batas produk wajib atau sekadar panduan UX; nilai 200 physical entries tidak boleh dipakai sebagai pengganti batas jumlah member.
+1. **Rasio Dekompresi ZIP Bomb (REQ-B03-04)**: Programmer melakukan PSV terlebih dahulu atas parser/extractor, streaming counters, enforcement per-entry/kumulatif, dan test yang tersedia. Architecture Authority menetapkan parameter normatif berdasarkan hasil PSV, threat model, benchmark payload Nexa yang sah, serta hard cap absolut per-entry dan kumulatif. Rasio 10:1 dan 100:1 tetap kandidat, bukan standar normatif; jangan memilih salah satunya hanya karena angka tersebut pernah muncul dalam draf.
+2. **Batas Ukuran Wrapper dan Payload Individual (REQ-B03-05)**: Programmer melakukan PSV terlebih dahulu atas batas yang benar-benar ditegakkan parser/extractor, termasuk compressed wrapper, expanded cumulative wrapper, dan payload individual .nx. Klaim baseline 2 GiB tetap `NOT VERIFIED` sampai dibuktikan. Architecture Authority menetapkan parameter normatif berdasarkan hasil PSV dan pengujian resource. Tambahkan acceptance coverage eksplisit untuk batas payload individual; jangan memetakan pengujian tersebut secara keliru ke AC-11/12 jika keduanya tidak mengujinya.
+3. **Batas 50 Member vs 200 Physical ZIP Entries (REQ-B03-06)**: Programmer melakukan PSV terlebih dahulu atas enforcement jumlah member UI/produk dan jumlah entry fisik ZIP. Pisahkan kedua domain tersebut dalam bukti dan test. Architecture Authority menyusun dampak teknis dan batas resource berdasarkan hasil PSV. Product Owner hanya perlu menetapkan apakah batas 50 member merupakan batas produk wajib atau sekadar panduan UX; nilai 200 physical entries tidak boleh dipakai sebagai pengganti batas jumlah member.
 4. **Status**: Semua nilai numerik tetap PROPOSED sampai threat model, benchmark, coverage AC, dan keputusan otoritas terkait selesai. Ini bukan permintaan agar PO merancang parameter teknis.
 
 ### 10.3 Keputusan Product Owner yang Telah Disahkan (Mandat AUDIT-NEW — PO APPROVED)
@@ -1821,10 +1823,10 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 | Parameter Evaluasi Kesiapan Implementasi (Gate B)  | Hasil Evaluasi Substantif                    |
 +----------------------------------------------------+----------------------------------------------+
 | 1. Kelulusan formal Gate A                         | GAGAL (Gate A belum lulus)                   |
-| 2. Penyelesaian Circular Dependency Kriptografi    | TERBLOKIR (B-08 tetap terbuka)               |
-| 3. Penyelesaian Blocker B-04 (2PC / Zero-DDL)      | TERBLOKIR (B-04 / CONF-03 tetap terbuka)     |
-| 4. Penyelesaian Blocker B-05 (Semantik Hash DB)    | TERBLOKIR (B-05 tetap terbuka)               |
-| 5. Penyelesaian Blocker B-06 (POSIX TOCTOU)        | TERBLOKIR (B-06 tetap terbuka)               |
+| 2. PSV B-08 — signed-content / signature construction | PSV Programmer wajib dilakukan terlebih dahulu; keputusan arsitektur hanya jika kontrak signature scope/representation tetap unresolved setelah PSV |
+| 3. PSV B-04 — Marketplace / Zero-DDL | PSV Programmer wajib dilakukan terlebih dahulu; eskalasi CONF-03 hanya jika pertanyaan normatif tetap unresolved setelah PSV |
+| 4. PSV B-05 — hash database / child mapping | PSV Programmer wajib dilakukan terlebih dahulu; eskalasi data hanya jika semantik tetap unresolved setelah PSV |
+| 5. PSV B-06 — filesystem / POSIX TOCTOU | PSV Programmer wajib dilakukan terlebih dahulu; penerimaan residual risk dipertimbangkan setelah bukti mitigasi dan test tersedia |
 | 6. PSV signer/membership dan keputusan CONF-01 (B-09) | PSV Programmer harus dilakukan terlebih dahulu; keputusan PO/Architecture Authority hanya diperlukan untuk kebijakan autentisitas atau kontrak lifecycle yang tetap belum ditetapkan setelah PSV |
 | 7. Otorisasi resmi pelaksanaan implementasi        | TIDAK DIBERIKAN (NOT AUTHORIZED)             |
 +----------------------------------------------------+----------------------------------------------+
@@ -1837,7 +1839,7 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 ## 13. READINESS GATE DAN BATAS OTORISASI
 
 ### 13.1 Evaluasi Kesiapan (Readiness Conclusion)
-Berdasarkan isi dokumen, laporan Programmer, dan batas bukti yang tersedia bagi Auditor, kesiapan sistem dirinci ke dalam 8 kategori kesiapan:
+Berdasarkan isi dokumen, laporan Programmer, dan batas bukti yang tersedia bagi Auditor, kesiapan sistem dirinci ke dalam 8 kategori kesiapan. Klasifikasi di bawah ini adalah status readiness, bukan pengganti urutan PSV: seluruh fakta implementasi yang menjadi dependency blocker source-dependent tetap harus diperiksa Programmer terlebih dahulu sesuai §7.1 dan §15.3.
 1. **Laporan inspeksi repositori lokal Programmer (`REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`):** Programmer melaporkan inspeksi atas DDL `schema.postgres.sql`, engine packaging Go `container.go`, modul Ed25519 SDK `crypto.ts`, handler NX Player `main.js`, ketiadaan 2PC di Marketplace `server.js`, dan status git commit `fc08a5c...`. Auditor belum memeriksa repositori `whisnu/nexa` atau bukti primer tersebut; seluruh klaim inspeksi tetap `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE` bagi audit independen ini.
 2. **Hal yang Berstatus Spesifikasi Konseptual (`SPECIFIED — PENDING IMPL`):** Draf JSON Schema audio berstatus proposed/non-normative; sintaksis Draft 7 tidak menjadikannya kontrak normatif, batas 199 track belum disahkan, dan schema universal multi-payload serta metadata persistence masih unresolved (NC-01/AC-01; §5.1), serializer RFC 8785 JCS, invariant Safe-Open, taksonomi 20 error code, dan formula derivasi ID.
 3. **Inventaris dan Klasifikasi Kesiapan Seluruh Acceptance Criteria (Total Tepat 34 AC) (DEFECT-01):**
@@ -2371,11 +2373,11 @@ Butir berikut tidak boleh dinyatakan terbukti hanya dari PLAN, laporan lama, nam
 | R-08 — Safe-Open/filesystem | Periksa implementasi per platform, descriptor-relative operations, symlink/ancestor handling, containment, TOCTOU, staging permissions, dan adversarial tests. | Tidak adanya satu primitive seperti `O_NOFOLLOW` pada cuplikan tertentu bukan bukti keamanan atau ketidakamanan seluruh jalur. |
 | R-09 — Parser/JCS/cryptography | Periksa raw-byte parser, duplicate-key/Unicode/number handling, RFC 8785 implementation, exact signed bytes, Ed25519 input, key role, dan test vectors. | Nama library atau pemanggilan serializer saja tidak membuktikan kesesuaian RFC 8785 maupun signature scope. |
 | R-10 — Album Signer/membership authenticity | Periksa identity binding, enrollment, authority, key custody, rotation, revocation, freshness, manifest verification, dan dependency Registry bila memang ada. | Jangan mengasumsikan Album Signer sudah mempunyai lifecycle atau authority yang belum dibuktikan. |
-| B-04 / NC-08 / CONF-03 | Periksa workflow aktual Studio/Marketplace dan kemampuan layanan eksternal yang terlibat. | Source evidence tidak menggantikan keputusan Zero-DDL atau keputusan arsitektur/PO yang masih diperlukan. |
-| B-05 / NC-09 | Periksa schema/DDL aktual, producer-consumer mapping, persistence, dan seluruh penggunaan hash terkait. | Jangan mengubah status blocker menjadi siap hanya karena nama kolom ditemukan. |
-| B-06 / NC-12 | Periksa source filesystem dan test keamanan per platform. | Mitigasi desain tertulis tidak sama dengan implementasi dan test yang lulus. |
-| B-08 | Periksa signed-content construction, signature envelope, serialization, dan verification path. | Source code yang ada tidak dengan sendirinya mengesahkan desain kriptografi yang belum diputuskan. |
-| B-09 / NC-04 / CONF-01 | Periksa bukti teknis signer/membership jika implementasi tersedia. | Identitas, authority, dan policy yang membutuhkan keputusan PO/Architecture Authority tetap unresolved sampai disahkan. |
+| B-04 / NC-08 / CONF-03 | Periksa workflow aktual Studio/Marketplace, schema, transaksi, dan side effect layanan eksternal. | Lakukan PSV terlebih dahulu. Source evidence tidak menggantikan keputusan normatif Zero-DDL/arsitektur yang mungkin tetap diperlukan setelah PSV. |
+| B-05 / NC-09 | Periksa schema/DDL aktual, producer-consumer mapping, persistence, byte-domain, dan seluruh penggunaan hash terkait. | Lakukan PSV terlebih dahulu; jangan mengubah status blocker menjadi siap hanya karena nama kolom ditemukan. |
+| B-06 / NC-12 | Periksa source filesystem dan test keamanan per platform. | Lakukan PSV terlebih dahulu; mitigasi desain tertulis tidak sama dengan implementasi dan test yang lulus. |
+| B-08 | Periksa signed-content construction, signature envelope, serialization, canonicalization, dan verification path. | Lakukan PSV terlebih dahulu; source code yang ada tidak dengan sendirinya mengesahkan desain kriptografi yang belum diputuskan. |
+| B-09 / NC-04 / CONF-01 | Periksa bukti teknis signer/membership, identity binding, dan lifecycle jika implementasi tersedia. | Lakukan PSV terlebih dahulu; kebijakan atau kontrak identitas/lifecycle yang tetap belum ditetapkan setelah PSV dieskalasikan kepada PO/Architecture Authority. |
 
 Daftar ini adalah target pemeriksaan minimum, bukan izin melakukan full clone, membuat repository duplikat, mengubah source code, menjalankan migrasi, atau mengubah database. Gunakan akses baca dan retrieval terarah. Jangan meminta ZIP repository penuh.
 
