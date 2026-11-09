@@ -2477,7 +2477,7 @@ Koreksi ini tidak menutup blocker yang memerlukan bukti source/schema/test/runti
 
 ### 15.9 Integrasi Hasil Primary Source Verification (PSV-01 s.d. PSV-09)
 
-Sesuai mandat `NEXA-PE02-PSV-ONLY-HANDOFF`, Programmer telah menyelesaikan verifikasi primer terhadap implementasi aktual pada repository sumber `whisnu/nexa`.
+Sesuai mandat `NEXA-PE02-PSV-ONLY-HANDOFF`, §15.9 merekam hasil pemeriksaan PSV yang dilaporkan Programmer terhadap implementasi pada repository sumber `whisnu/nexa`. Status dan klaim pada bagian ini merupakan laporan Programmer; belum menjadi hasil verifikasi independen Auditor.
 
 #### Identitas Pemeriksaan Sumber Primer
 - **Repository:** `whisnu/nexa` (Private repository)
@@ -2529,9 +2529,9 @@ ightarrow$ `AuthorizedPlaybackTracks.delete(certID)`.
 - **Batas Cakupan & Keterbatasan:** Terfokus pada UI renderer desktop. Mobile native viewers tidak diperiksa langsung pada server Linux headless.
 - **Kesimpulan Berbasis Bukti:**
   1. Sinyal completion alami (`ended`) secara eksklusif hanya diimplementasikan untuk audio.
-  2. Video viewer di kode saat ini belum dipasangi listener `ended` (gap implementasi minor yang dapat ditambahkan).
-  3. Dokumen dan gambar tidak memiliki konsep durasi atau completion event. Sesuai keputusan PO, dilarang membuat timeout buatan untuk dokumen/gambar.
-  4. Auto-Next hanya dapat diaktifkan secara otomatis untuk payload continuous-stream (audio dan video). Untuk dokumen/gambar, navigasi track berikutnya harus manual.
+  2. Video viewer di kode saat ini dilaporkan belum memiliki listener `ended`; hal ini adalah temuan implementasi desktop, bukan keputusan tentang perilaku Album lintas platform.
+  3. Dokumen dan gambar tidak memiliki konsep durasi atau completion event alami pada jalur yang diperiksa. Timeout buatan tetap dilarang sesuai batas keputusan PO yang berlaku.
+  4. Temuan desktop ini tidak menetapkan kebijakan Auto-Next hanya untuk audio/video dan tidak menetapkan navigasi manual-only untuk dokumen/gambar. Kontrak transisi Album harus tetap mengikuti keputusan PO bahwa Auto-Next terjadi setelah lifecycle viewer selesai; cara mendeteksi penyelesaian lifecycle untuk setiap tipe payload/platform yang belum terbukti harus ditandai sebagai gap teknis dan diselesaikan tanpa asumsi atau timeout buatan.
 
 ##### PSV-03 — Studio Persistence dan Recovery
 - **Referensi Mandat:** R-04, NC-06, AC-28, AC-29.
@@ -2641,7 +2641,7 @@ ightarrow$ mengeksekusi `INSERT INTO entitlements (...)` di PostgreSQL lokal.
 
 ### 15.10 Rekonsiliasi Blocker B-01..B-09 dan Disposisi Residual Decision Pasca-PSV
 
-Berdasarkan bukti primer yang diperoleh pada PSV-01 s.d. PSV-09, status Blocker Register B-01 sampai B-09 diperbarui secara definitif:
+Berdasarkan hasil PSV-01 s.d. PSV-09 sebagaimana dilaporkan Programmer (belum diverifikasi independen oleh Auditor), tabel berikut merekam status sementara Blocker Register B-01 sampai B-09. Status ini tidak dengan sendirinya menutup blocker atau mengesahkan desain:
 
 | Blocker ID | Status Pasca-PSV | Bukti Primer & Dasar Temuan PSV | Tindakan Lanjut Teknis & Disposisi |
 |---|:---:|---|---|
@@ -2650,10 +2650,10 @@ Berdasarkan bukti primer yang diperoleh pada PSV-01 s.d. PSV-09, status Blocker 
 | **B-03** (ZIP Extractor Aman) | `OPEN / BLOCKED` | PSV-06: Engine container murni biner; parser arsip ZIP belum ada di source tree. | Bangun streaming ZIP extractor aman dengan proteksi traversal dan anti-zip-bomb. |
 | **B-04** (Marketplace Transaction / Zero-DDL) | `OPEN / BLOCKED — ARCHITECTURE CONTRACT NOT APPROVED` | PSV-04 melaporkan transaksi lokal dan side effect HTTP eksternal; ini membuktikan kondisi implementasi yang diperiksa, bukan kontrak transaksi Album. | Lengkapi PSV retry/replay/compensation/reconciliation; parent delivery dan idempotent polling tetap proposal sampai Architecture Authority menetapkan kontrak. |
 | **B-05** (`acquired_package_sha256`) | `FIELD SEMANTICS REPORTED VERIFIED; END-TO-END CONTRACT OPEN` | PSV-05 melaporkan producer/consumer dan byte-domain parent wrapper pada field yang ada; belum membuktikan child mapping atau seluruh kontrak Album. | Pertahankan makna field aktual sebagai fakta implementasi; jangan mengubahnya menjadi keputusan produk atau mengklaim child mapping/entitlement telah selesai. |
-| **B-06** (Safe-Open / TOCTOU) | `OPEN / BLOCKED` | PSV-07: `fs_safe.ts` tidak ada; runtime menggunakan `fs.openSync` standar. | Bangun modul wrapper descriptor untuk POSIX; dokumentasikan mitigasi isolasi staging dan residual risk untuk Windows/Android. |
-| **B-07** (Batas Kuota ZIP) | `PO DECISION REQUIRED` | PSV-06: Source Go hanya membatasi payload kontainer 2 GiB; kuota ZIP wrapper belum ada di kode. | Ajukan ratifikasi batas PO: Max Compressed 500 MB, Max Expanded 2 GiB, Max Ratio 100:1, Max Entries 200, Max Members 50 (DEC-01). |
+| **B-06** (Safe-Open / TOCTOU) | `OPEN / BLOCKED — PLATFORM PSV INCOMPLETE` | PSV-07 melaporkan tidak ditemukannya modul Safe-Open pada ruang lingkup yang diperiksa; bukti lintas platform dan adversarial test belum tersedia. | Lengkapi bukti per platform dan adversarial test terlebih dahulu; POSIX descriptor dan staging/ACL lintas platform tetap opsi, bukan instruksi desain yang telah disahkan. |
+| **B-07** (Batas Kuota ZIP) | `OPEN / BLOCKED — ARCHITECTURE AUTHORITY DECISION REQUIRED` | PSV-06 melaporkan kuota ZIP wrapper belum ditemukan pada source yang diperiksa; batas payload `.nx` tidak membuktikan kuota wrapper. | Architecture Authority menetapkan parameter teknis berdasarkan threat model, benchmark, kapasitas platform, dan hasil PSV; angka usulan tidak diratifikasi PO atau dianggap normatif. |
 | **B-08** (Circular Signature JCS) | `OPEN / BLOCKED — SIGNED-CONTENT CONTRACT UNRESOLVED` | PSV-08 melaporkan primitive Ed25519 ada dan serializer/parser generik belum ada; trailer `.nx` mandiri tidak menetapkan format Album. | Lengkapi bukti test vectors, canonical bytes, signature scope, duplicate-key handling, dan verification path; detached envelope tetap opsi sampai Architecture Authority memutuskan. |
-| **B-09** (Album Signer Trust) | `PO / ARCHITECTURE DECISION REQUIRED` | PSV-09: Tipe data dan lifecycle Album Signer belum pernah ada di source SDK/Verify. | PO meratifikasi kebijakan fail-closed membership: Signer `UNKNOWN` menolak keanggotaan album, tetapi member `.nx` mandiri tetap valid diputar di bawah PE-01 (CONF-01 / DEC-02). |
+| **B-09** (Album Signer Trust) | `OPEN / BLOCKED — PSV EVIDENCE INCOMPLETE` | PSV-09 melaporkan tidak ditemukannya tipe data/lifecycle Album Signer pada ruang lingkup yang diperiksa; hal ini belum membuktikan seluruh identity binding, authority, key custody, rotation, revocation, freshness, dan lifecycle. | Selesaikan bukti PSV terlebih dahulu. Setelah itu, ajukan hanya pertanyaan normatif CONF-01 yang benar-benar belum diputuskan; jangan meminta ratifikasi ulang atau memperluas dampak ke member `.nx` mandiri. |
 
 #### Daftar Keputusan / Penetapan Residual (hanya setelah PSV yang relevan lengkap)
 1. **DEC-01 (Architecture Authority — parameter teknis B-07):** Tetapkan parameter kuota/rasio ZIP berdasarkan threat model, benchmark, kapasitas platform, dan hasil PSV. Angka 500 MB, 2 GiB, 100:1, 200 entri, dan 50 member dalam laporan saat ini adalah usulan yang belum disahkan. Product Owner tidak diminta meratifikasi angka teknis tersebut.
@@ -2664,7 +2664,7 @@ Berdasarkan bukti primer yang diperoleh pada PSV-01 s.d. PSV-09, status Blocker 
 ---
 
 #### Pernyataan Penutup Integrasi PSV Mandat Kanonikal
-1. Seluruh ruang lingkup PSV wajib (PSV-01 s.d. PSV-09) telah diselesaikan dengan bukti primer yang terverifikasi pada commit sumber `whisnu/nexa:main` (`fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`).
+1. Programmer melaporkan telah mengerjakan ruang lingkup PSV-01 s.d. PSV-09 terhadap commit sumber `whisnu/nexa:main` (`fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`). Klaim, cakupan, dan bukti tersebut masih menunggu pemeriksaan independen; pernyataan ini bukan deklarasi bahwa seluruh PSV telah lulus atau terverifikasi oleh Auditor.
 2. Tidak ada pekerjaan Document/Governance Reconciliation (DGR) yang diulang.
 3. Tidak ada source code, database, skema DDL, maupun konfigurasi runtime yang diubah dalam penugasan ini.
 4. Status tata kelola dipertahankan secara utuh: **Gate A tetap `NOT PASSED`**, **Gate B tetap `BLOCKED`**, **PE-02 Implementation tetap `NOT AUTHORIZED`**, **Sprint 16 & PE-01 tetap `CLOSED / FROZEN`**, dan **Sprint 17 tetap `NOT STARTED`**.
