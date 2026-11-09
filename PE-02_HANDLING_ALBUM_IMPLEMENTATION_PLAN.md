@@ -2401,7 +2401,7 @@ Jika akses ke `whisnu/nexa` gagal, catat langkah akses yang benar-benar dicoba d
 - Branch: `main`
 - Path: `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`
 - Baseline blob SHA saat §15 ditambahkan: `05f106299d8c8713d6a2d533f294ba7eb1249d0f`
-- **Baseline PLAN terbaru untuk handoff source verification:** `38752aa33ecd994e0df5ea188884a0a1d756cb0a`
+- **Baseline blob untuk setiap pelaksanaan PSV:** tidak ditetapkan sebagai SHA statis di dalam PLAN. Programmer WAJIB melakukan fetch ulang file ini dari `whisnu/plan:main` tepat sebelum mulai PSV dan sebelum setiap pembaruan; catat blob SHA yang benar-benar diterima sebagai baseline kerja pada ringkasan pengembalian. SHA historis tidak boleh diperlakukan sebagai baseline terbaru. Jika branch `main` berubah selama pekerjaan, fetch ulang dan rekonsiliasikan perubahan sebelum melanjutkan; jangan menimpa perubahan yang lebih baru.
 - Target: file yang sama, bukan file baru.
 
 Programmer wajib mengintegrasikan hasil DGR dan PSV ke bagian PLAN yang sudah relevan—termasuk section, matriks, register, evidence table, dan closing declaration yang terdampak—serta menyelaraskan semua rujukan silang. §15 ini adalah pembagian mandat dan tidak menggantikan isi teknis pada section terkait.
