@@ -208,7 +208,7 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 |    spesifikasi teknis yang belum dibekukan, taksonomi error        | Sub-Kategori 2b: [BLOCKED BY ARCH / SPEC] (18)|
 |    unresolved, keputusan identitas field normatif yang belum       |   - AC-02 (B-07/NC-07: Validasi Wrapper ZIP)  |
 |    disahkan, gap identitas & persistensi Album multi-member,       |   - AC-03 (B-08: Circular Dependency Sig)     |
-|    - AC-08 (NC-11: Registry Revocation Gap)  |
+|                                                                    |   - AC-08 (NC-11: Registry Revocation Gap)  |
 |    gap pemuatan kembali Album, prasyarat normatif JIT &            |   - AC-09 (NC-05/NEW-01: Field Hash Unres)    |
 |    autentisitas membership manifest signer UNKNOWN belum diputuskan, blocker arsitektur aktif,     |   - AC-10 (NC-05/A-05: Taksonomi Error Gen)   |
 |    atau spesifikasi lifecycle non-audio yang belum terdefinisi.    |   - AC-13 (B-07/NC-07: Usulan Kuota ZIP)      |
@@ -222,8 +222,8 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 |                                                                    |   - AC-28 (NC-01/06: Gap Identitas Album)     |
 |                                                                    |   - AC-29 (NC-06: Gap Reload Kolektif Album)  |
 |                                                                    |   - AC-32 (NC-13: Auto-Next Lifecycle Gap)   |
-|    - AC-33 (NC-14/CONF-01: Desktop Membership Gate)  |
-|    - AC-34 (NC-14/CONF-01: Mobile Membership Gate)   |
+|                                                                    |   - AC-33 (NC-14/CONF-01: Desktop Membership Gate)  |
+|                                                                    |   - AC-34 (NC-14/CONF-01: Mobile Membership Gate)   |
 +--------------------------------------------------------------------+-----------------------------------------------+
 | 3. [PO DECISION REQUIRED] (2 AC)                                   | AC-01 (NC-01: Kebijakan Unknown Fields)       |
 |    Kriteria keberhasilan atau penerimaan kontrak secara substantif | AC-07 (NC-04/B-09/CONF-01: Signer UNKNOWN)    |
