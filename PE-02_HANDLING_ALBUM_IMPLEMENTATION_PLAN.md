@@ -2318,3 +2318,120 @@ Sesuai ketentuan tata kelola dan hasil audit komprehensif REV6.3, deklarasi beri
 8. **Implementasi PE-02 Belum Diotorisasi**: implementasi kode PE-02 tetap `NOT AUTHORIZED`.
 9. **Status Blocker dan Keputusan PO**: B-04 / NC-08 / CONF-03 tetap `BLOCKED`; B-05 / NC-09 tetap `BLOCKED`; B-06 / NC-12 tetap `OPEN / BLOCKED`; B-08 tetap `BLOCKED`; B-09 / NC-04 / CONF-01 tetap memerlukan keputusan PO / Architecture Authority.
 10. **Status Gate A dan Gate B**: Gate A tetap `NOT PASSED`; Gate B tetap `BLOCKED`.
+
+
+## 15. PEMISAHAN PEKERJAAN DOKUMEN/GOVERNANCE DAN SOURCE CODE VERIFICATION — MANDAT KANONIKAL
+
+### 15.1 Tujuan dan prinsip pemisahan
+
+Bagian ini menetapkan batas kerja agar koreksi dokumen tidak tertunda oleh pemeriksaan source code yang tidak relevan, dan agar klaim implementasi tidak disahkan hanya berdasarkan pembacaan dokumen.
+
+Seluruh pekerjaan PE-02 dalam mandat ini dibagi menjadi:
+
+1. **Document/Governance Reconciliation (DGR):** pemeriksaan dan koreksi yang dapat dilakukan dari PLAN kanonikal, keputusan PO yang telah tersedia, governance, serta artefak historis yang dapat diakses. Jalur ini tidak memerlukan pemeriksaan source code repository `whisnu/nexa`.
+2. **Primary Source Code Verification (PSV):** pemeriksaan klaim mengenai perilaku atau kondisi implementasi aktual. Jalur ini wajib memeriksa source code, schema, test, dan/atau runtime evidence yang relevan dari repository `whisnu/nexa`. Bukti dokumentasi atau laporan Programmer saja tidak menggantikan pemeriksaan primer.
+3. **Integrated Reconciliation:** penggabungan hasil DGR dan PSV ke dalam dokumen ini. Setiap klaim tetap diberi provenance dan status pembuktian yang tepat.
+
+Pemisahan ini adalah pembagian metode kerja, bukan pembagian artefak. Hanya ada satu deliverable kanonikal: file PLAN yang sedang dibaca ini.
+
+### 15.2 Ruang lingkup DGR — tidak memerlukan pemeriksaan source code Nexa
+
+Programmer dapat mengerjakan butir berikut dengan membaca dan merekonsiliasi dokumen kanonikal serta sumber keputusan yang sah. Pemeriksaan repository `whisnu/nexa` tidak menjadi prasyarat untuk pekerjaan ini:
+
+| Area | Tugas DGR | Batas |
+|---|---|---|
+| Identitas dan lokasi artefak | Pastikan semua instruksi, referensi, dan closing declaration menunjuk file kanonikal `whisnu/plan:main/PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`. | Jangan membuat file PLAN, laporan investigasi, atau artefak pendamping baru. |
+| Status dan otorisasi | Selaraskan status Gate A, Gate B, PE-02 implementation, Sprint 16, PE-01, dan Sprint 17 di seluruh ringkasan, tabel, register, serta closing declaration. | Tidak boleh menaikkan status hanya karena teks PLAN telah dikoreksi atau diperbarui. |
+| Hierarki sumber | Periksa konsistensi penerapan §1.2 dan provenance keputusan PO, kontrak produk, White Paper/Roadmap, repository evidence, serta temuan historis. | Jangan mengubah keputusan atau menciptakan keputusan PO baru. |
+| Riwayat audit | Pertahankan temuan dan disposisi historis; bedakan snapshot historis dari status aktif. | Jangan menghapus atau mengarang riwayat, revision count, atau hasil audit. |
+| Konsistensi internal | Periksa rujukan silang, nomor bagian, ID temuan, jumlah item, agregat, istilah, status, dan tabel yang saling merujuk. | Bila nilai atau definisi sumber tidak tersedia/bertentangan, tandai unresolved; jangan menebak. |
+| R-01 traceability | Periksa apakah setiap klaim dalam dokumen memiliki sumber, identitas bukti, dan batas inferensi yang dinyatakan. | Pemeriksaan keterlacakan dokumen bukan pembuktian kebenaran implementasi. |
+| TD/B/AC/NC/CONF register | Periksa definisi, status, dependency, dan konsistensi antar-register berdasarkan isi PLAN serta keputusan formal yang tersedia. | Status yang membutuhkan fakta source atau keputusan PO/Architecture Authority tidak boleh diputuskan melalui DGR. |
+| Product Truth dan scope | Periksa bahwa rekomendasi/proposal tidak ditulis sebagai kontrak yang telah disahkan, dan bahwa baseline .nx/PE-01 tidak berubah. | Programmer tidak berwenang mengubah Product Truth, trust policy, authorization policy, atau kontrak Album yang belum diputuskan. |
+| Batas file dan perubahan | Pastikan hanya file PLAN kanonikal pada repository `whisnu/plan` branch `main` yang menjadi target pembaruan. | Tidak membuat salinan, file laporan baru, atau mengubah repository source `whisnu/nexa`. |
+
+DGR dapat diselesaikan tanpa menunggu PSV. Namun, jika sebuah koreksi DGR bergantung pada fakta implementasi yang belum dibuktikan, bagian tersebut harus tetap diberi status `NOT VERIFIED`, `BLOCKED`, atau status unresolved yang tepat.
+
+### 15.3 Ruang lingkup PSV — wajib memeriksa source code
+
+Butir berikut tidak boleh dinyatakan terbukti hanya dari PLAN, laporan lama, nama file, atau hasil pencarian terbatas. Programmer harus memeriksa repository sumber `whisnu/nexa` dan mencatat commit yang benar-benar diperiksa:
+
+| Area / temuan | Pemeriksaan primer minimum | Batas kesimpulan |
+|---|---|---|
+| R-02 — Player pre-verification dan authorization | Telusuri call path end-to-end untuk current-member state, JIT authorization, decryption, buffer registration, cache/state mutation, dan seluruh side effect pre-verification. | Tidak boleh menyimpulkan pre-verification aman atau terpisah hanya dari satu pemanggilan fungsi. |
+| R-03 — Viewer completion dan Auto-Next | Periksa lifecycle audio, video, document, dan image viewer; event completion, state transition, serta pemanggil Auto-Next. | Ketiadaan event pada satu file/lokasi bukan bukti bahwa fitur atau kebijakan tidak ada di seluruh sistem. |
+| R-04 — Studio persistence/recovery | Periksa NXPublishPipeline, penyimpanan progress, restart/crash recovery, retry, idempotency boundary, dan pencegahan listing duplikat. | Autosave lokal saja tidak membuktikan durable multi-member progress atau crash safety. |
+| R-05 — Marketplace dan Licensing Daemon | Periksa transaction boundary, SQL transaction, urutan side effect eksternal, retry, replay, compensation, reconciliation, dan idempotency. | SQL transaction tidak boleh diklaim sebagai distributed transaction/2PC tanpa mekanisme yang benar-benar ada. |
+| R-06 — acquired_package_sha256 | Temukan seluruh producer, consumer, persistence field, byte-domain, parent/child mapping, dan jalur akuisisi yang menggunakan digest tersebut. | Jangan menetapkan semantik parent/child atau menyamakannya dengan hash member/payload tanpa bukti. |
+| R-07 — ZIP parser/extractor | Telusuri seluruh parser dan extraction path yang relevan, entry type, path validation, collision, streaming counters, quota, serta test. | Tidak ditemukannya parser pada dua direktori bukan bukti parser tidak ada di repository. |
+| R-08 — Safe-Open/filesystem | Periksa implementasi per platform, descriptor-relative operations, symlink/ancestor handling, containment, TOCTOU, staging permissions, dan adversarial tests. | Tidak adanya satu primitive seperti `O_NOFOLLOW` pada cuplikan tertentu bukan bukti keamanan atau ketidakamanan seluruh jalur. |
+| R-09 — Parser/JCS/cryptography | Periksa raw-byte parser, duplicate-key/Unicode/number handling, RFC 8785 implementation, exact signed bytes, Ed25519 input, key role, dan test vectors. | Nama library atau pemanggilan serializer saja tidak membuktikan kesesuaian RFC 8785 maupun signature scope. |
+| R-10 — Album Signer/membership authenticity | Periksa identity binding, enrollment, authority, key custody, rotation, revocation, freshness, manifest verification, dan dependency Registry bila memang ada. | Jangan mengasumsikan Album Signer sudah mempunyai lifecycle atau authority yang belum dibuktikan. |
+| B-04 / NC-08 / CONF-03 | Periksa workflow aktual Studio/Marketplace dan kemampuan layanan eksternal yang terlibat. | Source evidence tidak menggantikan keputusan Zero-DDL atau keputusan arsitektur/PO yang masih diperlukan. |
+| B-05 / NC-09 | Periksa schema/DDL aktual, producer-consumer mapping, persistence, dan seluruh penggunaan hash terkait. | Jangan mengubah status blocker menjadi siap hanya karena nama kolom ditemukan. |
+| B-06 / NC-12 | Periksa source filesystem dan test keamanan per platform. | Mitigasi desain tertulis tidak sama dengan implementasi dan test yang lulus. |
+| B-08 | Periksa signed-content construction, signature envelope, serialization, dan verification path. | Source code yang ada tidak dengan sendirinya mengesahkan desain kriptografi yang belum diputuskan. |
+| B-09 / NC-04 / CONF-01 | Periksa bukti teknis signer/membership jika implementasi tersedia. | Identitas, authority, dan policy yang membutuhkan keputusan PO/Architecture Authority tetap unresolved sampai disahkan. |
+
+Daftar ini adalah target pemeriksaan minimum, bukan izin melakukan full clone, membuat repository duplikat, mengubah source code, menjalankan migrasi, atau mengubah database. Gunakan akses baca dan retrieval terarah. Jangan meminta ZIP repository penuh.
+
+### 15.4 Aturan evidence dan pelaporan PSV
+
+Untuk setiap klaim PSV, Programmer wajib mencatat:
+
+1. repository, branch, commit SHA, dan tanggal pemeriksaan;
+2. path file dan line range yang benar-benar diperiksa;
+3. call path atau dependency yang diperlukan agar konteks tidak terpotong;
+4. test yang ditemukan/dijalankan beserta command, environment, dan hasil aktual jika test memang dijalankan;
+5. pemisahan tegas antara `VERIFIED`, `PARTIALLY VERIFIED`, `NOT VERIFIED`, dan `NOT PRESENT IN THE EXAMINED SCOPE`;
+6. batas pencarian: direktori/modul yang diperiksa dan alasan cakupannya;
+7. setiap klaim yang belum terbukti tetap `NOT VERIFIED`; tidak boleh dinaikkan melalui inferensi dari laporan terdahulu.
+
+Jika akses ke `whisnu/nexa` gagal, catat langkah akses yang benar-benar dicoba dan hasil aktualnya. Jangan menyatakan repository tidak ada hanya karena koneksi yang digunakan tidak dapat membacanya. Jangan membuat bukti lokal, permalink, line number, test result, atau commit SHA yang tidak diperoleh secara langsung.
+
+### 15.5 Mandat pembaruan langsung ke PLAN kanonikal yang sama
+
+**Deliverable utama dan satu-satunya adalah pembaruan in-place pada file yang sudah ada:**
+
+- Repository: `whisnu/plan`
+- Branch: `main`
+- Path: `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`
+- Baseline blob SHA saat mandat ini ditambahkan: `82a87237286875bf6b48fa6d2e9c86a3179909e8`
+- Target: file yang sama, bukan file baru.
+
+Programmer wajib mengintegrasikan hasil DGR dan PSV ke bagian PLAN yang sudah relevan—termasuk section, matriks, register, evidence table, dan closing declaration yang terdampak—serta menyelaraskan semua rujukan silang. §15 ini adalah pembagian mandat dan tidak menggantikan isi teknis pada section terkait.
+
+**Dilarang:**
+- membuat `PE-02_HANDLING_ALBUM_PEMULIHAN_AKSES_READ-ONLY_REPOSITORY_DAN_VERIFIKASI_PRIMARY_SOURCE_EVIDENCE.md` atau laporan investigasi lain sebagai deliverable;
+- membuat PLAN kedua, salinan alternatif, file pendamping, atau branch/PR baru atas asumsi sendiri;
+- mengubah source code `whisnu/nexa`, DDL, schema, database, API, runtime, atau konfigurasi produk;
+- mengubah Product Truth, keputusan PO, atau status otorisasi implementasi;
+- menyatakan pekerjaan PSV selesai bila primary source evidence tidak tersedia.
+
+Jika mekanisme repository yang berlaku tidak mengizinkan pembaruan langsung pada `main`, Programmer harus berhenti dan meminta klarifikasi mengenai jalur publikasi yang diotorisasi. Jangan membuat branch atau PR sebagai keputusan sepihak. Bila branch head berubah sejak baseline, lakukan fetch ulang dan rekonsiliasi perubahan terbaru sebelum menulis; jangan menimpa perubahan orang lain.
+
+### 15.6 Urutan pelaksanaan
+
+1. Baca PLAN kanonikal terbaru pada `whisnu/plan:main`; pastikan file dan blob SHA sebelum mengedit.
+2. Selesaikan DGR terlebih dahulu karena tidak memerlukan source code Nexa. Terapkan koreksi dokumentasi yang dapat dibuktikan dari dokumen dan keputusan yang tersedia.
+3. Susun daftar klaim PSV yang masih diperlukan. Jangan memeriksa source untuk item yang murni editorial/governance.
+4. Lakukan targeted PSV pada repository `whisnu/nexa`. Jika akses gagal, pertahankan item terkait sebagai `NOT VERIFIED` dan jangan menunda koreksi DGR yang independen.
+5. Rekonsiliasikan hasil PSV dengan PLAN, tetapi jangan mengubah kontrak produk atau keputusan yang belum disahkan.
+6. Perbarui section PLAN yang sudah ada dan §15 ini bila klasifikasi kerja perlu disesuaikan berdasarkan bukti; tetap pada file kanonikal yang sama.
+7. Lakukan pemeriksaan akhir atas seluruh dokumen: konsistensi status, ID, agregat, referensi silang, provenance, path/line evidence, dan tidak adanya klaim source yang tidak terbukti.
+8. Serahkan identitas commit SHA dan blob SHA terbaru dari file PLAN yang sama, serta ringkasan singkat section yang diperbarui dan item yang masih `NOT VERIFIED/BLOCKED`.
+
+### 15.7 Batas kewenangan dan status akhir
+
+Mandat pembaruan PLAN tidak memberikan otorisasi implementasi. Source verification adalah pemeriksaan fakta implementasi, bukan izin memperbaiki atau mengubah implementasi.
+
+Status berikut wajib dipertahankan kecuali terdapat keputusan formal terpisah yang sah:
+
+- Gate A: `NOT PASSED` (menunggu koreksi dan independent re-audit).
+- Gate B: `BLOCKED`.
+- PE-02 Implementation: `NOT AUTHORIZED`.
+- Sprint 16: `CLOSED / FINAL ACCEPTED / FROZEN`.
+- PE-01: `CLOSED / FROZEN`.
+- Sprint 17: `NOT STARTED`.
+
+Jika instruksi, bukti, Product Truth, dependency, atau expected behavior material tidak jelas, Programmer wajib menghentikan penetapan dan menyatakan: **`INSTRUKSI TIDAK JELAS — STOP AND CLARIFY`**. Tidak boleh ada asumsi atau keputusan desain diam-diam.
