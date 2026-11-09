@@ -2340,7 +2340,7 @@ Pemisahan ini adalah pembagian metode kerja, bukan pembagian artefak. Hanya ada 
 
 ### 15.2 Ruang lingkup DGR — tidak memerlukan pemeriksaan source code Nexa
 
-Programmer dapat mengerjakan butir berikut dengan membaca dan merekonsiliasi dokumen kanonikal serta sumber keputusan yang sah. Pemeriksaan repository `whisnu/nexa` tidak menjadi prasyarat untuk pekerjaan ini:
+Tabel berikut menetapkan klasifikasi pekerjaan yang secara substansi tidak memerlukan pemeriksaan source code. **Seluruh DGR dalam tabel ini telah dikerjakan dan ditutup oleh pemelihara PLAN sebagaimana dicatat pada §15.8; tabel ini bukan daftar tugas DGR yang harus diulang atau diselesaikan Programmer.** Mandat Programmer pada handoff ini adalah PSV pada §15.3 dan integrasi bukti primer ke PLAN yang sama. Programmer hanya boleh menyentuh kembali butir DGR jika hasil PSV menemukan konflik faktual baru yang benar-benar memerlukan rekonsiliasi; setiap koreksi harus terbatas, berbasis bukti, dan tidak membuka ulang keputusan atau pekerjaan yang sudah ditutup. Pemeriksaan repository `whisnu/nexa` tidak pernah menjadi prasyarat bagi DGR:
 
 | Area | Tugas DGR | Batas |
 |---|---|---|
