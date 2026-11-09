@@ -2475,196 +2475,304 @@ Koreksi ini tidak menutup blocker yang memerlukan bukti source/schema/test/runti
 
 ---
 
-### 15.9 Integrasi Hasil Primary Source Verification (PSV-01 s.d. PSV-09)
+### 15.9 Integrasi Hasil Primary Source Verification (PSV-01 s.d. PSV-09) — Bukti Granular & Terarah
 
-Sesuai mandat `NEXA-PE02-PSV-ONLY-HANDOFF`, §15.9 merekam hasil pemeriksaan PSV yang dilaporkan Programmer terhadap implementasi pada repository sumber `whisnu/nexa`. Status dan klaim pada bagian ini merupakan laporan Programmer; belum menjadi hasil verifikasi independen Auditor.
+Sesuai mandat `HANDOFF PROGRAMMER — PE-02 TARGETED PRIMARY SOURCE VERIFICATION (PSV) LANJUTAN`, bagian ini merekam pembuktian primer granular terhadap 9 workstream PSV pada repositori sumber `whisnu/nexa`, memisahkan fakta source, fakta skema, bukti eksekusi test, bukti runtime, dan status subklaim secara ketat.
 
-#### Identitas Pemeriksaan Sumber Primer
-- **Repository:** `whisnu/nexa` (Private repository)
+#### Identitas Pemeriksaan Sumber Primer Otoritatif
+- **Repository Sumber:** `whisnu/nexa` (Private repository)
 - **Branch:** `main`
-- **Commit SHA Sumber:** `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`
-- **Tanggal Pemeriksaan:** 8–9 November 2026
-- **Metode Pemeriksaan:** Read-Only Git over HTTPS & GitHub REST API v3 terotentikasi, inspeksi pohon repositori lokal server Linux.
-- **Status Akses Repository:** **`PASS`** (Token read-only terverifikasi; ketiadaan respons pada audit sebelumnya terbukti akibat proteksi default 404 GitHub untuk repository privat).
+- **Commit SHA Sumber:** `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956` (Terverifikasi identik dengan `origin/main` via `git ls-remote origin`)
+- **Tanggal Pemeriksaan:** 9 November 2026
+- **Metode Pemeriksaan:** Read-Only Git over HTTPS, authenticated GitHub REST API v3, penelusuran pohon repositori lokal `/opt/antigravity/projects/nexa/`, eksekusi test suite terpilih (Go & Node.js).
+- **Status Akses Repository:** **`PASS`** (Token read-only terverifikasi; ketiadaan respons pada audit sebelumnya terbukti akibat proteksi default HTTP 404 GitHub untuk repository privat).
 - **Otorisasi Perubahan Kode:** **TIDAK DIBERIKAN / ZERO CODE IMPLEMENTATION**.
 
 ---
 
-#### Matriks Rinci Hasil PSV-01 sampai PSV-09
-
-##### PSV-01 — Player Pre-Verification dan Authorization
+#### 15.9.1 PSV-01 — Player Pre-Verification dan Authorization
 - **Referensi Mandat:** R-02, NC-13, AC-22, Stage 8a.
-- **Komponen & Berkas Diperiksa:** `player-desktop/main.js:L674-L745`, `L1008-L1022`, `L1208-L1214`; `player-desktop/renderer.js:L341-L342`.
-- **Call Path & Dependency:**
-  `renderer.js:openAndVerifyFile()` $
-ightarrow$ `ipcRenderer.invoke('open-and-verify-nx')` $
-ightarrow$ `main.js:open-and-verify-nx` $
-ightarrow$ `NexaContainer.unpack()` $
-ightarrow$ Discovery companion sidecar `.nxcert` $
-ightarrow$ `NexaSdk.verifyContainer()` $
-ightarrow$ Evaluasi integritas & lisensi $
-ightarrow$ `AuthorizedPlaybackTracks.set(certID, { filePath, payloadOffset, payloadLength, payloadBuffer, manifest, payloadFormat, certID })` $
-ightarrow$ return `playbackUrl = nexa-playback://${certID}`.
-  Saat transisi track: `renderer.js:L341-342` memanggil `window.api.releasePlaybackSession(certID)` $
-ightarrow$ IPC `release-playback-session` $
-ightarrow$ `AuthorizedPlaybackTracks.delete(certID)`.
-- **Test yang Ditemukan/Dijalankan:** Pengujian harness IPC Player `test/` (unit test container open single-track).
-- **Status Pembuktian:** **`PARTIALLY VERIFIED (ARCHITECTURAL GAP IDENTIFIED)`**
-- **Batas Cakupan & Keterbatasan:** Inspeksi mencakup seluruh handler IPC `open-and-verify-nx`, `release-playback-session`, dan custom protocol `nexa-playback`. Tidak menguji streaming pada audio card fisik.
-- **Kesimpulan Berbasis Bukti:**
-  1. Pada implementasi saat ini, verifikasi container (`open-and-verify-nx`) terikat secara atomik dengan pendaftaran otorisasi playback memori (`AuthorizedPlaybackTracks.set()`) dan ekstraksi buffer payload.
-  2. **GAP KRITIS:** Belum ada fungsi "metadata pre-verification" yang terpisah dari pendaftaran otorisasi playback. Jika Stage 8a background pre-verification memanggil `open-and-verify-nx` untuk track berikutnya, sistem akan secara prematur mengekstraksi buffer payload dan mengotorisasi playback track berikutnya sebelum track aktif selesai, melanggar batas otorisasi current-member PO.
-  3. **Rekomendasi teknis (BELUM NORMATIF):** Pemisahan jalur metadata pre-verification dari jalur pembukaan/otorisasi playback dapat dievaluasi sebagai opsi. Tidak ada implementasi atau keputusan desain baru yang boleh diasumsikan dari rekomendasi ini; batas yang sudah disetujui tetap berlaku: pre-verification tidak memberi otorisasi playback dan tidak boleh menyebabkan otorisasi member berikutnya sebelum gilirannya.
+- **Objek yang Diperiksa:**
+  - `player-desktop/main.js:L674-L745`, `L980-L1022`, `L1208-L1214` (IPC handler `open-and-verify-nx`, protocol handler `nexa-playback`, IPC handler `release-playback-session`).
+  - `player-desktop/renderer.js:L158-L160`, `L341-L342`, `L480-L505` (Fungsi `openAndVerifyFile`, pelepasan session, aktivasi renderer).
+  - `player-desktop/test/player-desktop.test.js:L190-L216` (Test 6: In-Memory Document Payload IPC Handler & Session Release).
+- **Bukti Source & Call Path:**
+  1. *Otorisasi Track Aktif:* `renderer.js:openAndVerifyFile(filePath)` memanggil IPC `open-and-verify-nx`. Di `main.js:L1008-L1022`, jika kontainer valid dan lisensi aktif:
+     ```javascript
+     AuthorizedPlaybackTracks.set(certID, {
+         filePath, payloadOffset, payloadLength,
+         payloadBuffer: result.payload,
+         manifest: result.manifest,
+         payloadFormat: payloadFormat,
+         certID
+     });
+     if (assetCategory === 'audio' || assetCategory === 'video') {
+         playbackUrl = `nexa-playback://${certID}`;
+     }
+     ```
+  2. *Pelepasan Otorisasi:* Saat beralih track, `renderer.js:L341-342` memanggil `window.api.releasePlaybackSession(verifiedTrackData.certificateID)`. Di `main.js:L1208-L1214`:
+     ```javascript
+     ipcMain.handle('release-playback-session', async (event, certID) => {
+         if (certID) { AuthorizedPlaybackTracks.delete(certID); }
+         return { success: true };
+     });
+     ```
+  3. *Penelusuran Caller Stage 8a / Background Pre-Verification:* Dilakukan pencarian menyeluruh pada direktori `player-desktop/`, `mobile/`, `sdk/`, dan `internal/` untuk pola `pre-verif`, `preverif`, `stage 8`, `stage8`, dan `background`. Hasil: **0 kemunculan**. Tidak ditemukan caller background pre-verification di codebase aktif.
+- **Bukti Test:**
+  - Test File: `player-desktop/test/player-desktop.test.js`
+  - Command Dijalankan: `node player-desktop/test/player-desktop.test.js`
+  - Environment: Node.js v22.23.4 pada Linux x86_64
+  - Exit Code: `1` (Gagal pada baris 124 karena test script mengasumsikan binary CLI `../../nexa` telah dikompilasi di root; berkas binary `./nexa` tidak ada di repositori).
+  - Pengujian Background Pre-Verification: **`NOT RUN / TEST NOT AVAILABLE`** (Tidak ada test case untuk background pre-verification di suite yang ada).
+- **Status Pembuktian Subklaim:**
+  - *Subklaim 1 (State & Authorization Boundary Player Desktop):* **`VERIFIED`** (`AuthorizedPlaybackTracks.set()` mengikat certID ke buffer memori dan URL stream).
+  - *Subklaim 2 (Pelepasan Otorisasi Saat Transisi):* **`VERIFIED`** (`AuthorizedPlaybackTracks.delete(certID)` menghapus otorisasi track aktif).
+  - *Subklaim 3 (Keberadaan Caller Background Pre-Verification Stage 8a):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Stage 8a belum diimplementasikan di kode).
+  - *Subklaim 4 (Batas Otorisasi Terhadap Alur Verifikasi Saat Ini):* **`VERIFIED`** (Jika Stage 8a memanggil `open-and-verify-nx`, alur tersebut atomik mendaftarkan `AuthorizedPlaybackTracks.set()`; pemisahan inspeksi metadata pasif wajib dibangun sebelum Stage 8a dapat aktif).
+- **Status Keseluruhan PSV-01:** **`PARTIALLY VERIFIED`** (Architectural coupling terbukti; caller Stage 8a belum ada di kode)
 
-##### PSV-02 — Viewer Completion dan Auto-Next
+---
+
+#### 15.9.2 PSV-02 — Viewer Completion dan Auto-Next
 - **Referensi Mandat:** R-03, NC-13, AC-32.
-- **Komponen & Berkas Diperiksa:** `player-desktop/renderer.js:L482-L505`, `L652-L655`, `L708-L771`, `L516-L530`.
-- **Call Path & Dependency:**
-  - Audio: `audioEngine.addEventListener('ended', () => { stopAudio(); playNextLibraryAsset(); })` (`renderer.js:L652-655`).
-  - Video: `videoEngine` (`renderer.js:L708-771`) memiliki event listener untuk `timeupdate` dan `durationchange`, tetapi **TIDAK** memiliki listener untuk event `ended`.
-  - Document/Image: `renderDocumentContent()` (`renderer.js:L516-530`) merender teks/gambar/PDF dalam DOM; navigasi halaman menggunakan tombol manual (`docPageNext`, `docPagePrev`). Tidak ada event completion dan tidak ada durasi alami.
-  - Unsupported binary: memanggil `shell.openPath` via OS (`main.js:L1169`); tidak ada sinyal completion.
-- **Test yang Ditemukan/Dijalankan:** Inspeksi event handler DOM pada Electron renderer.
-- **Status Pembuktian:** **`PARTIALLY VERIFIED (PAYLOAD ASYMMETRY CONFIRMED)`**
-- **Batas Cakupan & Keterbatasan:** Terfokus pada UI renderer desktop. Mobile native viewers tidak diperiksa langsung pada server Linux headless.
-- **Kesimpulan Berbasis Bukti:**
-  1. Sinyal completion alami (`ended`) secara eksklusif hanya diimplementasikan untuk audio.
-  2. Video viewer di kode saat ini dilaporkan belum memiliki listener `ended`; hal ini adalah temuan implementasi desktop, bukan keputusan tentang perilaku Album lintas platform.
-  3. Dokumen dan gambar tidak memiliki konsep durasi atau completion event alami pada jalur yang diperiksa. Timeout buatan tetap dilarang sesuai batas keputusan PO yang berlaku.
-  4. Temuan desktop ini tidak menetapkan kebijakan Auto-Next hanya untuk audio/video dan tidak menetapkan navigasi manual-only untuk dokumen/gambar. Kontrak transisi Album harus tetap mengikuti keputusan PO bahwa Auto-Next terjadi setelah lifecycle viewer selesai; cara mendeteksi penyelesaian lifecycle untuk setiap tipe payload/platform yang belum terbukti harus ditandai sebagai gap teknis dan diselesaikan tanpa asumsi atau timeout buatan.
+- **Objek yang Diperiksa:**
+  - Desktop: `player-desktop/renderer.js:L482-L505`, `L652-L655`, `L708-L771`, `L516-L530`.
+  - Mobile: `mobile/apps/player/src/components/AudioPlayer.tsx:L33-L75`, `VideoPlayer.tsx:L33-L45`, `DocumentViewer.tsx:L202-L205`, `screens/PlayerScreen.tsx:L36-L50`.
+- **Bukti Source & Call Path:**
+  1. *Desktop Audio:* `renderer.js:L652-L655` mengikat listener event native HTML5 Audio:
+     ```javascript
+     audioEngine.addEventListener('ended', () => {
+         stopAudio();
+         playNextLibraryAsset();
+     });
+     ```
+  2. *Desktop Video:* `renderer.js:L708-L771` mendefinisikan kontrol `videoEngine` (`timeupdate`, `durationchange`, seek, volume, fullscreen). **TIDAK DITEMUKAN** listener untuk event `ended` pada elemen `videoEngine`.
+  3. *Desktop Dokumen/Gambar:* `renderer.js:L516-L530` merender payload dokumen/gambar secara statis di dalam DOM. Navigasi halaman murni manual (`docPageNext.addEventListener('click', ...)`). Tidak ada event completion dan tidak ada durasi alami.
+  4. *Mobile Audio (`AudioPlayer.tsx`):* Menggunakan `expo-av` `Audio.Sound.createAsync(..., (playbackStatus) => { ... })`. Callback hanya mencatat `isPlaying`, `positionMillis`, dan `durationMillis`. Tidak memeriksa `playbackStatus.didJustFinish` dan tidak memiliki prop callback transisi.
+  5. *Mobile Video (`VideoPlayer.tsx`):* Menggunakan `expo-av` `Video`. Callback `onPlaybackStatusUpdate` hanya menyimpan status ke state lokal (`setStatus(playbackStatus)`). Tidak memeriksa `didJustFinish` dan tidak memiliki handler Auto-Next.
+  6. *Mobile Dokumen (`DocumentViewer.tsx`):* Fungsi `handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages))` hanya mengubah nomor halaman lokal. Tidak ada sinyal selesai.
+- **Bukti Test:**
+  - Desktop Test: `player-desktop/test/player-desktop.test.js` tidak menguji event `ended` atau Auto-Next (**`NOT RUN`**).
+  - Mobile Test: `mobile/apps/player/src/components/__tests__/AudioPlayer.test.tsx` hanya menguji render dan play/pause tombol.
+- **Status Pembuktian Subklaim:**
+  - *Subklaim 1 (Desktop Audio Completion):* **`VERIFIED`** (`audioEngine.ended` terbukti memanggil `playNextLibraryAsset()`).
+  - *Subklaim 2 (Desktop Video Completion):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Gap implementasi: listener `ended` belum dipasang pada `videoEngine`).
+  - *Subklaim 3 (Desktop Document/Image Completion):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Tidak memiliki mekanisme completion alami; timeout buatan dilarang keputusan PO).
+  - *Subklaim 4 (Mobile Audio/Video Completion):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Gap implementasi: `playbackStatus.didJustFinish` belum dievaluasi di React Native).
+  - *Subklaim 5 (Mobile Document/Image Completion):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Hanya navigasi manual per halaman).
+- **Status Keseluruhan PSV-02:** **`PARTIALLY VERIFIED`** (Audio desktop terbukti; video desktop, dokumen/gambar, dan mobile belum ada completion handler)
 
-##### PSV-03 — Studio Persistence dan Recovery
+---
+
+#### 15.9.3 PSV-03 — Studio Persistence dan Recovery
 - **Referensi Mandat:** R-04, NC-06, AC-28, AC-29.
-- **Komponen & Berkas Diperiksa:** `studio-desktop/publish_pipeline.js:L18-L36`, `L98-L149`, `L186-L270`, `L316-L360`; `studio-desktop/main.js:L630-L800`.
-- **Call Path & Dependency:**
-  `NXPublishPipeline` menangani satu paket aset mandiri (`this.assetPath`, `this.sessionId`). Pipeline menyediakan chunk upload resumable berbasis server authoritative offset query (`getStatus()`, L163-177). Wizard Step 6 pada `main.js:L800` membersihkan autosave lokal setelah single forge selesai.
-- **Test yang Ditemukan/Dijalankan:** Uji resumable transfer `test/` single-asset.
-- **Status Pembuktian:** **`PARTIALLY VERIFIED (SINGLE-PACKAGE PIPELINE PRESENT, MULTI-MEMBER ORCHESTRATION ABSENT)`**
-- **Batas Cakupan & Keterbatasan:** Memeriksa seluruh lifecycle `NXPublishPipeline` dan wizard forge single aset di Studio.
-- **Kesimpulan Berbasis Bukti:**
-  1. Pipeline upload resumable untuk satu berkas `.nx` telah terbukti matang di source dan mampu melanjutkan transfer dari byte offset server terakhir.
-  2. **GAP ARSITEKTUR:** Belum ada orchestrator multi-member Album, belum ada pelacakan status upload antar-member, dan belum ada file persistence recovery state untuk album multi-track jika Studio ditutup/crash di tengah jalan.
-  3. **Implikasi Zero-DDL (BELUM MENETAPKAN DESAIN):** Kebutuhan persistence/recovery multi-member harus dipenuhi tanpa perubahan DDL yang tidak diotorisasi. Penyimpanan lokal pada application data directory dan format JSON merupakan opsi desain yang perlu dievaluasi; path `userData/album_sessions/` dan format tersebut belum menjadi keputusan atau kontrak normatif.
+- **Objek yang Diperiksa:**
+  - `studio-desktop/publish_pipeline.js:L18-L36`, `L98-L149`, `L163-L177`, `L186-L270`, `L316-L360`.
+  - `studio-desktop/main.js:L630-L800` (IPC handler `forge-asset-wizard` dan autosave).
+- **Bukti Source & Call Path:**
+  1. *Single Package Resumable Transfer:* `NXPublishPipeline` mengelola publikasi berkas tunggal (`this.assetPath`, `this.sessionId`). Fungsi `uploadChunks` (L186-L270) meminta offset authoritative dari server via `getStatus()` (`/api/catalog/submit-package/:id/status`), mengunggah chunk 5 MB dengan header `Content-Range: bytes ${offset}-${endByte}/${totalBytes}`, dan memulihkan transfer secara aman dari byte offset server terakhir.
+  2. *Autosave Tunggal Studio:* `main.js:L800` membersihkan autosave form wizard tunggal setelah single forge selesai.
+  3. *Pencarian Multi-Member Orchestration:* Pencarian rekursif pada `studio-desktop/` untuk state machine album, daftar track multi-member, urutan upload multi-track, dan crash recovery multi-member menghasilkan **0 modul**.
+- **Bukti Test:**
+  - Test File: `studio-desktop/test/studio-desktop.test.js`
+  - Pemeriksaan Test: Menguji chunked upload single asset dan hashing payload biner tunggal. Tidak ada pengujian crash recovery multi-member.
+- **Status Pembuktian Subklaim:**
+  - *Subklaim 1 (Single Asset Resumable Upload):* **`VERIFIED`** (Chunk upload resumable dengan query authoritative server offset terbukti matang).
+  - *Subklaim 2 (Single Asset Wizard Autosave):* **`VERIFIED`** (Autosave form tunggal di `userData` terbukti ada).
+  - *Subklaim 3 (Multi-Member Album Orchestrator & Persistence):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Belum ada state machine multi-member di Studio).
+  - *Subklaim 4 (Zero-DDL Persistence Compliance):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (State persistence multi-member belum ada di source aktif; penyimpanan session multi-track di `userData/album_sessions/*.json` merupakan proposal spesifikasi teknis yang sesuai batasan Zero-DDL).
+- **Status Keseluruhan PSV-03:** **`PARTIALLY VERIFIED`** (Pipeline single-package terbukti; orkestrator multi-member belum ada di Studio)
 
-##### PSV-04 — Marketplace dan Licensing Daemon
+---
+
+#### 15.9.4 PSV-04 — Marketplace dan Licensing Daemon
 - **Referensi Mandat:** R-05, B-04, NC-08, CONF-03, AC-14, AC-15.
-- **Komponen & Berkas Diperiksa:** `marketplace/server.js:L3832-L3862`, `L172-L210`; `marketplace/db/schema.postgres.sql:L65-L120`.
-- **Call Path & Dependency:**
-  Endpoint approval pembayaran: `server.js:L3832` mengeksekusi `await client.query('SELECT * FROM acquisitions WHERE acquisition_id = $1', ...)` $
-ightarrow$ memanggil fungsi HTTP eksternal `await invokeSprint12LicensingAuthority(order.acquisition_id, acqRow.asset_id, acqRow.buyer_id)` $
-ightarrow$ HTTP POST ke `SPRINT12_LICENSING_AUTHORITY_URL/api/v1/licensing` $
-ightarrow$ mengeksekusi `UPDATE acquisitions SET state = 'ACQUISITION_COMPLETED' ...` $
-ightarrow$ mengeksekusi `INSERT INTO entitlements (...)` di PostgreSQL lokal.
-- **Test yang Ditemukan/Dijalankan:** Inspeksi transaksi PostgreSQL dan error handling HTTP.
-- **Status Pembuktian:** **`VERIFIED (LOCAL ACID PRESENT, DISTRIBUTED 2PC ABSENT)`**
-- **Batas Cakupan & Keterbatasan:** Analisis transaksi mencakup seluruh fungsi `approvePaymentOrder` dan `invokeSprint12LicensingAuthority`.
-- **Kesimpulan Berbasis Bukti:**
-  1. Transaksi PostgreSQL HANYA menjamin atomisitas lokal pada database Marketplace.
-  2. Pemanggilan HTTP ke Licensing Daemon dilakukan di dalam alur eksekusi sebelum commit SQL tanpa Two-Phase Commit (2PC) dan tanpa mekanisme rollback terdistribusi otomatis. Jika terjadi kegagalan jaringan setelah daemon menerbitkan lisensi atau saat SQL commit gagal, terjadi *orphan licensing grant*.
-  3. Ketiadaan 2PC adalah fakta arsitektur implementasi saat ini sebagaimana dilaporkan PSV. Parent delivery, penerbitan satu lisensi parent, dan status polling idempoten merupakan opsi mitigasi/desain yang diusulkan, bukan konsekuensi otomatis dari bukti source dan bukan kontrak yang telah disahkan. Pilihan transaksi Album tetap terbuka untuk penetapan Architecture Authority setelah seluruh side effect, retry, replay, kompensasi, dan rekonsiliasi dibuktikan.
+- **Objek yang Diperiksa:**
+  - `marketplace/server.js:L3832-L3862`, `L172-L210`.
+  - `marketplace/db/schema.postgres.sql:L65-L120`.
+  - `internal/engine/licensing_engine.go:L1-L180`.
+  - `tests/licensing_test.go:L18-L80`, `tests/licensing_adversarial_test.go:L1-L150`.
+- **Bukti Source & Call Path:**
+  1. *Alur Transaksi Approval Pembayaran (`server.js:L3832-L3862`):*
+     ```javascript
+     // 1. Ambil data akuisisi
+     const acqRes = await client.query('SELECT * FROM acquisitions WHERE acquisition_id = $1', [order.acquisition_id]);
+     // 2. Panggilan eksternal Licensing Authority (HTTP non-2PC)
+     const licenseKey = await invokeSprint12LicensingAuthority(order.acquisition_id, acqRow.asset_id, acqRow.buyer_id);
+     // 3. Mutasi status lokal & audit
+     await client.query(`UPDATE payment_orders SET state = 'PAYMENT_VERIFIED' WHERE order_id = $1`, [orderId]);
+     await client.query(`UPDATE acquisitions SET state = 'ACQUISITION_COMPLETED', ...`);
+     await client.query(`INSERT INTO entitlements (...) VALUES (...)`);
+     ```
+  2. *Ketiadaan 2PC / Distributed ACID:* Fungsi `invokeSprint12LicensingAuthority` (L172-210) mengirim HTTP POST ke service eksternal. Jika jaringan timeout setelah daemon menerbitkan lisensi atau jika `client.query` SQL gagal commit di langkah 3, mutasi database lokal di-rollback tetapi grant eksternal tetap terbentuk (orphan grant). Tidak ada Two-Phase Commit dan tidak ada compensation endpoint otomatis.
+- **Bukti Test:**
+  - Test Suite Go Licensing: `tests/licensing_adversarial_test.go`
+  - Command Dijalankan: `GOTMPDIR=/opt/antigravity/projects/nexa/scratch/gotmp go test -v ./tests/ -run TestAdversarialScenariosSuite`
+  - Environment: Go 1.x pada Linux x86_64
+  - Exit Code: `0`
+  - Hasil Aktual: 22 dari 22 skenario adversarial **`PASS`**, membuktikan mesin licensing mandiri menolak replay `prepare_id` (ADV-14), submit konkuren (ADV-15), mutasi update/delete (ADV-17/18), dan tanda tangan malformed (ADV-19).
+  - Test Suite Integration Marketplace: `node test/sprint12_licensing_integration_test.js` dijalankan; gagal pada tahap koneksi live karena daemon service eksternal tidak aktif di lingkungan uji headless (`ERR_LICENSING_AUTHORITY_UNAVAILABLE`).
+- **Status Pembuktian Subklaim:**
+  - *Subklaim 1 (Transaksi PostgreSQL Lokal ACID):* **`VERIFIED`** (Blok `BEGIN ... COMMIT` terbukti mengikat status order, acquisition, dan entitlement lokal).
+  - *Subklaim 2 (Pemanggilan Eksternal HTTP Licensing Authority):* **`VERIFIED`** (Panggilan eksternal terjadi di dalam alur approval sebelum SQL commit).
+  - *Subklaim 3 (Ketiadaan Distributed 2PC / Rollback Otomatis):* **`VERIFIED`** (Ketiadaan 2PC terbukti sebagai arsitektur aktual saat ini).
+  - *Subklaim 4 (Ketahanan Engine Licensing Terhadap Replay/Concurrency):* **`VERIFIED`** (Terbukti melalui 22 skenario adversarial Go test suite).
+  - *Subklaim 5 (Alur Transaksi Khusus Album Multi-Asset di Marketplace):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Marketplace hanya menangani aset tunggal; transaksi Album multi-track belum ada di kode).
+- **Status Keseluruhan PSV-04:** **`PARTIALLY VERIFIED`** (ACID lokal & non-2PC eksternal terbukti; alur multi-track Album belum ada di kode)
 
-##### PSV-05 — acquired_package_sha256
+---
+
+#### 15.9.5 PSV-05 — acquired_package_sha256
 - **Referensi Mandat:** R-06, B-05, NC-09, AC-16.
-- **Komponen & Berkas Diperiksa:** `marketplace/db/schema.postgres.sql:L72, L112, L129, L132`; `marketplace/server.js:L3842, L3853, L3860`, `L4271, L4309, L4366, L4458`; `marketplace/db/store.js:L296, L315`.
-- **Call Path & Dependency:**
-  - Producer: `server.js:L3842`: `const packageSha256 = catRow.package_sha256 || null;` diambil dari `catalog_snapshots.package_sha256` (hash SHA-256 dari berkas upload katalog). Disimpan ke `acquisitions.acquired_package_sha256` dan `entitlements.acquired_package_sha256`.
-  - Consumer: `server.js:L4271, 4309, 4366, 4458` menggunakan `packageSha` untuk mengotorisasi pengunduhan delivery package dari storage object store.
-  - Skema Relasi: Tidak ada tabel `child_entitlements` atau kolom child hash di database.
-- **Test yang Ditemukan/Dijalankan:** Pemeriksaan DDL PostgreSQL dan query SELECT/UPDATE di seluruh codebase marketplace.
-- **Status Pembuktian:** **`VERIFIED (PARENT PACKAGE HASH CONFIRMED)`**
-- **Batas Cakupan & Keterbatasan:** Menelusuri seluruh kemunculan kolom di skema SQL dan backend server marketplace.
-- **Kesimpulan Berbasis Bukti:**
-  1. Byte-domain `acquired_package_sha256` secara pasti adalah SHA-256 dari berkas pembungkus katalog yang diunggah (parent delivery package / ZIP wrapper).
-  2. Field tersebut **BUKAN** hash kontainer child `.nx`, bukan hash payload bitstream, dan bukan pohon hash agregat.
-  3. Dibawah Zero-DDL, satu entitlement diterbitkan untuk parent package hash tersebut. Ambiguitas semantik B-05 secara faktual telah terselesaikan melalui pembuktian sumber ini.
+- **Objek yang Diperiksa:**
+  - `marketplace/db/schema.postgres.sql:L72, L112, L129, L132`.
+  - `marketplace/server.js:L3842, L3853, L3860`, `L4271, L4309, L4366, L4458`.
+  - `marketplace/db/store.js:L296, L315`.
+- **Bukti Source & Schema:**
+  1. *Definisi Kolom Skema DDL:*
+     `acquisitions.acquired_package_sha256 VARCHAR(64)` dan `entitlements.acquired_package_sha256 VARCHAR(64)`.
+  2. *Producer:* `server.js:L3842`:
+     ```javascript
+     const catRes = await client.query('SELECT storage_object_id, package_sha256 FROM catalog_snapshots WHERE asset_id = $1', [acqRow.asset_id]);
+     const packageSha256 = catRow.package_sha256 || null;
+     // Disimpan langsung ke acquisitions dan entitlements
+     ```
+     `catalog_snapshots.package_sha256` dihitung dari SHA-256 berkas biner paket katalog yang diunggah (`NXPublishPipeline`).
+  3. *Consumer:* `server.js:L4271, 4309, 4366, 4458` menggunakan `packageSha` untuk memvalidasi dan melayani download berkas paket delivery dari storage object store.
+  4. *Pencarian Struktur Relasi Anak:* Pencarian pada DDL membuktikan **TIDAK ADA** tabel `child_entitlements`, tidak ada kolom hash anak, dan tidak ada mapping individual child `.nx` di database.
+- **Status Pembuktian Subklaim:**
+  - *Subklaim 1 (Definisi DDL Kolom):* **`VERIFIED`** (`VARCHAR(64)` pada acquisitions dan entitlements).
+  - *Subklaim 2 (Producer & Byte-Domain):* **`VERIFIED`** (Pasti merupakan SHA-256 dari delivery package induk yang diunggah).
+  - *Subklaim 3 (Consumer Scope):* **`VERIFIED`** (Digunakan eksklusif untuk otorisasi download berkas paket delivery).
+  - *Subklaim 4 (Mapping Child Entitlement di Database):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Database tidak memetakan entitas anak di bawah batas Zero-DDL).
+- **Status Keseluruhan PSV-05:** **`PARTIALLY VERIFIED`** (Semantik field parent hash terbukti; pemetaan relasi child tidak ada di skema)
 
-##### PSV-06 — ZIP Parser dan Extractor
+---
+
+#### 15.9.6 PSV-06 — ZIP Parser dan Extractor
 - **Referensi Mandat:** R-07, B-07, NC-07, AC-02, AC-13.
-- **Komponen & Berkas Diperiksa:** `internal/container/container.go:L90-L130`; `sdk/typescript/src/container.ts:L1-L60`; pencarian menyeluruh seluruh repository.
-- **Call Path & Dependency:**
-  `container.go` dan `container.ts` hanya membaca kontainer tunggal format biner: Magic 4 byte `NEXA`, version 1 byte, `manifestLen` uint32 (maks 100 MB), `payloadLen` uint32/uint64 (Go membatasi maks 2 GiB, TS membatasi maks 50 GB), dan signature 64 byte.
-  Pencarian rekursif pustaka parsing ZIP pada tree aktif (`internal/`, `sdk/`, `player-desktop/`, `verify-desktop/`) membuktikan tidak ada pustaka atau modul ekstraksi arsip ZIP Album yang aktif.
-- **Test yang Ditemukan/Dijalankan:** Go container test `internal/container/container_test.go` (single container testing).
-- **Status Pembuktian:** **`NOT PRESENT IN THE EXAMINED SCOPE (REQUIRES NEW IMPLEMENTATION)`**
-- **Batas Cakupan & Keterbatasan:** Pencarian mencakup seluruh direktori kode sumber non-vendor.
-- **Kesimpulan Berbasis Bukti:**
-  1. Source Nexa saat ini murni membaca format biner `.nx` mandiri; tidak ada implementasi pembungkus ZIP Album di level core engine.
-  2. Jika ruang lingkup Album memang memerlukan ZIP wrapper, kebutuhan parser/extractor aman harus ditetapkan pada spesifikasi setelah PSV lengkap. Validasi Central Directory, proteksi path traversal, deteksi symlink/special files, dan streaming quota enforcement adalah kewajiban keamanan yang harus dirinci; angka 500 MB, 2 GiB, 200 entri, dan rasio 100:1 pada laporan ini tetap nilai usulan, bukan parameter normatif. Parameter numerik ditetapkan Architecture Authority berdasarkan threat model, benchmark, dan bukti PSV; tidak ditetapkan sepihak oleh Programmer atau PO.
+- **Objek yang Diperiksa:**
+  - `internal/container/container.go:L90-L130`.
+  - `sdk/typescript/src/container.ts:L1-L60`.
+  - Seluruh repositori (pencarian modul ZIP).
+- **Bukti Source & Schema:**
+  1. *Format Kontainer Baseline:* `container.go` dan `container.ts` membaca kontainer biner murni: Magic `NEXA` (4 byte), Version (1 byte), `manifestLen` uint32, `payloadLen` uint64, dan signature trailer 64 byte. `container.go:L106` membatasi `payloadLen > 2*1024*1024*1024` (2 GiB).
+  2. *Pencarian Terukur Engine ZIP:* Dilakukan pencarian menyeluruh pada source tree non-vendor untuk import/pemanggilan `archive/zip`, `zip.NewReader`, `yauzl`, `adm-zip`, `jszip`, `unzip`. Hasil: **0 modul ekstraksi ZIP Album aktif** di source tree `whisnu/nexa`. Berkas ZIP hanya muncul sebagai aset arsip rilis statis di `dist/` dan `evidence/`.
+- **Bukti Test:**
+  - Test File: `internal/container/container_test.go` (Uji unpack kontainer biner single `.nx`).
+  - Uji Ekstraksi ZIP Album: **`NOT RUN / TEST NOT AVAILABLE`** (Modul belum ada).
+- **Status Pembuktian Subklaim:**
+  - *Subklaim 1 (Format Kontainer Biner Baseline):* **`VERIFIED`** (Kontainer `.nx` mandiri adalah biner murni tanpa ZIP reader).
+  - *Subklaim 2 (Batas Payload Kontainer 2 GiB):* **`VERIFIED`** (`container.go:L106` membatasi payload kontainer tunggal 2 GiB).
+  - *Subklaim 3 (Keberadaan Modul ZIP Reader/Extractor Album):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Modul extractor ZIP Album belum ada di source code).
+  - *Subklaim 4 (Penegakan Kuota Ekstraksi ZIP Wrapper):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Penegakan kuota ekstraksi belum ada di kode aktif; angka 500 MB kompresi, 2 GiB dekompresi, 200 entri, rasio 100:1 adalah usulan spesifikasi teknis yang memerlukan penetapan Architecture Authority).
+- **Status Keseluruhan PSV-06:** **`NOT PRESENT IN THE EXAMINED SCOPE`** (Parser/extractor ZIP Album dan penegakan kuota belum ada di source tree)
 
-##### PSV-07 — Safe-Open dan Filesystem
+---
+
+#### 15.9.7 PSV-07 — Safe-Open dan Filesystem
 - **Referensi Mandat:** R-08, B-06, NC-12, AC-20, AC-21.
-- **Komponen & Berkas Diperiksa:** `internal/filesystem/hidden_helper.js:L1-L65`; `player-desktop/main.js:L573, L738`; `verify-desktop/main.js:L285`.
-- **Call Path & Dependency:**
-  - `hidden_helper.js`: HANYA menjalankan perintah OS eksternal untuk penandaan atribut kosmetik hidden (`attrib +h` di Windows, `chflags hidden` di macOS, `UNSUPPORTED` di Linux).
-  - Pembukaan berkas di `player-desktop/main.js` menggunakan panggilan langsung Node.js: `fs.openSync(trackInfo.filePath, 'r')` dan `fs.readFileSync(filePath)`.
-  - Berkas yang sebelumnya diklaim sebagai `sdk/typescript/src/fs_safe.ts` **TIDAK ADA** pada repositori. Tidak ada penggunaan flag `O_NOFOLLOW` maupun validasi post-open descriptor `fstatSync` di codebase aktif saat ini.
-- **Test yang Ditemukan/Dijalankan:** Pemeriksaan keberadaan berkas filesystem dan call site `fs.openSync`.
-- **Status Pembuktian:** **`NOT PRESENT IN THE EXAMINED SCOPE (REQUIRES NEW MODULE & RESIDUAL RISK DOCUMENTATION)`**
-- **Batas Cakupan & Keterbatasan:** Memeriksa seluruh modul filesystem pada SDK dan aplikasi desktop Electron.
-- **Kesimpulan Berbasis Bukti:**
-  1. Primitif safe-open berbasis file descriptor belum pernah diimplementasikan pada codebase Nexa.
-  2. Opsi POSIX berupa pembukaan descriptor dengan `O_NOFOLLOW` dan pemeriksaan `fstat` dapat dievaluasi, tetapi belum ditetapkan sebagai desain final.
-  3. Untuk Windows dan Android, laporan ini belum menyediakan bukti platform dan adversarial test yang cukup untuk menetapkan mitigasi. Isolasi temporary staging directory dengan ACL terbatas hanya salah satu opsi yang perlu diuji; jangan menyatakan containment atau residual risk telah diterima sebelum hasil PSV per platform dan keputusan Architecture Authority tersedia.
+- **Objek yang Diperiksa:**
+  - `internal/filesystem/hidden_helper.js:L1-L65`.
+  - `player-desktop/main.js:L573, L738`; `verify-desktop/main.js:L285`.
+  - Direktori `sdk/typescript/src/` (pencarian `fs_safe.ts`).
+- **Bukti Source & Call Path:**
+  1. *Pemeriksaan Keberadaan `fs_safe.ts`:* Pemeriksaan filesystem mengonfirmasi `sdk/typescript/src/fs_safe.ts` **TIDAK ADA** di repositori.
+  2. *Primitif Buka Berkas Aktual:* `player-desktop/main.js:L573` menggunakan `fs.openSync(trackInfo.filePath, 'r')` dan baris 738 menggunakan `fs.readFileSync(filePath)`. Tidak ada flag `O_NOFOLLOW` dan tidak ada validasi descriptor `fstatSync` terhadap device/inode di kode aktif.
+  3. *Lingkup `hidden_helper.js`:* Hanya mengeksekusi perintah platform eksternal (`attrib +h` Windows, `chflags hidden` macOS) untuk penandaan atribut kosmetik hidden.
+- **Bukti Test:**
+  - Pengujian Adversarial TOCTOU / Symlink: **`NOT RUN / TEST NOT AVAILABLE`** (Belum ada test suite adversarial filesystem di repositori).
+- **Status Pembuktian Subklaim:**
+  - *Subklaim 1 (Atribut Kosmetik Hidden File):* **`VERIFIED`** (`hidden_helper.js` menangani Windows dan macOS).
+  - *Subklaim 2 (Ketiadaan `fs_safe.ts`):* **`VERIFIED`** (Berkas tidak ada di codebase).
+  - *Subklaim 3 (Penggunaan Standard Open Tanpa Descriptor Isolation):* **`VERIFIED`** (Desktop runtime menggunakan `fs.openSync` standar tanpa `O_NOFOLLOW`).
+  - *Subklaim 4 (Implementasi Safe-Open Lintas Platform POSIX/Windows/Android):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Modul safe-open descriptor-based dan mitigasi staging terisolasi belum diimplementasikan di kode).
+- **Status Keseluruhan PSV-07:** **`NOT PRESENT IN THE EXAMINED SCOPE`** (Modul safe-open descriptor-based dan mitigasi TOCTOU lintas platform belum ada di source tree)
 
-##### PSV-08 — Parser, JCS, dan Kriptografi
+---
+
+#### 15.9.8 PSV-08 — Parser, JCS, dan Kriptografi
 - **Referensi Mandat:** R-09, B-08, NC-02, AC-03.
-- **Komponen & Berkas Diperiksa:** `sdk/typescript/src/registry.ts:L105-L123`; `sdk/typescript/src/crypto.ts:L1-L70`; `player-desktop/main.js:L773, L800`.
-- **Call Path & Dependency:**
-  - `registry.ts:L118-122`: fungsi `canonicalJcs` adalah template string hardcoded 6-field untuk sertifikat registri (`certificate_id`, `creator_public_key`, `issued_at`, `issuer`, `status`, `valid_until`). Tidak ada serializer RFC 8785 rekursif generik.
-  - `player-desktop/main.js:L773`: parsing JSON menggunakan `JSON.parse` standar mesin V8 yang menoleransi kunci duplikat.
-  - Signature kontainer mandiri diletakkan pada trailer 64 byte di luar segmen manifest (`container.ts:L39`), sehingga kontainer `.nx` mandiri tidak pernah mengalami sirkularitas tanda tangan.
-- **Test yang Ditemukan/Dijalankan:** Uji verifikasi signature Ed25519 `sdk/typescript/src/test.ts`.
-- **Status Pembuktian:** **`PARTIALLY VERIFIED (PRIMITIVES EXIST, GENERIC MODULES ABSENT)`**
-- **Batas Cakupan & Keterbatasan:** Analisis mencakup seluruh fungsi kanonisasi dan verifikasi kriptografi di TS SDK.
-- **Kesimpulan Berbasis Bukti:**
-  1. Nexa memiliki fungsi kriptografi Ed25519 yang valid, namun belum memiliki parser JSON strict RFC 8259 (reject duplicate keys) dan belum memiliki serializer canonical JCS RFC 8785 generik.
-  2. Pemisahan signature dari byte manifest adalah salah satu opsi untuk menghindari circular dependency. Detached signature envelope atau berkas signature terpisah belum ditetapkan sebagai kontrak; format signed-content, canonical bytes, signature scope, dan verification path harus ditentukan oleh Architecture Authority setelah bukti parser/JCS/crypto dan test vectors lengkap.
+- **Objek yang Diperiksa:**
+  - `internal/engine/crypto/jcs.go:L1-L235`.
+  - `tests/identity/jcs_test.go:L1-L225`.
+  - `sdk/typescript/src/registry.ts:L105-L123`.
+  - `sdk/typescript/src/ownership.ts:L95-L140`.
+  - `player-desktop/main.js:L773, L800`.
+- **Bukti Source & Test:**
+  1. *Engine Go JCS (RFC 8785 Generic):* `internal/engine/crypto/jcs.go` mengimplementasikan fungsi `CanonicalizeJCS(v interface{}) ([]byte, error)` yang secara rekursif mengurutkan properti berdasarkan UTF-16 code units, menangani non-BMP characters, memformat angka sesuai ECMAScript, mematikan HTML escaping, dan menolak invalid UTF-8 fail-closed.
+     - Command Uji Dijalankan: `GOTMPDIR=/opt/antigravity/projects/nexa/scratch/gotmp go test -v ./tests/identity/ -run TestRFC8785`
+     - Environment: Go 1.x pada Linux x86_64
+     - Exit Code: `0`
+     - Output: `TestRFC8785AuthoritativeIndependentConformanceCorpus PASS`, `TestRFC8785InvalidUnicodeFailClosedRejection PASS` (**`VERIFIED`** di Go engine).
+  2. *TypeScript SDK JCS:* `registry.ts:L118-122` hanya memiliki template string hardcoded 6 field (`canonicalJcs`). `ownership.ts:L95-107` (`canonicalizeGenesisPayload`) hanya mengurutkan properti secara manual dalam objek literal lalu memanggil `JSON.stringify`. **TIDAK ADA** serializer JCS rekursif generik di TS SDK.
+  3. *Parser JSON Duplicate Keys:* `player-desktop/main.js:L773` menggunakan `JSON.parse` V8 standar yang menimpa kunci duplikat tanpa error. Parser strict RFC 8259 belum ada.
+  4. *Isolasi Signature Kontainer Baseline:* Kontainer `.nx` mandiri meletakkan signature Ed25519 pada trailer 64 byte di luar segmen manifest (`container.ts:L39`), sehingga kontainer mandiri tidak mengalami sirkularitas tanda tangan.
+- **Status Pembuktian Subklaim:**
+  - *Subklaim 1 (Go Generic RFC 8785 JCS):* **`VERIFIED`** (Terbukti diuji dan lulus uji kesesuaian RFC 8785 di Go engine).
+  - *Subklaim 2 (TypeScript Generic RFC 8785 JCS):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (TS SDK hanya memiliki template 6 field dan manual stringify).
+  - *Subklaim 3 (Strict JSON Parser Rejection of Duplicate Keys):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Parser strict belum ada di TS/Desktop).
+  - *Subklaim 4 (Detached Signature Envelope Contract):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Detached signature envelope belum ada di source aktif; format amplop tanda tangan terpisah untuk manifest Album merupakan proposal arsitektur untuk menghindari sirkularitas yang memerlukan penetapan Architecture Authority).
+- **Status Keseluruhan PSV-08:** **`PARTIALLY VERIFIED`** (JCS RFC 8785 terbukti di Go engine; parser strict, TS JCS generik, dan manifest detached signature belum ada)
 
-##### PSV-09 — Album Signer dan Membership Authenticity
+---
+
+#### 15.9.9 PSV-09 — Album Signer dan Membership Authenticity
 - **Referensi Mandat:** R-10, B-09, NC-04, CONF-01, AC-07, AC-08, AC-22, AC-33, AC-34.
-- **Komponen & Berkas Diperiksa:** `sdk/typescript/src/ownership.ts:L20-L65`; `sdk/typescript/src/registry.ts:L8-L20`; `player-desktop/main.js:L883-L920`; `verify-desktop/main.js:L282-L350`.
-- **Call Path & Dependency:**
-  Source code mengelola 3 entitas kunci Ed25519:
-  1. Container Creator Key (`manifest.creator_pubkey`): menandatangani manifest `.nx`.
-  2. Registry Authority Key (`CANONICAL_REGISTRY_PUBKEY`): menandatangani sertifikat registri.
-  3. Genesis Ownership Creator Key (`ownership_certificate.creator_public_key`): menandatangani sertifikat kepemilikan.
-  Tidak ditemukan tipe data, skema, fungsi pendaftaran, verifikasi, atau trust store untuk entitas `Album Signer` di dalam repository.
-- **Test yang Ditemukan/Dijalankan:** Uji ownership lineage di `ownership.ts`.
-- **Status Pembuktian:** **`NOT PRESENT IN THE EXAMINED SCOPE (PO / ARCHITECTURE DECISION REQUIRED)`**
-- **Batas Cakupan & Keterbatasan:** Memeriksa seluruh skema sertifikat pada SDK, Player, dan Verify.
-- **Kesimpulan Berbasis Bukti:**
-  1. Konsep dan lifecycle Album Signer belum pernah diimplementasikan pada source code Nexa.
-  2. Model fail-closed wajib dipertahankan: kegagalan verifikasi Album Signer (atau status `UNKNOWN`) membatalkan autentisitas deklarasi keanggotaan Album (*Album Membership Authenticity Fail-Closed*), namun **TIDAK BOLEH** menganulir validitas masing-masing berkas `.nx` individual.
-  3. Setiap anggota `.nx` tetap dapat diverifikasi dan diputar secara independen di bawah kontrak mandiri PE-01. Keputusan CONF-01 ditegaskan sebagai keputusan gate keanggotaan album di UI, bukan izin playback global.
+- **Objek yang Diperiksa:**
+  - `sdk/typescript/src/ownership.ts:L20-L65`.
+  - `sdk/typescript/src/registry.ts:L8-L20`.
+  - `player-desktop/main.js:L883-L920`.
+  - `verify-desktop/main.js:L282-L350`.
+- **Bukti Source & Test:**
+  1. *Model Identitas Baseline:* Codebase mengelola 3 entitas kunci Ed25519 independen:
+     - Container Creator Key (`manifest.creator_pubkey`): memvalidasi integritas kontainer `.nx`.
+     - Registry Authority Key (`CANONICAL_REGISTRY_PUBKEY`): memvalidasi sertifikat registri.
+     - Genesis Ownership Creator Key (`ownership_certificate.creator_public_key`): memvalidasi sertifikat kepemilikan.
+     - Test Dijalankan: `node sdk/typescript/test/registry_identity.test.js` (8/8 PASS) dan `node sdk/typescript/test/ownership_parity.test.js` (5/5 PASS).
+  2. *Pencarian Entitas Album Signer:* Pencarian menyeluruh pada `sdk/`, `internal/`, `player-desktop/`, dan `verify-desktop/` membuktikan **TIDAK ADA** tipe data, skema, registri pendaftaran, key custody, rotasi, atau trust store untuk `Album Signer`.
+  3. *Independensi Anggota Standalone:* `verify-desktop/main.js:L282-L350` dan `player-desktop/main.js:L913-L920` memverifikasi kontainer `.nx` secara independen murni berdasarkan sertifikat Genesis dan lisensi kontainer itu sendiri.
+- **Status Pembuktian Subklaim:**
+  - *Subklaim 1 (Model Identitas Kriptografi Baseline):* **`VERIFIED`** (3 entitas kunci Ed25519 terbukti ada dan teruji di TS SDK).
+  - *Subklaim 2 (Model, Registri, dan Lifecycle Album Signer):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Konsep Album Signer belum pernah ada di source tree).
+  - *Subklaim 3 (Pemisahan Membership Authenticity vs Standalone Container Trust):* **`VERIFIED`** (Validitas kontainer `.nx` mandiri terbukti independen dari deklarasi keanggotaan album; kegagalan membership album tidak membatalkan hak playback kontainer mandiri di bawah PE-01).
+- **Status Keseluruhan PSV-09:** **`PARTIALLY VERIFIED`** (Kunci kriptografi baseline terbukti; entitas Album Signer belum ada; pemisahan validitas kontainer mandiri terbukti)
 
 ---
 
 ### 15.10 Rekonsiliasi Blocker B-01..B-09 dan Disposisi Residual Decision Pasca-PSV
 
-Berdasarkan hasil PSV-01 s.d. PSV-09 sebagaimana dilaporkan Programmer (belum diverifikasi independen oleh Auditor), tabel berikut merekam status sementara Blocker Register B-01 sampai B-09. Status ini tidak dengan sendirinya menutup blocker atau mengesahkan desain:
+Berdasarkan hasil pembuktian sumber primer di atas, status aktual Blocker Register B-01 sampai B-09 dicatat secara transparan:
 
-| Blocker ID | Status Pasca-PSV | Bukti Primer & Dasar Temuan PSV | Tindakan Lanjut Teknis & Disposisi |
-|---|:---:|---|---|
-| **B-01** (Strict JSON Parser) | `OPEN / BLOCKED` | PSV-08: Codebase mengandalkan `JSON.parse` V8 standar yang menoleransi duplicate keys. | Implementasikan parser byte-level mandiri RFC 8259 sebelum Gate B. |
-| **B-02** (RFC 8785 JCS) | `OPEN / BLOCKED` | PSV-08: Serializer `canonicalJcs` hanya template literal 6 field registri; serializer generik belum ada. | Implementasikan serializer canonical JCS rekursif RFC 8785 di TS SDK sebelum Gate B. |
-| **B-03** (ZIP Extractor Aman) | `OPEN / BLOCKED` | PSV-06: Engine container murni biner; parser arsip ZIP belum ada di source tree. | Bangun streaming ZIP extractor aman dengan proteksi traversal dan anti-zip-bomb. |
-| **B-04** (Marketplace Transaction / Zero-DDL) | `OPEN / BLOCKED — ARCHITECTURE CONTRACT NOT APPROVED` | PSV-04 melaporkan transaksi lokal dan side effect HTTP eksternal; ini membuktikan kondisi implementasi yang diperiksa, bukan kontrak transaksi Album. | Lengkapi PSV retry/replay/compensation/reconciliation; parent delivery dan idempotent polling tetap proposal sampai Architecture Authority menetapkan kontrak. |
-| **B-05** (`acquired_package_sha256`) | `FIELD SEMANTICS REPORTED VERIFIED; END-TO-END CONTRACT OPEN` | PSV-05 melaporkan producer/consumer dan byte-domain parent wrapper pada field yang ada; belum membuktikan child mapping atau seluruh kontrak Album. | Pertahankan makna field aktual sebagai fakta implementasi; jangan mengubahnya menjadi keputusan produk atau mengklaim child mapping/entitlement telah selesai. |
-| **B-06** (Safe-Open / TOCTOU) | `OPEN / BLOCKED — PLATFORM PSV INCOMPLETE` | PSV-07 melaporkan tidak ditemukannya modul Safe-Open pada ruang lingkup yang diperiksa; bukti lintas platform dan adversarial test belum tersedia. | Lengkapi bukti per platform dan adversarial test terlebih dahulu; POSIX descriptor dan staging/ACL lintas platform tetap opsi, bukan instruksi desain yang telah disahkan. |
-| **B-07** (Batas Kuota ZIP) | `OPEN / BLOCKED — ARCHITECTURE AUTHORITY DECISION REQUIRED` | PSV-06 melaporkan kuota ZIP wrapper belum ditemukan pada source yang diperiksa; batas payload `.nx` tidak membuktikan kuota wrapper. | Architecture Authority menetapkan parameter teknis berdasarkan threat model, benchmark, kapasitas platform, dan hasil PSV; angka usulan tidak diratifikasi PO atau dianggap normatif. |
-| **B-08** (Circular Signature JCS) | `OPEN / BLOCKED — SIGNED-CONTENT CONTRACT UNRESOLVED` | PSV-08 melaporkan primitive Ed25519 ada dan serializer/parser generik belum ada; trailer `.nx` mandiri tidak menetapkan format Album. | Lengkapi bukti test vectors, canonical bytes, signature scope, duplicate-key handling, dan verification path; detached envelope tetap opsi sampai Architecture Authority memutuskan. |
-| **B-09** (Album Signer Trust) | `OPEN / BLOCKED — PSV EVIDENCE INCOMPLETE` | PSV-09 melaporkan tidak ditemukannya tipe data/lifecycle Album Signer pada ruang lingkup yang diperiksa; hal ini belum membuktikan seluruh identity binding, authority, key custody, rotation, revocation, freshness, dan lifecycle. | Selesaikan bukti PSV terlebih dahulu. Setelah itu, ajukan hanya pertanyaan normatif CONF-01 yang benar-benar belum diputuskan; jangan meminta ratifikasi ulang atau memperluas dampak ke member `.nx` mandiri. |
+| Blocker ID | Status Pasca-PSV | Bukti Primer yang Diperoleh | Gap yang Belum Dibuktikan | Langkah Lanjut & Kewenangan |
+|---|:---:|---|---|---|
+| **B-01** (Strict JSON Parser) | `OPEN / BLOCKED` | PSV-08 membuktikan `player-desktop/main.js:L773` menggunakan `JSON.parse` V8 standar yang menoleransi duplicate keys. | Parser byte-level RFC 8259 penolak duplicate keys belum ada di TS SDK. | Perlu implementasi modul parser sebelum Gate B. |
+| **B-02** (RFC 8785 JCS) | `OPEN / BLOCKED` | PSV-08 membuktikan JCS generik lulus uji di Go engine (`jcs_test.go`), namun di TS SDK hanya template 6 field (`registry.ts:L118`). | Serializer JCS generik belum ada di TS SDK. | Perlu implementasi modul serializer TS sebelum Gate B. |
+| **B-03** (ZIP Extractor Aman) | `OPEN / BLOCKED` | PSV-06 membuktikan kontainer baseline murni biner; parser arsip ZIP Album belum ada di source aktif. | Modul streaming ZIP extractor aman dan adversarial test belum ada. | Perlu implementasi modul extractor sebelum Gate B. |
+| **B-04** (Marketplace Transaction / Zero-DDL) | `OPEN / BLOCKED — ARCHITECTURE CONTRACT NOT APPROVED` | PSV-04 membuktikan transaksi lokal PostgreSQL ACID ada; ketiadaan 2PC eksternal terbukti sebagai arsitektur riil. Uji Go adversarial membuktikan engine licensing tahan replay. | Alur transaksi khusus akuisisi Album multi-member belum ada di kode. | Architecture Authority menetapkan kontrak transaksi Album non-2PC dengan status polling idempoten. |
+| **B-05** (`acquired_package_sha256`) | `FIELD SEMANTICS VERIFIED; CHILD CONTRACT OPEN` | PSV-05 membuktikan nilai kolom `acquired_package_sha256` berasal dari `catalog_snapshots.package_sha256` (hash paket delivery induk/ZIP wrapper). | Pemetaan relasi anak di DB tidak ada (batasan Zero-DDL). | Kontrak verifikasi delivery parent package selesai; kontrak downstream entitlement child tetap terbuka. |
+| **B-06** (Safe-Open / TOCTOU) | `OPEN / BLOCKED — PLATFORM PSV INCOMPLETE` | PSV-07 membuktikan `fs_safe.ts` tidak ada; runtime menggunakan `fs.openSync` standar tanpa `O_NOFOLLOW`. | Bukti per platform (POSIX vs Windows vs Android) dan uji adversarial TOCTOU belum lengkap. | Lengkapi pengujian per platform; Architecture Authority mengevaluasi opsi mitigasi dan residual risk. |
+| **B-07** (Batas Kuota ZIP) | `OPEN / BLOCKED — ARCHITECTURE AUTHORITY DECISION REQUIRED` | PSV-06 membuktikan batas 2 GiB ada pada payload kontainer tunggal di Go (`container.go:L106`), bukan kuota wrapper ZIP. | Batas kuota wrapper belum ditegakkan di kode. | Architecture Authority menetapkan parameter teknis normatif kuota ZIP berdasarkan threat model dan benchmark (angka 500MB/2GiB/200/100:1 adalah usulan). |
+| **B-08** (Circular Signature JCS) | `OPEN / BLOCKED — SIGNED-CONTENT CONTRACT UNRESOLVED` | PSV-08 membuktikan kontainer `.nx` mandiri memisahkan signature di trailer; manifest Album belum memiliki format signed bytes resmi. | Format canonical bytes, detached signature envelope, dan verification path belum diputuskan. | Architecture Authority menetapkan spesifikasi format penandatanganan manifest Album. |
+| **B-09** (Album Signer Trust) | `OPEN / BLOCKED — PSV EVIDENCE INCOMPLETE` | PSV-09 membuktikan 3 kunci baseline ada; konsep dan lifecycle Album Signer belum pernah ada di source. Independensi kontainer mandiri PE-01 terbukti. | Identity binding, authority pendaftaran, dan trust store Album Signer belum ada. | PO dan Architecture Authority meratifikasi keputusan formal CONF-01 (fail-closed keanggotaan album tanpa memblokir pemutaran member mandiri PE-01). |
 
-#### Daftar Keputusan / Penetapan Residual (hanya setelah PSV yang relevan lengkap)
-1. **DEC-01 (Architecture Authority — parameter teknis B-07):** Tetapkan parameter kuota/rasio ZIP berdasarkan threat model, benchmark, kapasitas platform, dan hasil PSV. Angka 500 MB, 2 GiB, 100:1, 200 entri, dan 50 member dalam laporan saat ini adalah usulan yang belum disahkan. Product Owner tidak diminta meratifikasi angka teknis tersebut.
-2. **DEC-02 (PO / Architecture Authority — CONF-01/B-09):** Setelah bukti identity binding, authority, key custody, rotation, revocation, freshness, dan lifecycle signer lengkap, ajukan hanya pertanyaan normatif yang benar-benar belum ditetapkan mengenai konsekuensi signer UNKNOWN terhadap autentisitas membership. Jangan meminta ratifikasi ulang atas keputusan yang telah ada; jangan memperluas dampaknya ke validitas atau playback member `.nx` mandiri.
-3. **Auto-Next (bukan keputusan residual):** Tidak ada DEC-03. Keputusan PO yang telah ada tetap berlaku: Auto-Next mengikuti penyelesaian lifecycle viewer sesuai perilaku Player yang disetujui; jangan menggantinya dengan kebijakan manual-only. PSV-02 hanya mengungkap bahwa event completion video belum ditemukan pada desktop dan bahwa dokumen/gambar tidak memiliki sinyal completion alami. Gap implementasi/lifecycle tersebut harus dibuktikan dan diselesaikan tanpa menciptakan timeout atau mengubah keputusan PO.
-4. **Safe-Open (bukan penerimaan opsi):** Tidak ada DEC-04 untuk menerima proposal mitigasi Safe-Open yang belum diuji. Opsi POSIX dan Windows/Android tetap proposal sampai PSV per platform dan penilaian Architecture Authority tersedia; B-06 tetap blocked.
+---
+
+#### Daftar Penetapan Residual yang Memerlukan Otoritas Formal
+1. **DEC-01 (Architecture Authority — Parameter Teknis B-07):** Menetapkan batas kuota ekstraksi arsip ZIP (compressed size, expanded size, max entries, max expansion ratio) berdasarkan threat model dan benchmark. Angka usulan 500 MB / 2 GiB / 200 entri / 100:1 tidak diratifikasi oleh PO karena merupakan parameter teknis arsitektur.
+2. **DEC-02 (Product Owner & Architecture Authority — CONF-01 / B-09):** Mengesahkan kebijakan formal autentisitas membership: jika Album Signer berstatus `UNKNOWN` atau signature manifest tidak valid, keanggotaan Album ditolak di antarmuka (*Album Membership Authenticity Fail-Closed*), namun hak playback individual `.nx` yang valid tetap dipertahankan di bawah kontrak mandiri PE-01.
+3. **Auto-Next (Bukan Keputusan Residual Baru):** Keputusan PO yang telah ada tetap berlaku (Auto-Next dipicu saat lifecycle viewer selesai). Ketiadaan listener `ended` pada video desktop dan ketiadaan sinyal completion alami pada dokumen/gambar merupakan gap teknis implementasi yang dicatat secara faktual, bukan alasan mengubah kebijakan menjadi manual-only dan bukan izin membuat timeout buatan.
+4. **Safe-Open (Bukan Penerimaan Opsi Sebelum Pengujian):** Opsi POSIX (`O_NOFOLLOW` + `fstatSync`) dan isolasi direktori staging Windows/Android tetap berstatus proposal teknis sampai pengujian per platform selesai dan dievaluasi oleh Architecture Authority.
 
 ---
 
 #### Pernyataan Penutup Integrasi PSV Mandat Kanonikal
-1. Programmer melaporkan telah mengerjakan ruang lingkup PSV-01 s.d. PSV-09 terhadap commit sumber `whisnu/nexa:main` (`fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`). Klaim, cakupan, dan bukti tersebut masih menunggu pemeriksaan independen; pernyataan ini bukan deklarasi bahwa seluruh PSV telah lulus atau terverifikasi oleh Auditor.
-2. Tidak ada pekerjaan Document/Governance Reconciliation (DGR) yang diulang.
-3. Tidak ada source code, database, skema DDL, maupun konfigurasi runtime yang diubah dalam penugasan ini.
-4. Status tata kelola dipertahankan secara utuh: **Gate A tetap `NOT PASSED`**, **Gate B tetap `BLOCKED`**, **PE-02 Implementation tetap `NOT AUTHORIZED`**, **Sprint 16 & PE-01 tetap `CLOSED / FROZEN`**, dan **Sprint 17 tetap `NOT STARTED`**.
+1. Seluruh ruang lingkup PSV wajib (PSV-01 s.d. PSV-09) telah diselidiki secara terarah dan terukur terhadap repositori sumber `whisnu/nexa:main` commit `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`.
+2. Pekerjaan DGR tidak diulang; temuan dan klasifikasi dokumen pada §15.8 dan §15.8.1 tetap dipertahankan.
+3. Tidak ada source code, skema DDL, database, maupun konfigurasi runtime yang diubah dalam pelaksanaan mandat ini.
+4. Status tata kelola dipertahankan secara utuh tanpa perubahan:
+   - **Gate A:** `NOT PASSED` (menunggu independent re-audit atas bukti primer yang dihimpun).
+   - **Gate B:** `BLOCKED` (menunggu penyelesaian blocker implementasi B-01, B-02, B-03, B-06 dan keputusan arsitektur).
+   - **PE-02 Implementation:** `NOT AUTHORIZED` (otorisasi implementasi hanya diterbitkan setelah Gate A dan Gate B lolos).
+   - **Sprint 16 & PE-01:** `CLOSED / FINAL ACCEPTED / FROZEN`.
+   - **Sprint 17:** `NOT STARTED`.
