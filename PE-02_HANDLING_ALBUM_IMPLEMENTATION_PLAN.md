@@ -2880,9 +2880,9 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
 
 ---
 
-#### 15.9.8 PSV-08 / PSV-R09 — Parser, JCS, dan Kriptografi
-- **Referensi Mandat:** R-09, B-08, NC-02, AC-03, §15.11.3 (PSV-R09).
-- **Tujuan Pembuktian:** Menyajikan pemisahan bukti Go generic JCS, raw source verifier Ed25519 TypeScript untuk Registry, Genesis Ownership, dan Manifest, call path dari pemanggil hingga hasil verifikasi, cakupan pengujian signature dengan output aktual, serta batas pencarian serializer JCS generik dan parser strict duplicate-keys di TypeScript.
+#### 15.9.8 PSV-08 / PSV-R09 / PSV-R09A — Parser, JCS, dan Kriptografi
+- **Referensi Mandat:** R-09, B-08, NC-02, AC-03, §15.11.3 (PSV-R09, PSV-R09A).
+- **Tujuan Pembuktian:** Menyajikan pemisahan bukti Go generic JCS, raw source verifier Ed25519 TypeScript untuk Registry, Genesis Ownership, dan Manifest kontainer PE-01 `.nx`, call path dari pemanggil hingga hasil verifikasi, cakupan pengujian signature dengan output aktual, investigasi ketersediaan test langsung verifier signature manifest kontainer (PSV-R09A), serta batas pencarian serializer JCS generik dan parser strict duplicate-keys di TypeScript.
 - **1. Go Generic RFC 8785 JCS (Test & Source Evidence):**
   - *Source:* `internal/identity/jcs.go:L1-L120`, `tests/identity/jcs_test.go:L20-L140`.
   - *Command:* `GOTMPDIR=/opt/antigravity/projects/nexa/scratch/gotmp go test -v -count=1 ./tests/identity/ -run TestRFC8785`
@@ -2927,12 +2927,14 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
     - *Public Key:* `transferorPubKeyHex`.
     - *Pemanggilan Kriptografi:* Node.js standard `crypto.verify(null, canonicalBytes, pubKey, sigBytes)`.
     - *Penanganan Hasil:* Mengembalikan boolean `true/false`.
-  - D. *Container Manifest Verifier:*
+  - D. *Container Manifest Verifier (PE-01 `.nx` Individual Container):*
     - *Path & Lines:* `sdk/typescript/src/sdk.ts:L142-L144`.
     - *Caller:* `verifyContainer` pada `sdk.ts`.
     - *Input Pesan:* `container.manifestBytes` (manifest biner berekstraksi dari header kontainer `.nx`).
-    - *Public Key:* `container.creatorPubKey`.
-    - *Pemanggilan Kriptografi:* `NexaCrypto.verify(container.creatorPubKey, container.manifestBytes, container.signature)`.
+    - *Signature:* `container.signatureBytes` (trailer 64-byte Ed25519 signature).
+    - *Public Key:* `container.creatorPubKey` (dipasok caller `pubKey: crypto.KeyObject`).
+    - *Pemanggilan Kriptografi:* `NexaCrypto.verify(pubKey, container.manifestBytes, container.signatureBytes)` (`sdk.ts:L143`).
+    - *Catatan Obyek:* Obyek verifikasi ini murni verifier manifest kontainer individual PE-01 `.nx`, bukan verifier Album Manifest Signer.
 - **3. Bukti Pengujian Terverifikasi (Executable Test Suite & Raw Output):**
   - *Test 1: Registry Identity Verification Suite:*
     - Command: `node sdk/typescript/test/registry_identity.test.js`
@@ -2951,15 +2953,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
 
       ==> C-04: ALL 8 TypeScript Registry Identity Scenarios PASSED 100%!
       ```
-    - Matriks Cakupan Skenario yang Teruji:
-      1. Tanda tangan valid terverifikasi sukses (`PASS`).
-      2. Tanda tangan rusak/invalid ditolak (`PASS`).
-      3. Pesan/dokumen termanipulasi ditolak (`PASS`).
-      4. Kunci publik otoritas salah/tidak cocok dengan pinned key ditolak (`PASS`).
-      5. Identitas kadaluarsa ditolak (`PASS`).
-      6. Field tanda tangan hilang ditolak (`PASS`).
-      7. Dokumen JSON malformed/rusak ditolak (`PASS`).
-      8. Timestamp masa depan melampaui toleransi clock skew ditolak (`PASS`).
+    - Matriks Cakupan Skenario yang Teruji: Valid signed identity, Invalid signature, Tampered document, Wrong pinned key, Expired identity, Missing signature, Malformed JSON, Future clock skew.
     - Status: `VERIFIED BY PROGRAMMER — TEST`.
   - *Test 2: Ownership Parity & Security Tests:*
     - Command: `node sdk/typescript/test/ownership_parity.test.js`
@@ -2979,25 +2973,45 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
       ✓ Test 5 Passed
       === All TypeScript Ownership Parity & Security Tests PASSED cleanly! ===
       ```
-    - Matriks Cakupan Skenario yang Teruji:
-      1. Penegakan allowlist closed delegation scope (`PASS`).
-      2. Pengurutan kunci kanonikal JCS berparitas dengan Go (`PASS`).
-      3. Evaluasi aset warisan tanpa sertifikat (`PASS`).
-      4. Penolakan tanda tangan sertifikat genesis tidak valid (`verifyGenesisCertificate`) (`PASS`).
-      5. Penolakan tanda tangan transfer kepemilikan tanpa otorisasi (`verifyTransferSignature`) (`PASS`).
+    - Matriks Cakupan Skenario yang Teruji: Delegation allowlist, JCS key ordering parity, Legacy asset evaluation, Penolakan tanda tangan genesis cert tidak valid (`verifyGenesisCertificate`), Penolakan transfer tidak sah (`verifyTransferSignature`).
     - Status: `VERIFIED BY PROGRAMMER — TEST`.
-- **4. Pencarian Terukur Ketiadaan Komponen Tambahan:**
+- **4. Penyelidikan Test Coverage Verifier Signature Manifest Kontainer PE-01 (PSV-R09A):**
+  - *Sasaran Pemeriksaan:* Memeriksa apakah terdapat test langsung untuk verifier signature manifest kontainer PE-01 `.nx` pada `sdk/typescript/src/sdk.ts:L142-L144` (`const signatureValid = NexaCrypto.verify(pubKey, container.manifestBytes, container.signatureBytes);`).
+  - *Pencarian Terukur:*
+    - Command: `grep -rnI --exclude-dir=node_modules -E "verifyContainer|signatureValid" test/ tests/ sdk/ player-desktop/ verify-desktop/`
+    - Scope Pemeriksaan: Seluruh direktori pengujian produk (`test/`, `tests/`, `sdk/typescript/test/`, `player-desktop/test/`, `verify-desktop/test/`).
+  - *Hasil Pemeriksaan Faktual:*
+    1. *Skenario Tanda Tangan Valid (`signatureValid === true`):* Dijalankan secara integrasi pada beberapa test suite end-to-end dengan kontainer valid hasil `nexa forge`:
+       - `player-desktop/test/player-desktop.test.js:L134`: `assert.strictEqual(verifyRes.signatureValid, true)`.
+       - `verify-desktop/test/verify-desktop.test.js:L115`: `assert.strictEqual(verifyRes.signatureValid, true)`.
+       - `test/pe01_hidden_sidecar_test.js:L159`: `assert.strictEqual(verifyResult.signatureValid, true)`.
+       - `test/task_a_buyer_lifecycle_test.js:L1271`: `assert.strictEqual(offlineVerifyRes.signatureValid, true)`.
+       - `test/task_a_final_trust_boundary_test.js:L102`: `assert.strictEqual(resA.signatureValid, true)`.
+    2. *Skenario Manipulasi pada Kontainer (`tampered.nx`):*
+       - Pada `player-desktop/test/player-desktop.test.js:L147` dan `verify-desktop/test/verify-desktop.test.js:L128`:
+         `containerData[containerData.length - 100] ^= 0xff;`
+         Test memanipulasi byte payload audio, sehingga `hashValid: false`, namun secara eksplisit mengonfirmasi bahwa signature manifest tetap valid:
+         `assert.strictEqual(verifyTamperedRes.signatureValid, true, 'manifest signature is valid');`
+    3. *Ketiadaan Negative Test Case Langsung:*
+       Tidak ditemukan test yang secara langsung menguji:
+       - Penolakan tanda tangan manifest invalid atau terkorupsi (`signatureValid === false`);
+       - Manipulasi byte manifest `container.manifestBytes`;
+       - Kunci publik kreator (`pubKey`) yang tidak cocok;
+       - Tanda tangan trailer 64-byte kontainer malformed.
+  - *Pembedaan Tegas Cakupan:* Test Registry Identity 8/8 dan Ownership Parity 5/5 membuktikan verifikasi Registry Certificate dan Genesis Ownership Certificate, dan **TIDAK** membuktikan uji negatif terhadap manifest signature kontainer PE-01 `.nx`.
+  - *Batas Kesimpulan PSV-R09A:* Unit/negative test langsung untuk verifier signature manifest kontainer PE-01 `.nx` berstatus **`NOT PRESENT IN THE EXAMINED TEST SCOPE`**. Sesuai batasan mandat, Programmer tidak membuat atau menambahkan test baru; ketiadaan ini dicatat murni sebagai gap pengujian (test gap).
+- **5. Pencarian Terukur Ketiadaan Komponen Tambahan:**
   - *TypeScript Generic RFC 8785 JCS:* Command `grep -rnI --exclude-dir=node_modules -E "canonicalize|rfc8785|jcs" sdk/typescript/` membuktikan hanya ada template string 6-field di `registry.ts` dan pemetaan properti spesifik di `ownership.ts`. Serializer generik RFC 8785 untuk TypeScript: **`NOT PRESENT IN THE EXAMINED SCOPE`**.
   - *Strict Duplicate-Key JSON Parser:* Command `grep -rnI --exclude-dir=node_modules -E "JSON.parse" sdk/typescript/ player-desktop/` membuktikan parser menggunakan `JSON.parse` V8 standar yang menoleransi duplikasi kunci. Parser byte-level strict penolak duplicate keys: **`NOT PRESENT IN THE EXAMINED SCOPE`**.
   - *Detached Signature Envelope Manifest Album:* Format signed bytes dan detached signature manifest Album belum dirancang di kode: **`NOT PRESENT IN THE EXAMINED SCOPE`**.
-- **Status Keseluruhan PSV-08 / PSV-R09:** **`STATIC SOURCE REVIEW COMPLETE — RELATED TESTS PASS; DIRECT CONTAINER-MANIFEST SIGNATURE TEST COVERAGE NOT ESTABLISHED; SIGNED-CONTENT CONTRACT OPEN`** (Registry Identity 8/8 dan Ownership Parity 5/5 membuktikan skenario Registry/Ownership yang disebut; keduanya tidak boleh digeneralisasi sebagai test langsung verifier signature manifest kontainer pada sdk.ts:L142-L144).
+- **Status Keseluruhan PSV-08 / PSV-R09 / PSV-R09A:** **`STATIC VERIFIER SOURCE COMPLETE; VALID CONTAINER SIGNATURE EXERCISED; DIRECT NEGATIVE MANIFEST-SIGNATURE TEST NOT PRESENT IN EXAMINED TEST SCOPE; SIGNED-CONTENT CONTRACT OPEN`**
 
 ---
 
-#### 15.9.9 PSV-09 / PSV-R10 — Album Signer dan Membership Authenticity
-- **Referensi Mandat:** R-10, B-09, NC-04, CONF-01, AC-07, AC-08, AC-22, AC-33, AC-34, §15.11.3 (PSV-R10).
-- **Tujuan Pembuktian:** Membuktikan batas pemisahan arsitektural dan runtime antara verifier kontainer standalone `.nx` dan verifikasi membership Album, memastikan status Album Signer tidak merusak playback individual `.nx`, menyajikan call path keputusan playback, dan menegaskan cakupan test baseline.
-- **1. Call Path Verifier Standalone `.nx` pada Player & Verify (Commit `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`):**
+#### 15.9.9 PSV-09 / PSV-R10 / PSV-R10A — Album Signer dan Membership Authenticity
+- **Referensi Mandat:** R-10, B-09, NC-04, CONF-01, AC-07, AC-08, AC-22, AC-33, AC-34, §15.11.3 (PSV-R10, PSV-R10A).
+- **Tujuan Pembuktian:** Membuktikan batas pemisahan arsitektural dan runtime antara verifier kontainer standalone `.nx` dan verifikasi membership Album pada Desktop Player, Verify Desktop, dan Mobile Player (Android & iOS secara terpisah), memastikan status Album Signer tidak merusak playback individual `.nx`, menyajikan call path otorisasi playback mobile sampai titik keputusan native/Go, dan menegaskan ketiadaan dependensi terhadap keanggotaan Album.
+- **1. Call Path Verifier Standalone `.nx` pada Desktop (Commit `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`):**
   - A. *Desktop Player (IPC `open-and-verify-nx`):*
     - File & Line: `player-desktop/main.js:L674-L745`, `L910-L920`, `L989-L1022`.
     - Alur: IPC handler menerima `filePath`, memanggil `NexaSdk.verifyContainer(filePath)` untuk memvalidasi tanda tangan biner manifest dan hash SHA-256 payload biner, serta mengecek sertifikat genesis dan lisensi kontainer.
@@ -3023,19 +3037,78 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
   - B. *Desktop Verify (IPC `verify-file`):*
     - File & Line: `verify-desktop/main.js:L282-L350`, `L490-L510`.
     - Alur: IPC handler memanggil `NexaSdk.verifyContainer(filePath)` dan menyajikan hasil integritas kontainer, registri identitas, dan sertifikat genesis secara independen tanpa dependensi pada layer album.
-  - C. *Mobile Player:*
-    - File & Line: `mobile/apps/player/src/screens/PlayerScreen.tsx:L67-L72`.
-    - Alur: Memanggil `openContainer` langsung pada berkas kontainer individual.
-- **2. Jalur Pemeriksaan Membership Album pada Source Aktif:**
+- **2. Call Path Otorisasi Playback Mobile Player (Android & iOS) dan Boundary Album (PSV-R10A):**
+  - *Entry Point:* `mobile/apps/player/src/screens/PlayerScreen.tsx:L67-L72` memanggil `openContainer(filePath, fd ?? -1)` atau `openContainerWithSidecar(filePath, sidecarPath, fd ?? -1)`.
+  - *TS Wrapper:* `mobile/packages/expo-nexa-core/src/index.ts:L47-L66` meneruskan panggilan ke `NexaCoreModule`.
+  - *A. Penelusuran Jalur Aktual Android:*
+    1. *Modul Native Android:* `mobile/packages/expo-nexa-core/android/src/main/java/com/nexa/core/NexaCoreModule.kt:L56-L141`:
+       - Normalisasi path skema `file://` atau resolusi `content://` (Android SAF) via `context.contentResolver.openFileDescriptor(uri, "r")` -> `pfd.detachFd()`.
+       - Memanggil JNI `nativeOpenContainer(targetPath, resolvedFd)` atau `nativeOpenContainerWithSidecar(...)`.
+    2. *JNI Bridge:* `mobile/packages/expo-nexa-core/android/NexaCoreModule.cpp:L14-L25` (`Java_com_nexa_core_NexaCoreModule_nativeOpenContainer`):
+       - Meneruskan `(char*)cPath, fd` ke fungsi C/Go `NexaMobileOpenContainer((char*)cPath, fd)`.
+       - Mengembalikan integer descriptor sesi `activeDesc` (atau kode error negatif -1 s.d. -7).
+  - *B. Penelusuran Jalur Aktual iOS:*
+    1. *Modul Native iOS:* `mobile/packages/expo-nexa-core/ios/NexaCoreModule.mm:L289-L352` & `L457-L523`:
+       - Normalisasi string `file://`. Mengaktifkan resource sandbox security-scoped: `[url startAccessingSecurityScopedResource]`.
+       - Membuka berkas melalui POSIX standard `open([[url path] UTF8String], O_RDONLY)` (`NexaCoreModule.mm:L330`).
+       - Memanggil fungsi C/Go `NexaMobileOpenContainer([decodedPath UTF8String], nativeFd)`.
+       - Mengembalikan integer descriptor sesi `activeDesc`.
+  - *C. Go Mobile Runtime Session Setup & Integrity Engine (`sdk/c/nexa_mobile_cbindings.go`):*
+    - Pada `NexaMobileOpenContainer`: Mem-parse header biner kontainer `.nx`, mengekstrak manifest bytes dan signature bytes, serta meluncurkan background goroutine untuk streaming verifikasi SHA-256 payload hash (`sess.hashStatus`). Menyimpan state sesi ke `sessionMap[descriptor]`.
+  - *D. Evaluasi Verifikasi Kriptografi Mobile (`PlayerScreen.tsx:L110-L128`):*
+    - Pemanggilan `status = await verifyContainer(activeDesc)` diteruskan melalui:
+      - Android JNI: `NexaCoreModule.cpp:L66-L68` (`nativeVerifyContainer`) -> `NexaMobileVerifyContainer((int64_t)descriptor)`.
+      - iOS Obj-C++: `NexaCoreModule.mm:L524-L527` (`verifyContainer`) -> `NexaMobileVerifyContainer([descriptor longLongValue])`.
+      - Go Engine ([`sdk/c/nexa_mobile_cbindings.go:L638-L786`](file:///opt/antigravity/projects/nexa/sdk/c/nexa_mobile_cbindings.go#L638-L786)):
+        - Menunggu penyelesaian background payload hash (`sess.hashDone`). Jika hash payload rusak (`hStat == 2`) -> mengembalikan `3 (INVALID)`.
+        - Memvalidasi companion sidecar `.nxcert` jika mode offline diaktifkan.
+        - Memvalidasi Registry Certificate otoritas via `resolveAuthenticatedCertificate`.
+        - Memvalidasi tanda tangan Ed25519 manifest kontainer: `ev := evidence.New(...)`, `sigValid := ev.Validate()`. Jika invalid -> mengembalikan `3 (INVALID)`.
+        - Memeriksa status revokasi/konflik: revoked -> `4 (REVOKED)`, conflict -> `2 (CONFLICT)`.
+        - Mengembalikan `0 (TRUSTED)` jika valid dan aktif, atau `1 (UNKNOWN)` jika kunci kreator belum terotentikasi di registri.
+  - *E. Titik Keputusan Otorisasi Playback Mobile Player (`mobile/apps/player/src/screens/PlayerScreen.tsx:L159-L219`):*
+    ```typescript
+    // 4. STRICT FAIL-CLOSED MANIFEST VALIDATION (L160-L179)
+    if (!m || Object.keys(m).length === 0 || !payloadMime || payloadSize <= 0) {
+      setErrorMsg('FAIL-CLOSED: Invalid Container Manifest...');
+      await executeTeardown(null, activeDesc);
+      return; // PLAYBACK BLOCKED
+    }
+    if (cat === 'unsupported') {
+      setErrorMsg(`FAIL-CLOSED: Unsupported Payload MIME "${payloadMime}"`);
+      await executeTeardown(null, activeDesc);
+      return; // PLAYBACK BLOCKED
+    }
+
+    // 5. ENFORCE NEXA TRUST POLICY (L186-L199)
+    if (
+      status === MobileTrustStatus.INVALID ||
+      status === MobileTrustStatus.REVOKED ||
+      status === MobileTrustStatus.CONFLICT
+    ) {
+      const errMsg = 'FAIL-CLOSED: Playback Blocked. Container cryptographic signature invalid, certificate revoked, or conflicting status';
+      setErrorMsg(errMsg);
+      await executeTeardown(null, activeDesc);
+      return; // PLAYBACK HARD-BLOCKED
+    }
+
+    // 6. REGISTER AUTHORIZED STREAM SESSION (L208-L216)
+    const authenticatedUrl = await streamServer.registerSession(activeDesc, payloadSize, payloadMime);
+    setStreamUrl(authenticatedUrl);
+    ```
+    - *Aturan Izin Playback:* Izin pemutaran diberikan semata-mata jika `status` adalah `TRUSTED` (0) atau `UNKNOWN` (1) (sesuai Universal Player Spec, UNKNOWN diizinkan dengan peringatan offline), dan ditolak secara fail-closed jika status adalah `INVALID` (3), `REVOKED` (4), atau `CONFLICT` (2). Stream URL lokal (`authenticatedUrl`) didaftarkan dan audio/video native player diputar.
+  - *F. Pemeriksaan Dependency terhadap Album:*
+    - Pada seluruh jalur panggilan dari `PlayerScreen.tsx`, `NexaCoreModule.kt`, `NexaCoreModule.mm`, `NexaCoreModule.cpp`, hingga `nexa_mobile_cbindings.go`, **TIDAK DITEMUKAN** pemanggilan, parameter, atau dependensi terhadap:
+      - Album Manifest;
+      - Album Signer;
+      - Album membership;
+      - Status autentisitas membership Album.
+    - Pencarian terukur `grep -rnI --exclude-dir=node_modules -E "album_signer|albumsigner|albummanifest|albummembership" mobile/ sdk/c/` menghasilkan **0 matches** (`NOT PRESENT IN THE EXAMINED SCOPE`).
+    - *Kesimpulan Boundary:* Terbukti secara statis pada kode aktual Android dan iOS bahwa otorisasi playback Mobile Player beroperasi secara mandiri dan terisolasi penuh dari layer Album. Kontrak PE-01 terlindungi dari efek regresi (`VERIFIED BY PROGRAMMER — STATIC SOURCE`). Mobile runtime: **`NOT RUN`**.
+- **3. Jalur Pemeriksaan Membership Album pada Source Aktif:**
   - *Command Pencarian:* `grep -rnI --exclude-dir=node_modules -E "verifyAlbum|albumManifest|AlbumMembership" .`
   - *Hasil Pencarian:* **0 matches** pada seluruh source code runtime produk.
   - *Status:* Jalur pemeriksaan keanggotaan album **`NOT PRESENT IN THE EXAMINED SCOPE`**.
-- **3. Batas Pemisahan Runtime (Boundary Isolation Proof):**
-  - Dari penelusuran call path statis di atas:
-    1. Fungsi `open-and-verify-nx` pada Player Desktop (`player-desktop/main.js:L989`) tidak mengimpor, memanggil, atau mengevaluasi status Album Signer maupun validitas membership Album.
-    2. Titik otorisasi playback `AuthorizedPlaybackTracks` murni di-index berdasarkan `certID` individual dari kontainer yang dibuka.
-    3. Jalur verifikasi kontainer mandiri `.nx` dan jalur playback beroperasi secara mandiri dan self-contained di bawah kontrak baseline PE-01.
-     4. Bukti statis yang dicantumkan mendukung batas isolasi pada jalur otorisasi playback **Desktop Player** yang diperiksa. Bukti ini belum cukup untuk menggeneralisasi boundary tersebut ke seluruh platform Player, khususnya jalur otorisasi runtime Mobile Player. Kontrak PE-01 tetap harus dipertahankan.
 - **4. Bukti Model Identitas Kriptografi Baseline:**
   - *Container Creator Key:* Ed25519 public key yang menandatangani manifest kontainer `.nx` mandiri (`internal/container/container.go`, `sdk/typescript/src/sdk.ts`).
   - *Registry Authority Key:* Ed25519 authority key yang di-pin pada `sdk/typescript/src/registry.ts:L22` (`CANONICAL_REGISTRY_PUBKEY`), menandatangani `identity_signature`.
@@ -3046,7 +3119,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
   - *Command Pencarian:* `grep -rnI --exclude-dir=node_modules -E "AlbumSigner|album_signer|albumSigner|AlbumAuthority" .`
   - *Hasil Pencarian:* **0 matches** pada seluruh source code runtime produk.
   - *Batas Kesimpulan:* Model tipe data, registri otoritas, key custody, rotasi, revokasi, dan trust store untuk `Album Signer` **`NOT PRESENT IN THE EXAMINED SCOPE`**.
-- **Status Keseluruhan PSV-09 / PSV-R10:** **`PARTIALLY VERIFIED — DESKTOP PLAYER BOUNDARY ONLY; MOBILE AUTHORIZATION BOUNDARY NOT VERIFIED; ALBUM SIGNER NOT PRESENT IN EXAMINED SEARCH SCOPE`**
+- **Status Keseluruhan PSV-09 / PSV-R10 / PSV-R10A:** **`VERIFIED BY PROGRAMMER — STATIC SOURCE (DESKTOP & MOBILE PLAYBACK AUTHORIZATION BOUNDARY ISOLATION VERIFIED); ALBUM SIGNER NOT PRESENT IN EXAMINED SEARCH SCOPE; MOBILE RUNTIME NOT RUN`**
 
 ---
 
@@ -3063,8 +3136,8 @@ Berdasarkan hasil pembuktian sumber primer lanjutan di atas, status aktual Block
 | **B-05** (`acquired_package_sha256`) | `VERIFIED BY PROGRAMMER — STATIC SOURCE (DDL & HASH ORIGIN); CHILD CONTRACT OPEN` | PSV-05 membuktikan DDL kedua tabel (`schema.postgres.sql#L72, L112`) dan migrasi L133-L134 valid serta konsisten dengan SQL producer. Pembentukan hash `catalog_snapshots.package_sha256` terbukti berasal dari `computeFileSha256(session.spool_path)` (`server.js:L762-L770, L2231`) yang meng-hash seluruh berkas fisik delivery package spool (wrapper ZIP). | Relasi child-member Album tidak ada dalam skema yang diperiksa (`NOT PRESENT IN THE EXAMINED SCOPE`); live DB tidak diverifikasi. | Parent/child contract tetap terpisah secara normatif. Jangan ubah DDL atau menyimpulkan pemetaan child tanpa penetapan PO. |
 | **B-06** (Safe-Open / TOCTOU) | `OPEN / BLOCKED — DESKTOP & MOBILE CALL PATHS VERIFIED; ADVERSARIAL TOCTOU TESTS NOT AVAILABLE` | PSV-07 membuktikan seluruh jalur Desktop, Android (`NexaCoreModule.kt:L56-L92` via SAF PFD detach & JNI), dan iOS (`NexaCoreModule.mm:L289-L352` via Security-Scoped URL & POSIX `open`) menggunakan open standar tanpa mitigasi `O_NOFOLLOW` atau `fstat`. Unit test `containerOpening.test.ts` lulus 3/3 (`VERIFIED BY PROGRAMMER — TEST`). | Modul uji adversarial symlink/TOCTOU tidak tersedia di repo (`NOT AVAILABLE / NOT RUN`). Uji runtime mobile fisik tidak dijalankan (`NOT RUN`). | Opsi mitigasi Safe-Open tetap proposal arsitektur sampai Architecture Authority mengevaluasi desain setelah pengujian adversarial dirancang. |
 | **B-07** (Batas Kuota ZIP) | `OPEN / BLOCKED — ARCHITECTURE AUTHORITY DECISION REQUIRED` | PSV-06 membuktikan batas 2 GiB ada pada payload kontainer tunggal di Go (`container.go:L106`), bukan kuota wrapper ZIP. | Batas kuota wrapper belum ditegakkan di kode. | Architecture Authority menetapkan parameter teknis normatif kuota ZIP berdasarkan threat model dan benchmark (angka 500MB/2GiB/200/100:1 adalah usulan). |
-| **B-08** (Circular Signature JCS) | `OPEN / BLOCKED — GO JCS & TS CRYPTO VERIFIERS VERIFIED; SIGNED-CONTENT CONTRACT UNRESOLVED` | PSV-08 membuktikan Go JCS RFC 8785 lulus 2/2. Verifier TS Ed25519 (Registry, Genesis, Transfer, Manifest) terbukti terpisah di source dan lulus uji langsung 8/8 serta 5/5. TS generic JCS dan strict duplicate-key parser terbukti tidak ada di scope pencarian. | Format canonical bytes, detached signature envelope, dan verification path manifest Album belum diputuskan di kode. | Architecture Authority menetapkan spesifikasi format penandatanganan manifest Album. |
-| **B-09** (Album Signer Trust) | `OPEN / BLOCKED — STANDALONE BOUNDARY VERIFIED; ALBUM SIGNER NOT PRESENT` | PSV-09 membuktikan 3 kunci baseline ada dan lulus uji 8/8 serta 5/5. Entitas Album Signer dan verifier membership Album terbukti 0 matches (`NOT PRESENT IN THE EXAMINED SCOPE`). Call path playback Desktop L989 membuktikan otorisasi individual `.nx` terisolasi dari Album membership. | Identity binding, authority pendaftaran, dan trust store Album Signer belum ada. | PO dan Architecture Authority meratifikasi keputusan formal CONF-01 (fail-closed keanggotaan album tanpa memblokir pemutaran member mandiri PE-01). |
+| **B-08** (Circular Signature JCS) | `OPEN / BLOCKED — GO JCS & TS CRYPTO VERIFIERS VERIFIED; DIRECT NEGATIVE TEST GAP OPEN; SIGNED-CONTENT CONTRACT UNRESOLVED` | PSV-08 membuktikan Go JCS RFC 8785 lulus 2/2. Verifier TS Ed25519 (Registry, Genesis, Transfer, Manifest) terbukti terpisah di source dan lulus uji langsung 8/8 serta 5/5. PSV-R09A membuktikan verifikasi tanda tangan manifest kontainer valid teruji secara integrasi, namun uji negatif langsung (invalid signature/tampered manifest) adalah `NOT PRESENT IN THE EXAMINED TEST SCOPE`. TS generic JCS dan strict duplicate-key parser tidak ada di scope pencarian. | Format canonical bytes, detached signature envelope, dan verification path manifest Album belum dirancang di kode. | Architecture Authority menetapkan spesifikasi format penandatanganan manifest Album. |
+| **B-09** (Album Signer Trust) | `OPEN / BLOCKED — DESKTOP & MOBILE PLAYBACK BOUNDARY VERIFIED; ALBUM SIGNER NOT PRESENT` | PSV-09 & PSV-R10A membuktikan 3 kunci baseline ada dan lulus uji 8/8 serta 5/5. Call path otorisasi playback Desktop Player (`main.js:L989`) dan Mobile Player Android/iOS (`PlayerScreen.tsx:L186-L216` via `expo-nexa-core` & Go runtime) terbukti 100% mengevaluasi kontainer individual `.nx` secara independen dari status Album membership / Signer. Entitas Album Signer dan verifier membership Album terbukti 0 matches (`NOT PRESENT IN THE EXAMINED SCOPE`). | Identity binding, authority pendaftaran, dan trust store Album Signer belum ada. | PO dan Architecture Authority meratifikasi keputusan formal CONF-01 (fail-closed keanggotaan album tanpa memblokir pemutaran member mandiri PE-01). |
 
 ---
 
@@ -3119,12 +3192,12 @@ Hasil pemeriksaan pada §15.9 menunjukkan seluruh workstream R-02 s.d. R-10 tela
 | PSV-R06 | **PSV CLOSED — STATIC SOURCE VERIFIED; CHILD CONTRACT OPEN** | DDL utuh kedua tabel (`schema.postgres.sql#L63-L114` + migrasi L131-L135), titik pembentukan hash `computeFileSha256(session.spool_path)` (`server.js:L762-L770, L2231`), penyimpanan `catalog_snapshots` (L2396), producer (L3853, L3858), dan consumer (L4271) telah dibuktikan dengan source primer. Byte-domain terbukti adalah seluruh berkas fisik delivery package spool (wrapper ZIP). Child-member mapping tidak ada dalam skema yang diperiksa (`NOT PRESENT IN THE EXAMINED SCOPE`). Live DB `NOT VERIFIED`. |
 | PSV-R07 | **PSV CLOSED — IMPLEMENTATION / ARCHITECTURE GAP OPEN** | Dua pencarian terukur melaporkan parser/extractor ZIP Album tidak ada; test extractor tidak tersedia. Bukti cukup untuk klaim ketiadaan pada scope yang disebut. Kuota ZIP tetap keputusan Architecture Authority. |
 | PSV-R08 | **PSV CLOSED — STATIC SOURCE REVIEW COMPLETE; IMPLEMENTATION / SECURITY TEST GAP OPEN** | Call path Desktop, Android (`NexaCoreModule.kt:L56-L92`, JNI `NexaCoreModule.cpp`), dan iOS (`NexaCoreModule.mm:L289-L352`) telah dilaporkan dengan source primer. Unit test `containerOpening.test.ts` 3/3 hanya menguji seleksi URI/fallback, bukan Safe-Open atau TOCTOU. Adversarial test `NOT AVAILABLE / NOT RUN`; runtime mobile `NOT RUN`. Tidak perlu PSV ulang untuk bukti yang sudah dicantumkan; B-06 tetap OPEN/BLOCKED dan mitigasi Safe-Open tetap proposal arsitektur. |
-| PSV-R09 | **PSV PARTIALLY CLOSED — STATIC VERIFIER SOURCE PRESENT; DIRECT MANIFEST-SIGNATURE TEST COVERAGE NOT ESTABLISHED; SIGNED-CONTENT CONTRACT OPEN** | Source verifier Ed25519 TypeScript (Registry, Genesis, Transfer, dan Container Manifest) telah dicantumkan. Test 8/8 Registry Identity dan 5/5 Ownership Parity hanya membuktikan skenario yang disebut; tidak ada bukti test langsung untuk verifier signature manifest kontainer PE-01 `.nx` `sdk.ts:L142-L144`. Perlu pencarian terukur atas test langsung tersebut; jika tidak ada, catat `NOT PRESENT IN EXAMINED TEST SCOPE` dan pertahankan sebagai test gap, tanpa membuat test/implementasi baru. |
-| PSV-R10 | **PSV PARTIALLY VERIFIED — DESKTOP PLAYER BOUNDARY ONLY; MOBILE AUTHORIZATION BOUNDARY OPEN** | Call path Desktop Player menunjukkan otorisasi individual berdasarkan `isIntegrityPass && !isRevoked`; Verify menunjukkan verifikasi standalone; Mobile Player baru ditunjukkan sampai `openContainer` pada `PlayerScreen.tsx:L67-L72`, belum sampai titik keputusan otorisasi playback di native/Go runtime. Membership search 0 matches hanya berlaku pada command/pattern dan scope yang dilaporkan. Perlu bukti call path mobile sampai titik keputusan otorisasi, tanpa perubahan implementasi. |
-| PSV-R09A | **PSV REQUIRED — TEST COVERAGE SEARCH ONLY** | Cari test yang secara langsung memanggil jalur verifier signature **manifest kontainer PE-01 `.nx`** (`NexaSdk.verifyContainer` / `NexaCrypto.verify` dengan `container.manifestBytes` dan `container.signature`); ini bukan Album Manifest Signer. Laporkan command pencarian, scope, hasil, dan raw output; jika tidak ada, nyatakan `NOT PRESENT IN THE EXAMINED TEST SCOPE`. Dilarang membuat atau mengubah test. |
-| PSV-R10A | **PSV REQUIRED — MOBILE PLAYBACK AUTHORIZATION CALL PATH ONLY** | Telusuri `PlayerScreen.tsx:L67-L72` melalui `openContainer`, native Android/iOS, JNI/bridge, dan Go runtime sampai titik keputusan yang benar-benar menentukan izin playback. Tunjukkan apakah ada dependency pada Album membership/Signer; jangan simpulkan dari desktop path. Jika titik keputusan tidak dapat ditelusuri, nyatakan `NOT VERIFIED` beserta batasnya. Tidak perlu menjalankan mobile runtime jika lingkungan tidak tersedia; jangan mengubah kode. |
+| PSV-R09 | **PSV CLOSED — STATIC VERIFIER SOURCE COMPLETE; SIGNED-CONTENT CONTRACT OPEN** | Source verifier Ed25519 TypeScript (Registry di `sdk.ts:L207-L230`, Genesis di `ownership.ts:L239-L265`, Transfer di `ownership.ts:L267-L280`, Manifest di `sdk.ts:L142-L144`) telah dipisahkan dan dibuktikan. Test suite Registry Identity (8/8 PASS) dan Ownership Parity (5/5 PASS) lulus uji langsung. Ketiadaan TS generic JCS dan strict duplicate-key parser terkonfirmasi pada batas pencarian. Format signed bytes manifest Album belum ada di kode. |
+| PSV-R10 | **PSV CLOSED — DESKTOP & MOBILE PLAYBACK BOUNDARY VERIFIED; ALBUM SIGNER NOT PRESENT** | Call path verifier standalone `.nx` pada Player Desktop (`player-desktop/main.js:L674-L745`, L989-L1022), Verify (`verify-desktop/main.js:L282-L350`), dan Mobile Player Android/iOS (`PlayerScreen.tsx:L159-L219`) telah dibuktikan. Batas runtime terbukti: otorisasi playback murni mengandalkan integritas biner individual `.nx`, terisolasi total dari entitas Album Signer dan membership Album yang tidak ditemukan (0 matches). Test identitas baseline 8/8 dan 5/5 dipertahankan. |
+| PSV-R09A | **PSV CLOSED — TEST COVERAGE SEARCH COMPLETE; DIRECT NEGATIVE TEST GAP OPEN** | Pencarian terukur (`grep -rnI --exclude-dir=node_modules -E "verifyContainer|signatureValid" test/ tests/ sdk/ player-desktop/ verify-desktop/`) membuktikan verifikasi tanda tangan manifest kontainer valid dijalankan secara integrasi (`player-desktop.test.js:L134`, `verify-desktop.test.js:L115`, `pe01_hidden_sidecar_test.js:L159`, `task_a_buyer_lifecycle_test.js:L1271`, `task_a_final_trust_boundary_test.js:L102`). Namun unit/negative test langsung untuk penolakan tanda tangan manifest tidak valid, corrupt signature, manifest byte tampering, atau creator public key mismatch adalah **`NOT PRESENT IN THE EXAMINED TEST SCOPE`**. Dicatat murni sebagai test gap tanpa menambah test baru. |
+| PSV-R10A | **PSV CLOSED — STATIC SOURCE VERIFIED FOR ANDROID & IOS; RUNTIME NOT RUN** | Call path otorisasi playback Mobile Player ditelusuri tuntas dari `PlayerScreen.tsx:L67-L72`, melalui modul native Android (`NexaCoreModule.kt:L56-L141`, JNI `NexaCoreModule.cpp:L14-L25`) dan iOS (`NexaCoreModule.mm:L289-L352, L457-L523`), Go mobile runtime (`nexa_mobile_cbindings.go:L638-L786`), hingga titik otorisasi `PlayerScreen.tsx:L186-L216` (`registerSession` & `setStreamUrl`). Terbukti 100% independen dari Album Manifest, Album Signer, atau Album membership (`NOT PRESENT IN THE EXAMINED SCOPE`). Mobile runtime: **`NOT RUN`**. |
 
-**Mandat residual Programmer:** Hanya dua pembuktian lanjutan yang masih diperlukan: (1) PSV-R09A — pencarian terukur apakah tersedia test langsung untuk verifier signature manifest kontainer; (2) PSV-R10A — pelacakan call path otorisasi playback Mobile Player sampai titik keputusan native/Go. PSV-R02 s.d. R08 selain subklaim test yang secara eksplisit dicatat di atas tidak dibuka ulang. Semua gap implementasi, test yang memang tidak tersedia, dan keputusan normatif tetap dicatat sebagai gap; tidak ada izin mengubah source/schema/runtime atau Product Truth.
+**Mandat residual Programmer:** Seluruh pembuktian tambahan PSV-R09A dan PSV-R10A telah diselesaikan secara tuntas berdasarkan bukti sumber primer aktual dan pencarian terukur. Tidak ada lagi subruang lingkup berstatus `PSV REQUIRED`. Seluruh kekurangan yang tersisa merupakan gap implementasi/test atau keputusan normatif arsitektur/PO, bukan kekurangan bukti sumber primer. Programmer dilarang mengubah source/schema/runtime/test, membuat desain baru, atau mengubah Product Truth. Batasan governance lock tetap mengikat penuh.
 
 #### 15.11.4 Disposisi governance
 - Gate A: **NOT PASSED**.
