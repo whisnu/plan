@@ -1345,16 +1345,16 @@ Dokumen ini menyusun ulang inventarisasi seluruh objek tanda tangan digital Ed25
 >    - **Catatan Implementasi Lokal Programmer (`whisnu/nexa:main` commit `fc08a5c`)**:
 >      - Implementasi Go (`internal/container/container.go`): Fungsi `Pack` (`container.go#L17-L64`) memvalidasi `len(signature) != 64` (L25), menulis `sigLen` uint32 BigEndian ke header (L48-50), dan menulis trailer biner 64-byte `signature` di akhir berkas (`buf.Write(signature)`, L59-61). Fungsi `Unpack` (`container.go#L67-L135`) membaca header, memvalidasi `sigLen == 64` (L106), menghitung `expectedSize = headerSize + manifestLen + payloadLen + sigLen` (L111), membaca trailer `signature = make([]byte, sigLen)` (L129-130), dan mengembalikan `signature []byte` (L134). Pada `internal/engine/container/container.go#L212-L295` (`UnpackMetadata`), trailer dialokasikan sebagai `signatureBytes = make([]byte, sigLen)` (L287) dan dibaca via `r.ReadAt(signatureBytes, sigOffset)` (L288).
 >      - Implementasi TypeScript SDK (`sdk/typescript/src/container.ts`): Interface `NexaContainerData` (`container.ts#L4-L8`) mendefinisikan `signatureBytes: Buffer;` (L7). Fungsi `unpack` (`container.ts#L44-L104`) membaca `sigLen` (L73/L81), memvalidasi `sigLen === 64` (L85), mengalokasikan `const signatureBytes = Buffer.alloc(sigLen)` (L100), menyalin byte trailer kontainer dari offset `headerSize + manifestLen + payloadLen` (L101), dan mengembalikannya sebagai properti `signatureBytes` (L103). Verifikasi SDK (`sdk/typescript/src/sdk.ts#L143, L151`) mengeksekusi `NexaCrypto.verify(pubKey, container.manifestBytes, container.signatureBytes)` (L143) dan `NexaCrypto.sha256(container.signatureBytes)` (L151).
->    - **Status Bukti Audit Independen**: Berdasarkan inspeksi repositori lokal Programmer pada host Linux server, alur data pembentukan dan pembacaan kedua sisi memetakan byte trailer yang sama. Namun demikian, karena berkas-berkas sumber tersebut belum dapat diakses atau diperiksa secara independen oleh Auditor (pemeriksaan Auditor menghasilkan HTTP 404 / repositori sumber tidak tersedia), dokumen ini secara jujur dan transparan menetapkan status pembuktian primer hubungan kedua representasi ini sebagai:  
->      **`NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`**.  
->      Dokumen secara tegas tidak mempertahankan label `REPOSITORY-VERIFIED` tanpa bukti primer yang dapat diaudit secara independen oleh Auditor.
+>    - **Status Provenance Bukti**: Programmer melaporkan inspeksi source lokal yang memetakan byte trailer Go dan TypeScript pada commit yang dicantumkan. Auditor menilai provenance, kutipan, dan konsistensi internal pada PLAN; akses langsung Auditor ke repository sumber bukan prasyarat. Status bukti dibatasi sebagai `VERIFIED BY PROGRAMMER — STATIC SOURCE`, bukan verifikasi independen Auditor dan bukan bukti runtime.
+>      (Tidak ada klaim `REPOSITORY-VERIFIED`.)
+> 2. *Genesis Ownership Certificate Signature (`creator_signature`)*:
 > 2. *Genesis Ownership Certificate Signature (`creator_signature`)*:
 >    - **Pembedaan Konseptual & Catatan Implementasi Lokal**: Properti `creator_signature: string;` dilaporkan pada interface `OwnershipCertificate` (`sdk/typescript/src/ownership.ts#L26`), diverifikasi atas canonical JSON Genesis Certificate terhadap `ownCert.creator_public_key` (`sdk/typescript/src/sdk.ts#L234-L255#L235, L252, L255`), dan didefinisikan sebagai kolom `creator_signature TEXT NOT NULL` pada tabel `ownership_tokens` (`migrations/004_ownership.sql#L25`).
->    - **Status Bukti Audit Independen**: Pembedaan konseptual bahwa `creator_signature` **BUKAN** trailer kontainer PE-01 melainkan tanda tangan atas data sertifikat kepemilikan genesis oleh pencipta asli aset (Genesis Creator, Objek 4) dipertahankan 100%. Namun, status bukti primer implementasinya bagi audit independen ditetapkan sebagai:  
->      **`NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`**.
-> 3. *Kesimpulan*: Objek 2 (Container Packaging Signature) dan Objek 4 (Genesis Ownership Certificate Signature) dipertahankan sebagai dua entri inventaris konseptual yang berbeda. Pembedaan tersebut tidak dengan sendirinya membuktikan rincian implementasi mengenai payload, lokasi penyimpanan, kunci penandatangan, public key verifikasi, atau verifier aktual. Rincian implementasi tersebut merupakan deskripsi yang dilaporkan Programmer dan belum dapat diperiksa secara independen oleh Auditor. Oleh karena itu, status bukti implementasi primer kedua objek tetap `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE` sampai bukti primer tersedia untuk pemeriksaan independen.
+>    - **Status Provenance Bukti**: Pembedaan konseptual bahwa `creator_signature` bukan trailer kontainer PE-01 melainkan tanda tangan atas data sertifikat Genesis Ownership tetap dipertahankan. Bukti implementasi yang dilaporkan Programmer dibatasi sebagai `VERIFIED BY PROGRAMMER — STATIC SOURCE`; hal ini bukan verifikasi independen Auditor dan bukan bukti runtime.
+> 3. *Kesimpulan*: Objek 2 (Container Packaging Signature) dan Objek 4 (Genesis Ownership Certificate Signature) tetap merupakan dua entri inventaris konseptual berbeda. Pembedaan ini tidak membuktikan payload, lokasi penyimpanan, kunci, public key, atau verifier di luar bukti source yang dikutip. Klaim implementasi tersebut berstatus `VERIFIED BY PROGRAMMER — STATIC SOURCE` sesuai provenance Programmer, bukan `NOT VERIFIED` hanya karena Auditor tidak mengakses repository secara langsung.
 
-> **Catatan Pemisahan Signature Genesis (AUDIT-NEW-04):** Pembedaan Objek 3 (`issuer_signature`) dan Objek 4 (`creator_signature`) secara tegas dipertahankan sebagai **dua entri inventaris konseptual yang berbeda** dan tidak digabung menjadi satu signature. Keduanya mewakili dua peran sertifikat yang berbeda (sertifikat registri vs sertifikat kepemilikan genesis). Uraian mengenai entitas penandatangan (Registry Authority vs Genesis Creator), public key verifikasi (`registryPubKey` vs `ownCert.creator_public_key`), payload kanonikal, dan alur verifikasi merupakan deskripsi implementasi lokal yang dilaporkan Programmer. Karena source primer terkait pada repositori `whisnu/nexa` belum tersedia untuk pemeriksaan independen oleh Auditor, rincian implementasi tersebut berstatus **`NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`**.
+
+> **Catatan Pemisahan Signature Genesis (AUDIT-NEW-04):** Pembedaan Objek 3 (`issuer_signature`) dan Objek 4 (`creator_signature`) tetap dipertahankan sebagai dua entri konseptual. Rincian implementasi yang dilaporkan Programmer berstatus `VERIFIED BY PROGRAMMER — STATIC SOURCE` sesuai kutipan yang tersedia; status ini bukan verifikasi independen Auditor dan bukan bukti runtime.
 
 ##### B. Inventarisasi Field Hash SHA-256: Usulan Spesifikasi Manifest & Keberadaan Kolom DDL Database
 Dari penelusuran skema database dan spesifikasi manifest, terdapat **2 field hash SHA-256** dengan tingkat pembuktian yang berbeda secara tegas (dokumen ini tidak mengklaim keduanya sebagai kontrak normatif yang telah disahkan):
@@ -1395,13 +1395,13 @@ const certIdMatches = (!ownCert.underlying_cert_id || ownCert.underlying_cert_id
 Properti `underlying_cert_id` pada Genesis Ownership Certificate secara konseptual merupakan **string referensi identifier sertifikat registri induk (`certID`)**, **BUKAN** merupakan digest SHA-256 bitstream audio. Status bukti repositori bagi audit independen: **`NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE (CONCEPTUAL INVARIANT: CERTIFICATE IDENTIFIER REFERENCE — NOT AN AUDIO HASH DIGEST)`**.
 
 ##### E. Rekapitulasi Jumlah & Status Otoritatif (AUDIT-NEW-04)
-1. **Jumlah Objek Tanda Tangan Ed25519**: 4 objek (3 objek berstatus `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE` karena akses independen Auditor terhadap repositori sumber `whisnu/nexa` belum tersedia + 1 `PROPOSED SPECIFICATION` pada skema manifest).
-   - Klaim hubungan kode antara `signature` trailer di Go (`internal/container/container.go#L17-L135`) dan `signatureBytes` di TypeScript SDK (`sdk/typescript/src/container.ts#L4-L104`, `sdk.ts#L143, L151`) dilaporkan dari repositori lokal Programmer `whisnu/nexa` commit `fc08a5c`, namun bagi verifikasi independen Auditor berstatus **`NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`**.
-   - Field `creator_signature` secara konseptual terbukti bukan field kontainer melainkan properti eksklusif Genesis Ownership Certificate (Objek 4); status verifikasi bukti implementasi pada `sdk/typescript/src/ownership.ts#L26` dan `migrations/004_ownership.sql#L25` bagi audit independen adalah **`NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`**.
+1. **Jumlah Objek Tanda Tangan Ed25519**: 4 objek konseptual; 3 objek implementasi (Container Packaging, Registry Authority Certificate, Genesis Ownership Certificate) memiliki bukti source yang dilaporkan Programmer dan dibatasi sebagai `VERIFIED BY PROGRAMMER — STATIC SOURCE`; 1 objek Album Manifest Signer tetap `PROPOSED SPECIFICATION` dan belum ditemukan implementasinya.
+   - Klaim hubungan kode antara `signature` trailer di Go (`internal/container/container.go#L17-L135`) dan `signatureBytes` di TypeScript SDK (`sdk/typescript/src/container.ts#L4-L104`, `sdk.ts#L143, L151`) dilaporkan Programmer dari commit `fc08a5c`; statusnya `VERIFIED BY PROGRAMMER — STATIC SOURCE`, bukan verifikasi independen Auditor atau bukti runtime.
+   - Field `creator_signature` secara konseptual bukan field kontainer melainkan properti Genesis Ownership Certificate (Objek 4); bukti implementasi pada `sdk/typescript/src/ownership.ts#L26` dan `migrations/004_ownership.sql#L25` dilaporkan Programmer sebagai `VERIFIED BY PROGRAMMER — STATIC SOURCE`, bukan verifikasi independen Auditor atau bukti runtime.
 2. **Status Field Hash SHA-256**:
    - notasi konseptual draf audio `tracks[] [notasi draf audio non-normatif; bukan path manifest universal].<unresolved_audio_hash_field>` (bukan path manifest normatif): `PROPOSED SPECIFICATION` (usulan skema manifest §5.1 khusus audio; identitas field berstatus `UNRESOLVED — FIELD IDENTITY NOT ESTABLISHED BY NORMATIVE CONTRACT (PO / ARCHITECTURE DECISION REQUIRED; STOP AND CLARIFY)`).
    - *Field Hash Non-Audio (Video, Document, Image)*: Kontrak skema manifest untuk Video, Document, dan Image belum mendefinisikan field hash payload khusus secara normatif: **`UNRESOLVED — STOP AND CLARIFY`**; programmer dilarang mengarang field hash generik sepihak.
-   - `acquired_package_sha256`: Keberadaan kolom pada DDL berstatus **`NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`** (akses berkas DDL belum tersedia bagi Auditor), dan semantik penulisan, payload aktual, producer, dan consumer tetap **`UNRESOLVED — BLOCKED BY B-05`** melalui pemisahan 3 tingkat pembuktian.
+   - `acquired_package_sha256`: Keberadaan kedua kolom pada DDL statis, producer, consumer, dan asal hash `catalog_snapshots.package_sha256` dilaporkan Programmer sebagai `VERIFIED BY PROGRAMMER — STATIC SOURCE` pada §15.9.5 / E-03. Byte-domain yang dilaporkan adalah seluruh berkas fisik delivery package spool (wrapper ZIP). Live DB tetap `NOT VERIFIED`; relasi child-member dan kontrak downstream child acquisition tetap `UNRESOLVED — BLOCKED BY B-05`. Ketiadaan akses langsung Auditor bukan alasan menurunkan status bukti Programmer.
    - Dokumen **TIDAK MENGKLAIM** keduanya sebagai "dua objek hash normatif terverifikasi".
 3. **Entitas Komputasi Internal**: 3 entitas komputasional in-memory tanpa representasi field kontrak tersimpan.
 4. **Identifier Referensi Non-Hash**: 1 identifier referensi sertifikat (`underlying_cert_id`, status audit: `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE`).
@@ -1419,12 +1419,12 @@ Properti `underlying_cert_id` pada Genesis Ownership Certificate secara konseptu
 Dokumen ini merinci evaluasi operasional atas kerentanan race condition akses berkas (TOCTOU):
 1. **Protected Asset / Security Property**: Integritas dan kerahasiaan bitstream audio kontainer `.nx` anggota album yang tersimpan pada direktori ekstraksi lokal dari manipulasi unauthorized process.
 2. **Threat Model & Window of Vulnerability**: Penyerang lokal (*local unprivileged adversary*) yang memiliki izin tulis pada filesystem induk bersama. Jendela kerentanan berada pada interval mikrosekon antara resolusi path nama berkas dan perolehan descriptor di kernel (`open`), serta antara `open` dan inspeksi metadata `fstat`.
-3. **Protection Boundary dari Mitigasi yang Ditetapkan**:
-   - Pembukaan berkas wajib menggunakan flag kernel atomik `O_RDONLY | O_NOFOLLOW` (`fs_safe.ts#L30-L55`). Ini menjamin bahwa jika komponen akhir path adalah symlink, panggilan `open` langsung digagalkan kernel dengan `ELOOP` tanpa mendereferensi target.
-4. **Kondisi Anomali yang Terdeteksi & Perilaku Fail-Closed**:
-   - Setelah descriptor `fd` diperoleh, sistem mengeksekusi `fstatSync(fd)` dan membandingkannya dengan `lstatSync(resolvedPath)`.
-   - Deteksi anomali: (a) `!fdStat.isFile()` (bukan file reguler); (b) `fdStat.dev !== lstat.dev` atau `fdStat.ino !== lstat.ino` (terjadi pergantian inode/device antara open dan stat).
-   - Respon penolakan: Descriptor segera ditutup via `fs.closeSync(fd)`, membatalkan pemutaran fail-closed (`canPlay: false`), dan melempar `ERR_FILESYSTEM_CONTAINMENT_VIOLATION`.
+3. **Protection Boundary yang Diusulkan (Belum Terbukti Diimplementasikan):**
+   - Target kontrol yang diusulkan adalah pembukaan berkas menggunakan flag kernel atomik `O_RDONLY | O_NOFOLLOW` pada platform yang mendukungnya. Rujukan `fs_safe.ts#L30-L55` adalah referensi rancangan/target kontrol, bukan bukti modul aktif; PSV-R08 melaporkan `fs_safe.ts` tidak ditemukan dalam scope pencarian.
+4. **Kondisi Anomali dan Perilaku Fail-Closed yang Diusulkan:**
+   - Rancangan mengusulkan pemeriksaan `fstatSync(fd)` dan pembandingan dengan `lstatSync(resolvedPath)` setelah descriptor diperoleh.
+   - Kriteria deteksi usulan: (a) `!fdStat.isFile()`; (b) `fdStat.dev !== lstat.dev` atau `fdStat.ino !== lstat.ino`.
+   - Respons fail-closed yang diusulkan: descriptor ditutup, akses/playback ditolak, dan kandidat error `ERR_FILESYSTEM_CONTAINMENT_VIOLATION` digunakan setelah taksonomi error disahkan.
 5. **Residual Risk yang Tidak Terlindungi di POSIX Userspace**:
    - Pada standar POSIX userspace (Linux kernel < 5.6 tanpa `openat2(RESOLVE_BENEATH)` atau ketiadaan *mount namespace* privat), penyerang yang mengeksekusi *concurrent ancestor directory rename* saat kernel menyelesaikan komponen direktori induk sebelum mencapai leaf file secara teoretis dapat mengarahkan traversal ke luar direktori kanonikal.
 6. **Otoritas Penerimaan Residual Risk & Syarat Penutupan**:
@@ -2868,7 +2868,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
       Time:        0.281 s
       Ran all test suites matching /src\/utils\/__tests__\/containerOpening.test.ts/i.
       ```
-    - Status: `VERIFIED BY PROGRAMMER — TEST` untuk pengujian unit logika seleksi URI dan fail-closed error handling di lapisan TypeScript.
+     - Status: `VERIFIED BY PROGRAMMER — TEST` hanya untuk seleksi URI dan penanganan error pada helper TypeScript `openContainerWithFallback`; test ini **bukan** pengujian Safe-Open, symlink, descriptor validation, atau TOCTOU.
   - 2. *Adversarial Filesystem / TOCTOU Tests:*
     - Status: **`NOT AVAILABLE / NOT RUN`** (Modul uji adversarial symlink traversal, directory escaping, atau TOCTOU file replacement tidak ditemukan di codebase).
   - 3. *Native Runtime Execution (Android Emulator / iOS Simulator):*
@@ -2876,7 +2876,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
 - **Pencarian Terukur Modul `fs_safe.ts`:**
   - *Command Pencarian:* `find . -name "fs_safe.ts"`
   - *Hasil Pencarian:* **0 matches** (`NOT PRESENT IN THE EXAMINED SCOPE`).
-- **Status Keseluruhan PSV-07 / PSV-R08:** **`VERIFIED BY PROGRAMMER — STATIC SOURCE & UNIT TEST; ADVERSARIAL TESTS NOT AVAILABLE`** (Jalur pemanggilan filesystem Desktop, Android, dan iOS terbukti menggunakan open standar tanpa descriptor-level symlink/TOCTOU mitigation. Unit test container opening lulus 3/3; adversarial test tidak tersedia; mobile runtime tidak dijalankan).
+- **Status Keseluruhan PSV-07 / PSV-R08:** **`VERIFIED BY PROGRAMMER — STATIC SOURCE; URI UNIT TEST ONLY; ADVERSARIAL TESTS NOT AVAILABLE; MOBILE RUNTIME NOT RUN`** (Jalur source yang dicantumkan menunjukkan pemanggilan filesystem desktop, Android, dan iOS yang diperiksa; unit test 3/3 hanya mencakup seleksi URI/fallback, bukan mitigasi Safe-Open. Pengujian adversarial tidak tersedia dan runtime mobile tidak dijalankan).
 
 ---
 
@@ -3035,7 +3035,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
     1. Fungsi `open-and-verify-nx` pada Player Desktop (`player-desktop/main.js:L989`) tidak mengimpor, memanggil, atau mengevaluasi status Album Signer maupun validitas membership Album.
     2. Titik otorisasi playback `AuthorizedPlaybackTracks` murni di-index berdasarkan `certID` individual dari kontainer yang dibuka.
     3. Jalur verifikasi kontainer mandiri `.nx` dan jalur playback beroperasi secara mandiri dan self-contained di bawah kontrak baseline PE-01.
-    4. Dengan demikian, terbukti secara statis bahwa kegagalan verifikasi membership Album atau status `UNKNOWN` pada Album Signer tidak masuk ke jalur keputusan playback individual `.nx` (`VERIFIED BY PROGRAMMER — STATIC SOURCE`). Kontrak PE-01 terlindungi dari efek regresi.
+     4. Dengan demikian, bukti statis yang dicantumkan mendukung batas isolasi pada jalur otorisasi playback **Desktop Player** yang diperiksa. Bukti ini belum cukup untuk menggeneralisasi boundary tersebut ke seluruh platform Player, khususnya jalur otorisasi runtime Mobile Player. Kontrak PE-01 tetap harus dipertahankan.
 - **4. Bukti Model Identitas Kriptografi Baseline:**
   - *Container Creator Key:* Ed25519 public key yang menandatangani manifest kontainer `.nx` mandiri (`internal/container/container.go`, `sdk/typescript/src/sdk.ts`).
   - *Registry Authority Key:* Ed25519 authority key yang di-pin pada `sdk/typescript/src/registry.ts:L22` (`CANONICAL_REGISTRY_PUBKEY`), menandatangani `identity_signature`.
@@ -3046,7 +3046,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
   - *Command Pencarian:* `grep -rnI --exclude-dir=node_modules -E "AlbumSigner|album_signer|albumSigner|AlbumAuthority" .`
   - *Hasil Pencarian:* **0 matches** pada seluruh source code runtime produk.
   - *Batas Kesimpulan:* Model tipe data, registri otoritas, key custody, rotasi, revokasi, dan trust store untuk `Album Signer` **`NOT PRESENT IN THE EXAMINED SCOPE`**.
-- **Status Keseluruhan PSV-09 / PSV-R10:** **`VERIFIED BY PROGRAMMER — STATIC SOURCE & TEST; ALBUM SIGNER NOT PRESENT IN SCOPE`**
+- **Status Keseluruhan PSV-09 / PSV-R10:** **`PARTIALLY VERIFIED — DESKTOP PLAYER BOUNDARY ONLY; MOBILE AUTHORIZATION BOUNDARY NOT VERIFIED; ALBUM SIGNER NOT PRESENT IN EXAMINED SEARCH SCOPE`**
 
 ---
 
