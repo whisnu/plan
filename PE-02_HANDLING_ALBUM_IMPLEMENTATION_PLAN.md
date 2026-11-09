@@ -2735,7 +2735,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
     Digunakan eksklusif untuk otorisasi download berkas paket delivery dari storage engine.
 - **Relasi Child Acquisition di Database:**
   - Di bawah batasan Zero-DDL, tabel relasi child entitlement atau pemetaan hash anggota individual `.nx` **TIDAK ADA** di database (`NOT PRESENT IN THE EXAMINED SCOPE`).
-- **Disposisi Blocker B-05:** Semantik kolom `acquired_package_sha256` terbukti pasti merupakan parent package delivery hash. Kontrak downstream child acquisition tetap terbuka/unresolved.
+- **Disposisi Blocker B-05:** DDL statis menunjukkan kedua kolom menyimpan nilai yang bersumber dari `catalog_snapshots.package_sha256`. Domain byte dan objek yang benar-benar di-hash pada titik pembentukan nilai tersebut belum terbukti dari bukti yang dicantumkan. Karena itu, klasifikasi sebagai parent package delivery hash masih `NOT VERIFIED`. Kontrak downstream child acquisition tetap terbuka/unresolved.
 - **Status Keseluruhan PSV-05 / PSV-R06:** **`PARTIALLY VERIFIED`** (DDL utuh kedua tabel terbukti; semantik field parent hash terbukti; pemetaan relasi child tidak ada di skema database).
 
 ---
@@ -2793,7 +2793,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
   - *Hasil Pencarian:* **0 matches** (`NOT PRESENT IN THE EXAMINED SCOPE`).
 - **Bukti Test (Test Evidence):**
   - *Status:* **`NOT AVAILABLE / NOT RUN`** (Tidak ada adversarial test untuk symlink substitution atau TOCTOU file replacement di codebase).
-- **Status Keseluruhan PSV-07 / PSV-R08:** **`NOT PRESENT IN THE EXAMINED SCOPE`** (Modul safe-open descriptor-based dan mitigasi TOCTOU lintas platform belum diimplementasikan di kode; platform mobile NOT RUN).
+- **Status Keseluruhan PSV-07 / PSV-R08:** **`PARTIALLY VERIFIED — DESKTOP PATHS ONLY`** (Bukti desktop menunjukkan pemanggilan filesystem standar dan gap mitigasi TOCTOU pada jalur yang diperiksa. Status implementasi dan pengujian Android/iOS adalah `NOT VERIFIED / NOT RUN`; bukti yang dicantumkan tidak cukup untuk menyatakan ketiadaan mitigasi pada platform mobile atau seluruh lintas platform).
 
 ---
 
@@ -2882,10 +2882,11 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
   - *Command Pencarian:* `grep -rnI --exclude-dir=node_modules -E "AlbumSigner|album_signer|albumSigner|AlbumAuthority" .`
   - *Hasil Pencarian:* **0 matches** pada seluruh source code runtime produk.
   - *Batas Kesimpulan:* Model tipe data, registri otoritas, key custody, rotasi, revokasi, dan trust store untuk `Album Signer` **`NOT PRESENT IN THE EXAMINED SCOPE`**.
-- **4. Pemisahan Validitas Standalone `.nx` vs Membership Authenticity:**
-  - Verifikasi kontainer `.nx` mandiri pada `verify-desktop/main.js:L282-L350` dan `player-desktop/main.js:L913-L920` terbukti murni bergantung pada validitas sertifikat Genesis dan lisensi kontainer itu sendiri.
-  - Kegagalan verifikasi keanggotaan album atau status `UNKNOWN` pada Album Signer **tidak membatalkan hak pemutaran individual `.nx` mandiri** di bawah kontrak PE-01.
-- **Status Keseluruhan PSV-09 / PSV-R10:** **`PARTIALLY VERIFIED`** (Kunci identitas baseline terbukti 100% dan teruji; entitas Album Signer belum ada; pemisahan validitas kontainer mandiri terbukti faktual).
+- **4. Jalur Verifikasi Standalone `.nx` vs Membership Authenticity:**
+  - Potongan jalur verifier kontainer `.nx` mandiri pada `verify-desktop/main.js:L282-L350` dan `player-desktop/main.js:L913-L920` menunjukkan pemeriksaan sertifikat Genesis dan lisensi kontainer individual.
+  - Bukti yang dicantumkan belum menampilkan call graph atau boundary yang cukup untuk memastikan bahwa kegagalan verifikasi membership Album atau status `UNKNOWN` pada Album Signer tidak memengaruhi jalur playback individual `.nx`.
+  - Kontrak PE-01 mengenai validitas dan playback standalone `.nx` tetap harus dipertahankan. Namun, klaim independensi jalur runtime terhadap hasil membership Album belum boleh dinyatakan terbukti sebelum verifier/call path terkait ditelusuri.
+- **Status Keseluruhan PSV-09 / PSV-R10:** **`PARTIALLY VERIFIED`** (Test identitas baseline yang dicantumkan dilaporkan lulus; entitas Album Signer tidak ditemukan pada scope pencarian; verifier standalone `.nx` terlihat pada potongan source, tetapi boundary runtime terhadap membership Album belum terbukti).
 
 ---
 
