@@ -2401,6 +2401,7 @@ Jika akses ke `whisnu/nexa` gagal, catat langkah akses yang benar-benar dicoba d
 - Branch: `main`
 - Path: `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`
 - Baseline blob SHA saat §15 ditambahkan: `05f106299d8c8713d6a2d533f294ba7eb1249d0f`
+- **Baseline PLAN terbaru untuk handoff source verification:** `38752aa33ecd994e0df5ea188884a0a1d756cb0a`
 - Target: file yang sama, bukan file baru.
 
 Programmer wajib mengintegrasikan hasil DGR dan PSV ke bagian PLAN yang sudah relevan—termasuk section, matriks, register, evidence table, dan closing declaration yang terdampak—serta menyelaraskan semua rujukan silang. §15 ini adalah pembagian mandat dan tidak menggantikan isi teknis pada section terkait.
@@ -2417,7 +2418,7 @@ Jika mekanisme repository yang berlaku tidak mengizinkan pembaruan langsung pada
 ### 15.6 Urutan pelaksanaan
 
 1. Baca PLAN kanonikal terbaru pada `whisnu/plan:main`; pastikan file dan blob SHA sebelum mengedit.
-2. Selesaikan DGR terlebih dahulu karena tidak memerlukan source code Nexa. Terapkan koreksi dokumentasi yang dapat dibuktikan dari dokumen dan keputusan yang tersedia.
+2. DGR dokumen/governance yang dapat dilakukan tanpa source code telah dikerjakan langsung pada PLAN kanonikal oleh pemelihara PLAN sebelum handoff source verification ini. Programmer tidak diminta mengulang DGR atau membuat laporan DGR; cukup periksa bahwa koreksi yang sudah masuk tidak bertentangan dengan bukti source yang kemudian ditemukan. Jika ditemukan konflik faktual baru dari source, catat dan rekonsiliasikan secara terbatas tanpa menghapus koreksi dokumentasi yang sah.
 3. Susun daftar klaim PSV yang masih diperlukan. Jangan memeriksa source untuk item yang murni editorial/governance.
 4. Lakukan targeted PSV pada repository `whisnu/nexa`. Jika akses gagal, pertahankan item terkait sebagai `NOT VERIFIED` dan jangan menunda koreksi DGR yang independen.
 5. Rekonsiliasikan hasil PSV dengan PLAN, tetapi jangan mengubah kontrak produk atau keputusan yang belum disahkan.
@@ -2439,3 +2440,19 @@ Status berikut wajib dipertahankan kecuali terdapat keputusan formal terpisah ya
 - Sprint 17: `NOT STARTED`.
 
 Jika instruksi, bukti, Product Truth, dependency, atau expected behavior material tidak jelas, Programmer wajib menghentikan penetapan dan menyatakan: **`INSTRUKSI TIDAK JELAS — STOP AND CLARIFY`**. Tidak boleh ada asumsi atau keputusan desain diam-diam.
+
+
+### 15.8 Disposisi Document/Governance Reconciliation sebelum handoff source verification
+
+Pekerjaan DGR yang dapat dilakukan tanpa pemeriksaan source code telah dikerjakan langsung pada file PLAN kanonikal sebelum Programmer menerima mandat PSV ini.
+
+Koreksi dokumentasi yang telah diterapkan:
+1. §2.1: agregat kategori 34 AC direkonsiliasi menjadi 12 Specification Ready + 20 Execution Blocked + 2 PO Decision Required.
+2. §2.1: AC-33 dan AC-34 dipindahkan dari kategori Specification Ready ke Execution Blocked, konsisten dengan baris individual dan dependency autentisitas membership CONF-01.
+3. §2.1: AC-08 dimasukkan ke subkategori Blocked by Architecture / Spec, konsisten dengan unresolved Registry revocation lifecycle.
+4. §2.1: catatan keputusan PO Manual Next untuk AC-33/34 diperjelas agar tidak dibaca sebagai penyelesaian membership authenticity blocker.
+5. §15.5: identitas baseline blob pada saat §15 ditambahkan dipertahankan, dan baseline PLAN terbaru untuk handoff PSV dicantumkan secara terpisah.
+
+Agregat aktif tetap tepat 34 AC. Tidak ada keputusan PO baru, perubahan Product Truth, perubahan source code, perubahan schema, atau perubahan otorisasi implementasi yang dilakukan melalui koreksi ini.
+
+**Disposisi pekerjaan:** DGR yang dapat dibuktikan dari dokumen telah diterapkan. Programmer selanjutnya bertanggung jawab atas PSV dan integrasi temuan primer ke file PLAN yang sama. Programmer tidak perlu mengulang pekerjaan DGR yang sudah diselesaikan, kecuali bukti primer baru menunjukkan konflik faktual yang perlu direkonsiliasi.
