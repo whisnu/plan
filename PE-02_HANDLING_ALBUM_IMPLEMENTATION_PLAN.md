@@ -2482,10 +2482,10 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 TARGETED PRIMARY SOURCE VERIFICATION
 #### Identitas Pemeriksaan Sumber Primer Otoritatif
 - **Repository Sumber:** `whisnu/nexa` (Private repository)
 - **Branch:** `main`
-- **Commit SHA Sumber:** `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956` (Terverifikasi identik dengan `origin/main` via `git ls-remote origin`)
+- **Commit SHA Sumber:** `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956` (dilaporkan Programmer identik dengan `origin/main` via `git ls-remote origin`; belum diverifikasi independen pada audit ini)
 - **Tanggal Pemeriksaan:** 9 November 2026
 - **Metode Pemeriksaan:** Read-Only Git over HTTPS, authenticated GitHub REST API v3, penelusuran pohon repositori lokal `/opt/antigravity/projects/nexa/`, eksekusi test suite terpilih (Go & Node.js).
-- **Status Akses Repository:** **`PASS`** (Token read-only terverifikasi; ketiadaan respons pada audit sebelumnya terbukti akibat proteksi default HTTP 404 GitHub untuk repository privat).
+- **Status Akses Repository:** **`PASS — REPORTED BY PROGRAMMER; NOT INDEPENDENTLY VERIFIED`**. Akses independen Auditor pada audit ini belum tersedia; respons HTTP 404 dari koneksi Auditor tidak membuktikan repository atau path tidak ada.
 - **Otorisasi Perubahan Kode:** **TIDAK DIBERIKAN / ZERO CODE IMPLEMENTATION**.
 
 ---
@@ -2528,7 +2528,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 TARGETED PRIMARY SOURCE VERIFICATION
   - *Subklaim 1 (State & Authorization Boundary Player Desktop):* **`VERIFIED`** (`AuthorizedPlaybackTracks.set()` mengikat certID ke buffer memori dan URL stream).
   - *Subklaim 2 (Pelepasan Otorisasi Saat Transisi):* **`VERIFIED`** (`AuthorizedPlaybackTracks.delete(certID)` menghapus otorisasi track aktif).
   - *Subklaim 3 (Keberadaan Caller Background Pre-Verification Stage 8a):* **`NOT PRESENT IN THE EXAMINED SCOPE`** (Stage 8a belum diimplementasikan di kode).
-  - *Subklaim 4 (Batas Otorisasi Terhadap Alur Verifikasi Saat Ini):* **`VERIFIED`** (Jika Stage 8a memanggil `open-and-verify-nx`, alur tersebut atomik mendaftarkan `AuthorizedPlaybackTracks.set()`; pemisahan inspeksi metadata pasif wajib dibangun sebelum Stage 8a dapat aktif).
+  - *Subklaim 4 (Batas Otorisasi Terhadap Stage 8a):* **`NOT VERIFIED — CONDITIONAL RISK ONLY`** (Pernyataan bahwa pemanggilan `open-and-verify-nx` akan mendaftarkan `AuthorizedPlaybackTracks.set()` merupakan inferensi kondisional dari alur desktop yang dilaporkan; tidak ada caller Stage 8a yang ditemukan/dibuktikan, sehingga belum membuktikan perilaku background pre-verification).
 - **Status Keseluruhan PSV-01:** **`PARTIALLY VERIFIED`** (Architectural coupling terbukti; caller Stage 8a belum ada di kode)
 
 ---
@@ -2749,8 +2749,8 @@ Berdasarkan hasil pembuktian sumber primer di atas, status aktual Blocker Regist
 | **B-01** (Strict JSON Parser) | `OPEN / BLOCKED` | PSV-08 membuktikan `player-desktop/main.js:L773` menggunakan `JSON.parse` V8 standar yang menoleransi duplicate keys. | Parser byte-level RFC 8259 penolak duplicate keys belum ada di TS SDK. | Perlu implementasi modul parser sebelum Gate B. |
 | **B-02** (RFC 8785 JCS) | `OPEN / BLOCKED` | PSV-08 membuktikan JCS generik lulus uji di Go engine (`jcs_test.go`), namun di TS SDK hanya template 6 field (`registry.ts:L118`). | Serializer JCS generik belum ada di TS SDK. | Perlu implementasi modul serializer TS sebelum Gate B. |
 | **B-03** (ZIP Extractor Aman) | `OPEN / BLOCKED` | PSV-06 membuktikan kontainer baseline murni biner; parser arsip ZIP Album belum ada di source aktif. | Modul streaming ZIP extractor aman dan adversarial test belum ada. | Perlu implementasi modul extractor sebelum Gate B. |
-| **B-04** (Marketplace Transaction / Zero-DDL) | `OPEN / BLOCKED — ARCHITECTURE CONTRACT NOT APPROVED` | PSV-04 membuktikan transaksi lokal PostgreSQL ACID ada; ketiadaan 2PC eksternal terbukti sebagai arsitektur riil. Uji Go adversarial membuktikan engine licensing tahan replay. | Alur transaksi khusus akuisisi Album multi-member belum ada di kode. | Architecture Authority menetapkan kontrak transaksi Album non-2PC dengan status polling idempoten. |
-| **B-05** (`acquired_package_sha256`) | `FIELD SEMANTICS VERIFIED; CHILD CONTRACT OPEN` | PSV-05 membuktikan nilai kolom `acquired_package_sha256` berasal dari `catalog_snapshots.package_sha256` (hash paket delivery induk/ZIP wrapper). | Pemetaan relasi anak di DB tidak ada (batasan Zero-DDL). | Kontrak verifikasi delivery parent package selesai; kontrak downstream entitlement child tetap terbuka. |
+| **B-04** (Marketplace Transaction / Zero-DDL) | `OPEN / BLOCKED — ARCHITECTURE CONTRACT NOT APPROVED` | Laporan PSV-04 menyatakan terdapat transaksi PostgreSQL lokal, panggilan HTTP eksternal, dan test adversarial engine licensing; bukti primer belum diverifikasi independen. | Alur transaksi khusus akuisisi Album multi-member belum ada di kode; batas transaksi, failure window, kompensasi, dan idempotensi masih perlu dibuktikan/diputuskan. | Architecture Authority mengevaluasi dan menetapkan kontrak transaksi Album. Parent delivery/polling idempoten tetap proposal, bukan prasyarat desain yang telah diputuskan. |
+| **B-05** (`acquired_package_sha256`) | `PROGRAMMER-REPORTED FIELD SEMANTICS; INDEPENDENT PSV NOT VERIFIED; CHILD CONTRACT OPEN` | Laporan PSV-05 menyatakan field berasal dari `catalog_snapshots.package_sha256` dan merepresentasikan parent delivery package; belum diverifikasi independen dan terdapat konflik internal dengan kutipan DDL E-03 pada §4.4. | Keberadaan kolom pada tabel `entitlements`, producer/consumer aktual, byte-domain hash, serta pemetaan child belum dapat ditetapkan sebelum konflik DDL diselesaikan dengan bukti primer. | PSV lanjutan wajib merekonsiliasi DDL dan call path; tidak mengubah field semantics atau kontrak child secara sepihak. |
 | **B-06** (Safe-Open / TOCTOU) | `OPEN / BLOCKED — PLATFORM PSV INCOMPLETE` | PSV-07 membuktikan `fs_safe.ts` tidak ada; runtime menggunakan `fs.openSync` standar tanpa `O_NOFOLLOW`. | Bukti per platform (POSIX vs Windows vs Android) dan uji adversarial TOCTOU belum lengkap. | Lengkapi pengujian per platform; Architecture Authority mengevaluasi opsi mitigasi dan residual risk. |
 | **B-07** (Batas Kuota ZIP) | `OPEN / BLOCKED — ARCHITECTURE AUTHORITY DECISION REQUIRED` | PSV-06 membuktikan batas 2 GiB ada pada payload kontainer tunggal di Go (`container.go:L106`), bukan kuota wrapper ZIP. | Batas kuota wrapper belum ditegakkan di kode. | Architecture Authority menetapkan parameter teknis normatif kuota ZIP berdasarkan threat model dan benchmark (angka 500MB/2GiB/200/100:1 adalah usulan). |
 | **B-08** (Circular Signature JCS) | `OPEN / BLOCKED — SIGNED-CONTENT CONTRACT UNRESOLVED` | PSV-08 membuktikan kontainer `.nx` mandiri memisahkan signature di trailer; manifest Album belum memiliki format signed bytes resmi. | Format canonical bytes, detached signature envelope, dan verification path belum diputuskan. | Architecture Authority menetapkan spesifikasi format penandatanganan manifest Album. |
@@ -2776,3 +2776,47 @@ Berdasarkan hasil pembuktian sumber primer di atas, status aktual Blocker Regist
    - **PE-02 Implementation:** `NOT AUTHORIZED` (otorisasi implementasi hanya diterbitkan setelah Gate A dan Gate B lolos).
    - **Sprint 16 & PE-01:** `CLOSED / FINAL ACCEPTED / FROZEN`.
    - **Sprint 17:** `NOT STARTED`.
+
+
+### 15.11 Review Auditor atas Hasil Eksekusi Programmer — Disposisi PSV dan DGR
+
+#### 15.11.1 Batas pemeriksaan dan provenance
+1. Auditor telah membaca dan memeriksa konsistensi internal file PLAN kanonikal yang dikembalikan Programmer. Pemeriksaan ini **bukan** verifikasi independen atas source repository whisnu/nexa.
+2. Upaya fetch read-only Auditor terhadap delapan path sumber yang dirujuk pada §15.9, pada commit fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956, menerima HTTP 404 dari koneksi GitHub Auditor. Hasil ini hanya berarti akses sumber tidak berhasil pada koneksi Auditor; **tidak** membuktikan repository, commit, atau file tidak ada.
+3. Karena source repository belum dapat diperiksa langsung, seluruh klaim source, schema, test, dan runtime pada §15.9 diperlakukan sebagai **HASIL YANG DILAPORKAN PROGRAMMER**, bukan hasil audit independen. Pernyataan akses PASS, kesamaan origin/main, dan hasil pencarian source juga tetap berprovenance laporan Programmer.
+4. Tidak ada perubahan source code, schema, database, konfigurasi runtime, atau Product Truth. Tidak ada Gate yang dinaikkan dan tidak ada otorisasi implementasi yang diberikan.
+
+#### 15.11.2 Koreksi DGR yang dilakukan langsung pada PLAN kanonikal
+| ID | Temuan dokumen | Disposisi |
+|---|---|---|
+| DGR-PSV-01 | Status akses repository dan kesamaan commit sebelumnya ditulis tanpa atribusi eksplisit sehingga dapat terbaca sebagai verifikasi independen Auditor. | Dikoreksi: status akses dan kesamaan commit dinyatakan sebagai laporan Programmer yang belum diverifikasi independen. |
+| DGR-PSV-02 | Subklaim PSV-01 tentang batas otorisasi Stage 8a berisi kondisi hipotetis tetapi diberi status VERIFIED. | Dikoreksi menjadi NOT VERIFIED — CONDITIONAL RISK ONLY; caller Stage 8a tidak terbukti ada. |
+| DGR-PSV-03 | Disposisi B-04 berpotensi mengangkat polling idempoten menjadi bagian kontrak yang harus ditetapkan, padahal masih proposal. | Dikoreksi agar Architecture Authority mengevaluasi kontrak; polling idempoten tetap proposal dan bukan keputusan normatif. |
+| DGR-PSV-04 | Status semantik field B-05 dinyatakan VERIFIED, padahal bukti DDL internal pada §4.4 E-03 bertentangan dengan §15.9.5 mengenai keberadaan kolom entitlements.acquired_package_sha256. | Dikoreksi menjadi PROGRAMMER-REPORTED ... NOT VERIFIED; konflik ditetapkan sebagai PSV blocker dan tidak diselesaikan dengan asumsi. |
+
+Koreksi di atas merupakan koreksi dokumentasi/provenance yang tidak memerlukan PSV tambahan. Karena telah diterapkan langsung pada PLAN kanonikal, item DGR-PSV-01 s.d. DGR-PSV-04 **tidak boleh dimasukkan kembali** sebagai pekerjaan Programmer.
+
+#### 15.11.3 Register PSV residual — wajib bukti primer lanjutan
+| ID | PSV | Kekurangan atau konflik yang masih terbuka | Bukti yang masih diperlukan | Klasifikasi |
+|---|---|---|---|---|
+| PSV-R01 | Identitas source baseline | Auditor belum dapat mengakses source repository; commit fc08a5c... dan status origin/main hanya dilaporkan Programmer. | Bukti read-only yang dapat diverifikasi: commit SHA, tree SHA, git ls-remote origin output lengkap, dan identitas commit yang benar-benar diperiksa. Jangan kirim token/kredensial. Akses langsung Auditor tetap diperlukan untuk verifikasi independen. | PSV |
+| PSV-R02 | Player pre-verification / authorization | Stage 8a tidak ditemukan menurut laporan; subklaim 4 sebelumnya hanya inferensi kondisional. Test Player gagal exit code 1 karena binary CLI tidak tersedia; belum ada uji background pre-verification. | Bukti source caller/call graph hanya bila caller ditemukan; jika tidak ada, sertakan command pencarian, direktori/scope, pola, dan output. Status test yang gagal tetap FAILED, bukan PASS. Nyatakan runtime NOT RUN bila memang tidak dijalankan. | PSV |
+| PSV-R03 | Viewer completion / Auto-Next | Source event dilaporkan, tetapi bukti test Auto-Next dan runtime lintas platform/payload tidak tersedia. | Test yang benar-benar menguji completion→Auto-Next untuk desktop audio/video dan mobile audio/video; hasil dokumen/gambar harus dinyatakan sesuai perilaku yang ada tanpa timeout buatan. Sertakan command, environment, exit code, output, serta runtime evidence bila tersedia; bila tidak, NOT RUN. | PSV |
+| PSV-R04 | Studio persistence / recovery | Test single-asset dilaporkan, tetapi tidak ada command/output terperinci dan tidak ada crash/restart/retry recovery multi-member. | Bukti test yang benar-benar dijalankan beserta command/output; untuk Album multi-member yang belum ada, dokumentasikan pencarian source yang dapat direproduksi dan tandai test/runtime NOT AVAILABLE atau NOT RUN. Jangan menetapkan userData/album_sessions/*.json sebagai desain. | PSV |
+| PSV-R05 | Marketplace / Licensing transaction | Potongan source yang dicantumkan belum memperlihatkan batas BEGIN/COMMIT/ROLLBACK yang mendasari klaim ACID; 22 test engine licensing tidak dengan sendirinya membuktikan transaksi Marketplace. | Call path lengkap approval→HTTP daemon→SQL transaction, termasuk lokasi begin/commit/rollback, error/timeout window, compensation/reconciliation endpoint atau bukti pencarian ketiadaannya; pisahkan test engine licensing dari test integrasi Marketplace. Sertakan output test dan status runtime daemon. | PSV |
+| PSV-R06 | acquired_package_sha256 | Konflik internal: §15.9.5 menyatakan kolom ada pada acquisitions dan entitlements, sedangkan kutipan DDL E-03 §4.4 hanya memperlihatkan kolom tersebut pada acquisitions; bagian entitlements yang dikutip tidak memuatnya. | Kutipan DDL utuh yang mencakup definisi kedua tabel pada commit yang sama, producer, semua consumer, sumber byte yang di-hash, serta test terkait. Jangan mengubah DDL/semantik field atau menyimpulkan child mapping sebelum konflik terbukti selesai. | PSV — STOP pada subklaim yang berkonflik |
+| PSV-R07 | ZIP parser / extractor | Klaim tidak adanya parser ZIP belum disertai command pencarian dan output yang dapat direproduksi; tidak ada test extractor. | Command pencarian, scope/pengecualian vendor/build artifacts, output hasil, serta bukti parser/extractor bila ditemukan. Jika tidak ada, tandai test/runtime extractor NOT AVAILABLE; parameter kuota tetap keputusan Architecture Authority. | PSV |
+| PSV-R08 | Safe-Open / filesystem | Bukti yang dilaporkan terbatas pada desktop; matriks platform dan adversarial TOCTOU/symlink test belum tersedia. | Source call path dan bukti per platform yang benar-benar relevan/tersedia; adversarial test untuk symlink/TOCTOU, hasil command/output; platform yang tidak diuji harus ditandai NOT RUN, bukan diasumsikan aman. | PSV |
+| PSV-R09 | Parser / JCS / cryptography | Hasil Go JCS dilaporkan PASS, tetapi output lengkap/corpus tidak disertakan; strict duplicate-key parser dan generic TS JCS belum terbukti melalui test; tidak ada runtime evidence. | Source dan test vectors/corpus, command lengkap, stdout/stderr, exit code; uji terpisah Go JCS, TS JCS, duplicate-key rejection, dan signature verification. Jangan menyimpulkan Go JCS membuktikan TS SDK. | PSV |
+| PSV-R10 | Album Signer / membership authenticity | Test identitas baseline dilaporkan 8/8 dan 5/5, tetapi output mentah tidak tersedia; tidak ada bukti test lifecycle Album Signer karena entitasnya dilaporkan belum ada. | Source identity binding dan verifier path; command/output test baseline; pencarian terukur untuk signer registry/custody/rotation/revocation/trust store; pisahkan validitas standalone .nx dari autentisitas membership Album. | PSV |
+
+**Aturan penanganan residual:** Programmer hanya boleh menambahkan bukti yang benar-benar diperoleh ke bagian PSV terkait pada file PLAN yang sama. Dilarang mengulang DGR yang sudah dikoreksi, membuat laporan/plan pendamping, mengubah source/schema/runtime, menetapkan desain baru, atau mengubah Product Truth. Bila bukti tidak tersedia, status wajib tetap NOT VERIFIED, NOT RUN, NOT PRESENT IN THE EXAMINED SCOPE, atau BLOCKED sesuai fakta; jangan mengganti kekurangan bukti dengan inferensi.
+
+#### 15.11.4 Disposisi governance
+- Gate A: **NOT PASSED**.
+- Gate B: **BLOCKED**.
+- PE-02 Implementation: **NOT AUTHORIZED**.
+- Sprint 16: **CLOSED / FINAL ACCEPTED / FROZEN**.
+- PE-01: **CLOSED / FROZEN**.
+- Sprint 17: **NOT STARTED**.
+- Tidak ada keputusan PO atau Architecture Authority baru yang dihasilkan oleh review ini.
