@@ -186,9 +186,9 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 +--------------------------------------------------------------------+-----------------------------------------------+
 | Kategori Klasifikasi Status Utama (Total Tepat 34 AC)              | Cakupan ID AC & Rincian Ketergantungan        |
 +--------------------------------------------------------------------+-----------------------------------------------+
-| 1. [TEST-PLANNED — SPECIFICATION READY] (14 AC)                    | AC-04, AC-11, AC-12, AC-17, AC-18,     |
+| 1. [TEST-PLANNED — SPECIFICATION READY] (12 AC)                    | AC-04, AC-11, AC-12, AC-17, AC-18,     |
 |    Skenario uji dan kriteria penerimaan fail-closed terdefinisi     | AC-19, AC-23, AC-24, AC-25, AC-27,            |
-|    lengkap pada tingkat spesifikasi teknis rencana dokumen tanpa   | AC-30, AC-31, AC-33, AC-34                    |
+|    lengkap pada tingkat spesifikasi teknis rencana dokumen tanpa   | AC-30, AC-31                                  |
 |    terhambat dependensi spesifikasi usulan atau celah arsitektur.  | *Catatan Verifikasi & Keputusan PO:*          |
 |                                                                    | - AC-17: Kepatuhan skema statis DDL dipatuhi; |
 |                                                                    |   runtime live DB berstatus NOT VERIFIED.     |
@@ -201,10 +201,10 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 |                                                                    | - AC-33..34: Keputusan PO Verify Manual Next  |
 |                                                                    |   Desktop & Mobile Lite Disahkan.             |
 +--------------------------------------------------------------------+-----------------------------------------------+
-| 2. [TEST-PLANNED — EXECUTION BLOCKED] (18 AC)                      | Sub-Kategori 2a: [MODUL ENGINE PENDING] (2):  |
+| 2. [TEST-PLANNED — EXECUTION BLOCKED] (20 AC)                      | Sub-Kategori 2a: [MODUL ENGINE PENDING] (2):  |
 |    Skenario uji terencana, namun eksekusi pengujian terblokir      |   - AC-05 (B-01: Strict JSON Parser Engine)   |
 |    oleh modul implementasi internal yang belum dikoding, usulan    |   - AC-06 (B-02: RFC 8785 JCS Serializer)     |
-|    spesifikasi teknis yang belum dibekukan, taksonomi error        | Sub-Kategori 2b: [BLOCKED BY ARCH / SPEC] (16)|
+|    spesifikasi teknis yang belum dibekukan, taksonomi error        | Sub-Kategori 2b: [BLOCKED BY ARCH / SPEC] (18)|
 |    unresolved, keputusan identitas field normatif yang belum       |   - AC-02 (B-07/NC-07: Validasi Wrapper ZIP)  |
 |    disahkan, gap identitas & persistensi Album multi-member,       |   - AC-03 (B-08: Circular Dependency Sig)     |
 |    gap pemuatan kembali Album, prasyarat normatif JIT &            |   - AC-09 (NC-05/NEW-01: Field Hash Unres)    |
@@ -220,6 +220,8 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 |                                                                    |   - AC-28 (NC-01/06: Gap Identitas Album)     |
 |                                                                    |   - AC-29 (NC-06: Gap Reload Kolektif Album)  |
 |                                                                    |   - AC-32 (NC-13: Auto-Next Lifecycle Gap)   |
+|    - AC-33 (NC-14/CONF-01: Desktop Membership Gate) |
+|    - AC-34 (NC-14/CONF-01: Mobile Membership Gate)  |
 +--------------------------------------------------------------------+-----------------------------------------------+
 | 3. [PO DECISION REQUIRED] (2 AC)                                   | AC-01 (NC-01: Kebijakan Unknown Fields)       |
 |    Kriteria keberhasilan atau penerimaan kontrak secara substantif | AC-07 (NC-04/B-09/CONF-01: Signer UNKNOWN)    |
@@ -2396,7 +2398,7 @@ Jika akses ke `whisnu/nexa` gagal, catat langkah akses yang benar-benar dicoba d
 - Repository: `whisnu/plan`
 - Branch: `main`
 - Path: `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md`
-- Baseline blob SHA saat mandat ini ditambahkan: `82a87237286875bf6b48fa6d2e9c86a3179909e8`
+- Baseline blob SHA saat §15 ditambahkan: `05f106299d8c8713d6a2d533f294ba7eb1249d0f`
 - Target: file yang sama, bukan file baru.
 
 Programmer wajib mengintegrasikan hasil DGR dan PSV ke bagian PLAN yang sudah relevan—termasuk section, matriks, register, evidence table, dan closing declaration yang terdampak—serta menyelaraskan semua rujukan silang. §15 ini adalah pembagian mandat dan tidak menggantikan isi teknis pada section terkait.
