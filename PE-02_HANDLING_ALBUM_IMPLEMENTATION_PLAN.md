@@ -2728,7 +2728,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
     `UPDATE acquisitions SET state = 'ACQUISITION_COMPLETED', acquired_storage_object_id = $1, acquired_package_sha256 = $2, updated_at = $3 WHERE acquisition_id = $4`
   - Producer 2 (`marketplace/server.js:L3858`):
     `INSERT INTO entitlements (entitlement_id, acquisition_id, license_key, acquired_storage_object_id, acquired_package_sha256, asset_id, buyer_id, issued_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
-  - *Domain Byte yang Di-hash:* Nilai berasal dari `catRow.package_sha256` (`catalog_snapshots.package_sha256`, `server.js:L3839-L3842`), yang dihitung dari berkas arsip unggahan delivery package induk (wrapper ZIP) yang disimpan ke storage engine.
+  - *Asal Nilai Hash yang Terlihat pada Jalur Producer:* Nilai yang ditulis ke kedua kolom berasal dari `catRow.package_sha256` (`catalog_snapshots.package_sha256`, `server.js:L3839-L3842`). Bukti yang dicantumkan belum menunjukkan fungsi dan input byte aktual pada saat `catalog_snapshots.package_sha256` pertama kali dihitung. Karena itu, klasifikasi sebagai hash wrapper ZIP/parent delivery package belum boleh dinyatakan terbukti sampai titik pembentukan hash dan byte inputnya ditelusuri.
 - **Bukti Source Consumer (Commit `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`):**
   - Consumer (`marketplace/server.js:L4271, L4309, L4366, L4458`):
     `const packageSha = entitlement.acquired_package_sha256 || acq.acquired_package_sha256 || (catItem && catItem.package_sha256);`
@@ -2736,7 +2736,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
 - **Relasi Child Acquisition di Database:**
   - Di bawah batasan Zero-DDL, tabel relasi child entitlement atau pemetaan hash anggota individual `.nx` **TIDAK ADA** di database (`NOT PRESENT IN THE EXAMINED SCOPE`).
 - **Disposisi Blocker B-05:** DDL statis menunjukkan kedua kolom menyimpan nilai yang bersumber dari `catalog_snapshots.package_sha256`. Domain byte dan objek yang benar-benar di-hash pada titik pembentukan nilai tersebut belum terbukti dari bukti yang dicantumkan. Karena itu, klasifikasi sebagai parent package delivery hash masih `NOT VERIFIED`. Kontrak downstream child acquisition tetap terbuka/unresolved.
-- **Status Keseluruhan PSV-05 / PSV-R06:** **`PARTIALLY VERIFIED`** (DDL utuh kedua tabel terbukti; semantik field parent hash terbukti; pemetaan relasi child tidak ada di skema database).
+- **Status Keseluruhan PSV-05 / PSV-R06:** **`PARTIALLY VERIFIED`** (DDL statis kedua tabel dan alur penyalinan nilai dari `catalog_snapshots.package_sha256` dilaporkan; domain byte pada titik pembentukan hash belum terbukti; pemetaan relasi child tidak ditemukan dalam skema yang diperiksa).
 
 ---
 
