@@ -1,5 +1,5 @@
 # NEXA PE-02 A1 — TARGETED SOURCE-EVIDENCE SUPPLEMENT
-## ARCHITECTURAL FACTUAL EVIDENCE DOSSIER
+## ARCHITECTURAL FACTUAL EVIDENCE DOSSIER (RECONCILED & CORRECTED)
 
 - **Repository:** `whisnu/nexa`
 - **Branch:** `main`
@@ -10,19 +10,16 @@
     - `docs/roadmaps/Nexa_Development_Roadmap_v4_8.md`
     - `docs/whitepapers/Nexa_White_Paper_v5_6.md`
 - **Inspection Date:** 2026-11-10
-- **Task Nature:** Read-Only Source-Evidence Supplement (Zero Code/Schema/Config Changes)
+- **Task Nature:** Read-Only Source-Evidence Verification & Documentation Correction (Zero Code/Schema/Config Changes)
 - **Reference Plan:** `whisnu/plan` -> `main` -> `PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md` (§16.16.4A, §16.16.4B)
 
 ---
 
 ## 1. REVISION & WORKING-TREE STATUS CLARIFICATION
 
-In the previous preliminary handoff, the repository status was colloquially described as "Clean" while simultaneously mentioning two untracked markdown documents in `docs/`. 
-
-To strictly comply with Section 3 of this Mandate:
-- **Corrected Working-Tree Classification:** `DIRTY — UNTRACKED FILES`.
-- **Justification:** `git status --porcelain` returns two untracked files (`?? docs/roadmaps/Nexa_Development_Roadmap_v4_8.md` and `?? docs/whitepapers/Nexa_White_Paper_v5_6.md`). There are zero modified tracked files (`git diff --stat` is empty). No source files have been altered, added, or removed.
-- **Commit Lineage:** The commit inspected in this supplement is identical to the baseline: `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956` (HEAD of `main`). All line numbers and source citations in this supplement correspond exactly to this commit.
+- **Working-Tree Classification:** `DIRTY — UNTRACKED FILES`.
+- **Justification:** `git status --porcelain` returns two untracked documentation files (`docs/roadmaps/Nexa_Development_Roadmap_v4_8.md` and `docs/whitepapers/Nexa_White_Paper_v5_6.md`). There are zero modified tracked files (`git diff --stat` is empty).
+- **Commit Lineage:** The commit inspected in this supplement is `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956` (HEAD of `main`). All line numbers and source citations correspond exactly to this revision.
 
 ---
 
@@ -31,10 +28,10 @@ To strictly comply with Section 3 of this Mandate:
 | Group | Topic | Status | Evidence IDs | Core Supplemental Finding |
 | :--- | :--- | :--- | :--- | :--- |
 | **A** | Genesis Root Certificate & Creator Genesis Identity | `PARTIAL` | `A-SUP-01`, `A-SUP-02` | `IdentityAssertion` verifies JCS Ed25519 signature against `ActivePublicKey`; however, `GenesisRootKey` is ingested purely as untrusted caller data from the assertion itself. There is **zero trust-anchor store, zero pinned root certificate store, and zero trust-anchor lookup** in the identity engine. |
-| **B** | Individual Creator vs Organization Key Lineage | `PARTIAL` | `B-SUP-01`, `B-SUP-02` | Organization has comprehensive 2-step root recovery and monotonic Level-1 active key sequencing. Individual Creator (`SubjectTypeIndividual`) has **zero key rotation, zero recovery mechanisms, and zero tests in `tests/identity/`**; verifier unconditionally fails with `ERR_ACTIVE_KEY_PROOF_INCOMPLETE` if Level-1 assertions are absent. |
-| **C** | Album-wide Ownership vs per-asset Evidence | `PARTIAL` | `C-SUP-01`, `C-SUP-02` | `OwnershipCertificate` is strictly bound to scalar `asset_id`. A repository-wide regex search across all Go packages for `album` yields **0 matches**. Zero native mechanisms exist for multi-asset aggregation, compilation rights, or publisher-origin authority. |
-| **D** | Registry Authority & Federated Trust | `PARTIAL` | `D-SUP-01`, `D-SUP-02`, `D-SUP-03` | Registry public keys are trusted strictly via caller-injected `RegistryTarget.PublicKey` pinning (`AllowUnpinnedRegistries=false`). `Evaluator.Evaluate` relies exclusively on dynamic HTTP network queries; **no offline self-contained cryptographic Registry proof structure exists**. |
-| **E** | Revocation Proof & Status/Freshness | `PARTIAL` | `E-SUP-01`, `E-SUP-02`, `E-SUP-03` | `isRevoked` and `isOffline` are raw boolean inputs. `RegistryKeyRevocationList` is signed at service issuance but has **zero verification functions** in the codebase. Dual-Horizon time evaluation (`revoked_at` vs `recorded_at`) is **completely unimplemented** in verifiers. |
+| **B** | Individual Creator vs Organization Key Lineage | `PARTIAL` | `B-SUP-01`, `B-SUP-02` | `ResolveActiveSigningAuthorityAt` and `ActiveKeyAuthorizationAssertion` are **structurally generic** and do not restrict by subject type. Source supports a generic resolver for both subject types; however, all existing tests in `tests/identity/` and `tests/audit/sprint14/` specifically test Organization scenarios, and no dedicated test for Individual Creator key issuance exists in the test suite. |
+| **C** | Album-wide Ownership vs per-asset Evidence | `NOT FOUND IN REPOSITORY AT REVISION fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956` | `C-SUP-01`, `C-SUP-02` | `OwnershipCertificate` is strictly bound to scalar `asset_id`. An exhaustive search across all relevant code directories (`cmd/`, `internal/`, `pkg/`, `marketplace/`, `studio-desktop/`, `player-desktop/`, `verify-desktop/`, `mobile/`, `storage/`, `sdk/`, `migrations/`) confirms zero structures exist for multi-asset aggregation, compilation rights, or publisher-origin authority. |
+| **D** | Registry Authority & Federated Trust | `PARTIAL` | `D-SUP-01`, `D-SUP-02`, `D-SUP-03` | Registry public keys are trusted strictly via caller-injected `RegistryTarget.PublicKey` pinning (`AllowUnpinnedRegistries=false`). Field `SupportedFeatures` is **strictly excluded from `CanonicalJCS()` and signature verification**. `Evaluator.Evaluate` relies exclusively on dynamic HTTP network queries; **no offline self-contained cryptographic Registry proof structure exists**. |
+| **E** | Revocation Proof & Status/Freshness | `PARTIAL` | `E-SUP-01`, `E-SUP-02`, `E-SUP-03` | `isRevoked` and `isOffline` are raw boolean inputs. `RegistryKeyRevocationList.ListSignature` **does not bind `RevokedKeys`** and has **zero verification functions** in the codebase. Dual-Horizon time evaluation (`revoked_at` vs `recorded_at`) is **completely unimplemented** in verifiers. `ONLINE_FRESH` is merely an online path classification (`ONLINE_CLASSIFICATION`), not an established freshness proof. |
 | **F** | Tier-2 Membership Authority & Signer Delegation | `PARTIAL` | `F-SUP-01`, `F-SUP-02` | `DelegationAssertion` supports 3-level scoped delegation; however, capability `ALBUM_MEMBERSHIP_SIGNING` is `NOT FOUND` (0 matches), `album_id` is **not in the struct or signed preimage**, and verifier has zero wiring to Album Manifest parsing. |
 
 ---
@@ -87,28 +84,10 @@ type IdentityAssertion struct {
   ```
 - **Excluded Fields:** `Signature` and `Metadata` are strictly excluded from the canonical preimage.
 - **Verification Function:** `ed25519.Verify(pubKey, canonicalBytes, sigBytes)` in `verifier.go:L224`.
-- **Public Key Used:** The raw 32-byte Ed25519 public key decoded from `activeSigningKeyAtT` (resolved by `ResolveActiveSigningAuthorityAt`).
+- **Public Key Used:** Raw 32-byte Ed25519 public key decoded from `activeSigningKeyAtT` (resolved by `ResolveActiveSigningAuthorityAt`).
 
 #### Evidence `A-SUP-02`: Absence of Independent Trust-Anchor Store in Verifier
 - **Files:** `internal/engine/identity/verifier.go` (lines 14–31, 131), `pkg/nexa/identity.go` (lines 17–30)
-- **Verifier Entry Point:**
-```go
-type IdentityVerifier struct{}
-
-func NewIdentityVerifier() *IdentityVerifier {
-	return &IdentityVerifier{}
-}
-
-func (v *IdentityVerifier) ExecutePipeline(
-	assertion *domain.IdentityAssertion,
-	recoveryAssertions []*domain.RootRecoveryAssertion,
-	activeKeyAssertions []*domain.ActiveKeyAuthorizationAssertion,
-	delegationAssertions []*domain.DelegationAssertion,
-	isRevoked bool,
-	targetTimestamp string,
-	isOffline bool,
-) *domain.VerificationResult
-```
 - **Data Flow of Genesis Root Key:**
   1. The caller instantiates an empty `IdentityVerifier{}` (no state, no database connection, no configuration store).
   2. In `verifier.go:L131`, the verifier passes `assertion.GenesisRootKey` directly to `ResolveRootAuthorityAt`:
@@ -121,8 +100,8 @@ func (v *IdentityVerifier) ExecutePipeline(
      ```
   4. In `verifier.go:L181-L224`, `ed25519.Verify` verifies the assertion signature against the derived active key.
 - **Factual Determination on Trust-Anchor Source:**
-  - **Source of Genesis Key:** Ingested entirely from the untrusted caller input (`assertion.GenesisRootKey`).
-  - **Trust Anchor Store:** **NOT FOUND / DOES NOT EXIST**. There is no trust-anchor repository, no file on disk, no pinned root key store, and no external certificate authority lookup in `IdentityVerifier`.
+  - **Source of Genesis Key:** Ingested entirely from untrusted caller input (`assertion.GenesisRootKey`).
+  - **Trust Anchor Store:** **NOT FOUND / DOES NOT EXIST**. There is no trust-anchor repository, no pinned root key store, and no external certificate authority lookup in `IdentityVerifier`.
   - **Distinction for AA:** `ExecutePipeline` proves that the signature is **cryptographically valid and consistent with the asserted genesis key and active key sequence**, but it **does NOT prove that the Genesis Root Key is trusted by the client or system**. Trust in the Genesis Root Key is an unverified caller assumption.
 
 ---
@@ -139,38 +118,37 @@ func (v *IdentityVerifier) ExecutePipeline(
   5. `ResolveActiveSigningAuthorityAt` strictly requires sequence number monotonically increasing (`SequenceNumber == pred + 1`), predecessor key match (`PreviousActiveKey == pred.ActivePublicKey`), and rejects competing sequence numbers (`ErrCodeActiveKeyConflict`).
 - **Tests:** Fully verified by `TestVerify2StepRootRecovery`, `TestUnboundedRecoveryLineageDepth`, and `TestActiveKeyAuthorizationSequenceRules` in `tests/identity/`.
 
-#### Evidence `B-SUP-02`: Individual Creator Lineage & Active Key Resolution Gap
-- **Files:** `internal/domain/identity.go` (line 30), `internal/engine/identity/verifier.go` (lines 77–81, 156–170), `internal/engine/identity/active_key.go` (lines 99–102)
-- **Factual Trace of Individual Creator:**
-  1. `SubjectTypeIndividual` is defined in `internal/domain/identity.go:L30`:
-     ```go
-     const (
-         SubjectTypeIndividual   SubjectType = "INDIVIDUAL"
-         SubjectTypeOrganization SubjectType = "ORGANIZATION"
-     )
-     ```
-  2. In `verifier.go:L77-L81`, the verifier checks that `SubjectType` is either Organization or Individual:
-     ```go
-     if assertion.SubjectType != domain.SubjectTypeOrganization && assertion.SubjectType != domain.SubjectTypeIndividual {
-         result.ErrorCode = domain.ErrCodeSubjectTypeUnknown
-         return result
-     }
-     ```
-  3. **Critical Discovery:** Beyond line 77, `verifier.go` **never branches on `SubjectType`**. It subjects Individual Creator assertions to the exact same Organization pipeline!
-  4. In `verifier.go:L156`, `ResolveActiveSigningAuthorityAt` is called unconditionally:
-     ```go
-     activeSigningKeyAtT, err := ResolveActiveSigningAuthorityAt(assertion.GenesisRootKey, recoveryAssertions, activeKeyAssertions, recoveryDigestPtr, targetTimestamp)
-     ```
-  5. In `active_key.go:L99-L102`, `ResolveActiveSigningAuthorityAt` contains a hard fail-closed guard:
-     ```go
-     // Rule (HR-14-IMP-02): Active key authorization proof MUST be present.
-     if len(activeKeyAssertions) == 0 {
-         return "", fmt.Errorf("%s: missing active key authorization proof", domain.ErrCodeActiveKeyProofIncomplete)
-     }
-     ```
-  6. **Consequence:** If an Individual Creator submits an `IdentityAssertion` with their permanent Genesis Key (and provides no `activeKeyAssertions`), verification **fails unconditionally with `ERR_ACTIVE_KEY_PROOF_INCOMPLETE`**!
-  7. **Test Audit Result:** A search across `tests/identity/` and `tests/audit/sprint14/` reveals **0 test cases with `SubjectTypeIndividual`**. All 43 test cases in these suites exclusively test `SubjectTypeOrganization`.
-  8. **Conclusion for AA:** Nexa has **no native key rotation, no key succession, and no separate verification path for Individual Creators**. An Individual Creator currently cannot verify their identity assertion without fabricating Organization-style Level-1 active key assertions.
+#### Evidence `B-SUP-02`: Scope of `ResolveActiveSigningAuthorityAt` for Individual & Organization
+- **Files:** `internal/domain/identity.go` (lines 30, 99–114), `internal/engine/identity/active_key.go` (lines 93–154), `internal/engine/identity/verifier.go` (lines 77–81, 156–170)
+- **Function Definition:**
+  ```go
+  func ResolveActiveSigningAuthorityAt(
+      genesisRootKey string,
+      recoveryAssertions []*domain.RootRecoveryAssertion,
+      activeKeyAssertions []*domain.ActiveKeyAuthorizationAssertion,
+      genesisRecoveryKeyDigest *string,
+      targetTimestamp string,
+  ) (string, error)
+  ```
+- **Detailed Findings:**
+  1. **Absence of Subject-Type Branching:** `ResolveActiveSigningAuthorityAt` does **not accept or evaluate `subject_type`**. It operates purely on `genesisRootKey`, recovery assertions, and active key assertions.
+  2. **Call-Site Inspection in `IdentityVerifier.ExecutePipeline`:**
+     - On line 77, `verifier.go` validates that `assertion.SubjectType` is either `ORGANIZATION` or `INDIVIDUAL`.
+     - On line 156, it invokes `ResolveActiveSigningAuthorityAt` identically for both subject types.
+     - There is **no branching** that diverts `SubjectTypeIndividual` away from the resolver or alters active key evaluation based on subject type.
+  3. **Structure of `ActiveKeyAuthorizationAssertion`:**
+     - Delineated in `internal/domain/identity.go:L99-L114`.
+     - Field `SubjectID string` holds the canonical URN `urn:nexa:id:` + hex(sha256(GenesisKey)), which is the exact same derivation format for both Individual and Organization subjects.
+     - Contains **no `subject_type` field**.
+     - Signature is verified against `RootAuthorityAt(assertion.EffectiveAt)` via Ed25519.
+  4. **Consequences:**
+     - The resolver and assertion struct are **structurally generic and capable of binding both subject types**.
+     - If an Individual Creator issues an `ActiveKeyAuthorizationAssertion` signed by their Genesis Root Key, the verifier will process and verify it without error.
+  5. **Status in Existing Tests:**
+     - All identity tests in `tests/identity/` and `tests/audit/sprint14/` happen to use test fixtures where `SubjectType` is set to `ORGANIZATION`.
+     - There are **zero tests** specifically demonstrating an Individual Creator issuing or rotating active keys.
+  6. **Reconciled Conclusion (Kategori 3):**
+     **Source code supports a generic active-key resolver for both Individual and Organization subject types; there is no source-level barrier prohibiting Individual Creator active key authorization. However, test evidence demonstrating assertion issuance specifically for Individual Creators is currently absent from the test suite.**
 
 ---
 
@@ -214,24 +192,26 @@ type CanonicalGenesisPayload struct {
   1. `CreatorSignature`: Ed25519 signature generated with `creatorPrivKey` over `CanonicalGenesisPayload`. Binds Creator to initial claim over single asset `AssetID`.
   2. `IssuerSignature`: Ed25519 signature generated with `issuerPrivKey` over the same `CanonicalGenesisPayload`. Binds the certifying registry/authority to the certificate.
 
-#### Evidence `C-SUP-02`: Search Results Proving Absence of Album-Wide Ownership Mechanisms
-- **Search Command:**
+#### Evidence `C-SUP-02`: Search Results Proving Absence of Album-Wide Ownership Across All Repository Code
+- **Search Scope:** Bounded across all relevant product code directories: `cmd/`, `internal/`, `pkg/`, `marketplace/`, `studio-desktop/`, `player-desktop/`, `verify-desktop/`, `mobile/`, `storage/`, `sdk/`, `migrations/`.
+- **Search Commands:**
   ```bash
-  grep -RIn --exclude-dir=.git -i "album" internal pkg
+  grep -RIn --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=vendor --exclude-dir=evidence --exclude-dir=docs --exclude-dir=scratch -i -E "album|collection|multi.?asset|asset.?list|asset_ids|member_ids" cmd internal pkg marketplace studio-desktop player-desktop verify-desktop mobile storage sdk migrations
+  grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E "type Ownership[A-Za-z]+ struct" .
   ```
-- **Output:** Exit Code `1` (0 matches across all Go source files in `internal/` and `pkg/`).
-- **Targeted Package Searches:**
-  1. `internal/domain/ownership.go`: `AssetID string` is strictly scalar; all methods (`OwnershipTransfer`, `OwnershipDelegation`, `OwnershipEvent`) operate on scalar `AssetID`.
-  2. `internal/engine/ownership/cert.go`: `CanonicalGenesisPayload` accepts exactly one `assetID string`.
-  3. `internal/engine/ownership/verifier.go`: `VerifyOwnershipCertificate` evaluates only `cert.AssetID`.
-- **Conclusion for AA:** **`NOT FOUND IN EXAMINED SCOPE`**. Nexa possesses zero data structures, zero interfaces, and zero verifier logic for Album-wide ownership, compilation rights, multi-asset aggregation, or publisher-origin authority.
+- **Findings:**
+  - `collection` matched only standard library references (C# `System.Collections.Generic`, JS `which-collection`, open-source license texts).
+  - All ownership structures (`OwnershipCertificate`, `OwnershipTransfer`, `OwnershipDelegation`, `OwnershipEvent`) reside strictly in `internal/domain/ownership.go` and `pkg/nexa/ownership.go`, and require scalar `AssetID string`.
+  - Zero structures, interfaces, schemas, or API endpoints exist for Album-wide ownership or publisher-origin authority.
+- **Reconciled Conclusion:**
+  **`NOT FOUND IN REPOSITORY AT REVISION fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956` across all examined code directories.**
 
 ---
 
 ### Group D: Registry Authority and Federated Trust
 
-#### Evidence `D-SUP-01`: Structure & Self-Signed Preimage of `RegistryIdentity`
-- **File:** `internal/domain/registry_identity.go` (lines 13–63)
+#### Evidence `D-SUP-01`: Structure, Canonicalization & Exclusion of `SupportedFeatures` in `RegistryIdentity`
+- **File:** `internal/domain/registry_identity.go` (lines 13–63), `internal/service/service.go` (lines 62–71)
 - **Struct Definition:**
 ```go
 type RegistryIdentity struct {
@@ -254,57 +234,36 @@ func (r *RegistryIdentity) CanonicalJCS() string {
 		quoteJSON(r.APIVersion), quoteJSON(r.EndpointURL), quoteJSON(expiresStr), quoteJSON(issuedStr), quoteJSON(r.PublicKey), quoteJSON(r.RegistryID))
 }
 ```
-- **Verification (`VerifySignature()`):** Validates that `r.IdentitySignature` was generated by `r.PublicKey` over `CanonicalJCS()`, verifies expiry (`now.After(ExpiresAt)`), and allows maximum 5-minute clock skew on `IssuedAt`.
+- **Signing & Verification:**
+  - Signing in `service.go:L69`: `sigBytes := ed25519.Sign(s.cfg.IssuerPrivateKey, []byte(identity.CanonicalJCS()))`.
+  - Verification in `registry_identity.go:L62`: `ed25519.Verify(pubKey, []byte(r.CanonicalJCS()), sigBytes)`.
+- **Status of `SupportedFeatures`:**
+  - `SupportedFeatures` is **strictly excluded** from `CanonicalJCS()`.
+  - In `internal/service/service.go:L63`, it is populated with string literals (`multi_registry`, `federated_trust`, etc.), but is never referenced by `Evaluator.Evaluate`.
+- **Cryptographic Consequences:**
+  1. Signature `RegistryIdentity.IdentitySignature` does **NOT** provide cryptographic integrity over `SupportedFeatures`.
+  2. Modifying `SupportedFeatures` does not cause `VerifySignature()` to fail.
+  3. Consumers cannot assume `SupportedFeatures` has been authenticated merely because `VerifySignature()` succeeded.
+  4. `NO ALTERNATIVE AUTHENTICATION MECHANISM FOUND IN EXAMINED SCOPE` protects `SupportedFeatures`.
 
 #### Evidence `D-SUP-02`: Source of Trust for Registry Keys
 - **File:** `internal/domain/federation.go` (lines 5–18), `internal/engine/federation/evaluator.go` (lines 203–273)
-- **Mechanism of Trust:**
-  1. Trust in a Registry is established **exclusively by key pinning in the caller's configuration**:
-     ```go
-     type RegistryTarget struct {
-         RegistryID string `json:"registry_id"`
-         URL        string `json:"url"`
-         PublicKey  string `json:"public_key,omitempty"` // Pinned public key hex
-     }
-     ```
-  2. In `evaluator.go:L204-L211`, `queryRegistry` enforces a strict fail-closed check:
-     ```go
-     if target.PublicKey == "" && !allowUnpinned {
-         res.RegistryTrusted = false
-         res.Error = "Unpinned Registry rejected by fail-closed policy (AllowUnpinnedRegistries = false)"
-         res.ResponseStatus = "untrusted"
-         return
-     }
-     ```
-  3. In `evaluator.go:L265`, `queryRegistry` verifies that the downloaded `regId.PublicKey == target.PublicKey` and `regId.VerifySignature() == true`. If the keys mismatch or signature fails, `res.RegistryTrusted` is set to `false`.
-- **Meaning of `AllowUnpinnedRegistries=false`:** Discards any registry target that does not have an explicitly pre-pinned Ed25519 public key in the client's `FederationConfig`.
+- **Mechanism:**
+  - Trust in a Registry is established **exclusively by key pinning in the caller's configuration** (`RegistryTarget.PublicKey`).
+  - In `evaluator.go:L204-L211`, `queryRegistry` enforces a strict fail-closed check: if `target.PublicKey == ""` and `!allowUnpinned`, the registry is rejected as untrusted (`res.RegistryTrusted = false`).
+  - In `evaluator.go:L265`, it confirms `regId.PublicKey == target.PublicKey` and `regId.VerifySignature() == true`.
 
 #### Evidence `D-SUP-03`: Dynamic HTTP Reliance & Absence of Offline Proofs
 - **File:** `internal/engine/federation/evaluator.go` (lines 57–90, 214–290)
-- **Call Flow:**
-  - `Evaluator.Evaluate` receives `assetHash`, `certID`, and `cfg domain.FederationConfig`.
-  - Spawns goroutines calling `e.queryRegistry` for each target.
-  - Queries `GET {target.URL}/v1/identity` and `GET {target.URL}/v1/certificates/{certID}` via `http.Client`.
-  - Aggregates status: `ACTIVE`, `REVOKED`, `CONFLICT`, `UNKNOWN`.
 - **Offline Behavior (`evaluator.go:L74-L85`):**
-  ```go
-  if len(cfg.Registries) == 0 {
-      res.TrustResult = "UNKNOWN"
-      res.EvidenceCompleteness = "NONE"
-      res.InternalState = domain.InternalStateIncomplete
-      res.CanonicalUIState = domain.UICanonicalVerificationIncomplete
-      return res
-  }
-  ```
-- **Factual Determination for AA:**
-  1. `RegistryIdentity` **only proves service endpoint identity** (that the server possesses the pinned key); it does not attest to specific assets or albums.
-  2. **Offline Registry Proof:** **NOT FOUND / DOES NOT EXIST**. There is zero support in `evaluator.go` for verifying embedded, offline static Registry attestations without live HTTP queries.
+  If `len(cfg.Registries) == 0` or offline network failure occurs, `Evaluator.Evaluate` immediately returns `TrustResult: UNKNOWN` and `EvidenceCompleteness: NONE`.
+- **Finding:** There is **zero support** in the codebase for verifying embedded, offline static Registry attestations without live HTTP queries.
 
 ---
 
 ### Group E: Revocation Proof and Status/Freshness
 
-#### Evidence `E-SUP-01`: Tracking of `FreshnessContext` and `RevocationFinality`
+#### Evidence `E-SUP-01`: Tracking of `FreshnessContext` & Clarification of `ONLINE_FRESH`
 - **File:** `internal/domain/identity.go` (lines 158–174), `internal/engine/identity/verifier.go` (lines 34–49)
 - **Data Flow in Verifier:**
   ```go
@@ -312,46 +271,43 @@ func (r *RegistryIdentity) CanonicalJCS() string {
   if isOffline {
       freshness = domain.FreshnessOfflineCached
   }
-
-  finality := domain.RevocationFinalityNone
-  if isRevoked {
-      finality = domain.RevocationFinalityRecoverable
-  }
   ```
-- **Observations:**
-  1. `FreshnessContext` is a direct mapping from the caller-supplied `isOffline bool`.
-  2. `FreshnessOfflineUnchecked` is defined in `domain/identity.go:L164` but **is never referenced or assigned anywhere else in the repository**.
-  3. `RevocationFinality` is a direct mapping from caller-supplied `isRevoked bool`.
-  4. `RevocationFinalityTerminal` is defined in `domain/identity.go:L173` but **is never referenced or assigned anywhere else in the repository**.
+- **Clarification of `ONLINE_FRESH`:**
+  - `FreshnessOnlineFresh` is a direct mapping from the caller-supplied boolean argument `!isOffline`.
+  - There is **no verification of network connectivity, no registry ping, no cache TTL validation, and no freshness timestamp check**.
+  - Therefore, `ONLINE_FRESH` in the current implementation represents an **online path classification (`ONLINE_CLASSIFICATION`)**, NOT an established temporal or cryptographic freshness proof (`ONLINE_FRESHNESS NOT ESTABLISHED`).
 
-#### Evidence `E-SUP-02`: Incomplete Verification of `RegistryKeyRevocationList`
-- **Files:** `internal/domain/registry_identity.go` (lines 24–29), `internal/service/service.go` (lines 75–88)
-- **Issuance Logic in `service.go`:**
+#### Evidence `E-SUP-02`: Incomplete Verification of `RegistryKeyRevocationList` & Preimage Analysis
+- **Files:** `internal/domain/registry_identity.go` (lines 24–29), `internal/service/service.go` (lines 75–88), `internal/config/config.go` (lines 140–158)
+- **Issuance Logic in `service.go:L75-L88`:**
   ```go
-  crl := &domain.RegistryKeyRevocationList{
-      RegistryID:  "nexa-registry-primary",
-      RevokedKeys: []string{},
-      UpdatedAt:   now,
+  func (s *service) GetRegistryKeyRevocations(ctx context.Context) (*domain.RegistryKeyRevocationList, error) {
+      now := time.Now().UTC().Truncate(time.Second)
+      crl := &domain.RegistryKeyRevocationList{
+          RegistryID:  "nexa-registry-primary",
+          RevokedKeys: []string{},
+          UpdatedAt:   now,
+      }
+      canonStr := fmt.Sprintf(`{"registry_id":"%s","updated_at":"%s"}`, crl.RegistryID, crl.UpdatedAt.Format("2006-01-02T15:04:05.000000000Z"))
+      sigBytes := ed25519.Sign(s.cfg.IssuerPrivateKey, []byte(canonStr))
+      crl.ListSignature = hex.EncodeToString(sigBytes)
+      return crl, nil
   }
-  canonStr := fmt.Sprintf(`{"registry_id":"%s","updated_at":"%s"}`, crl.RegistryID, crl.UpdatedAt.Format("2006-01-02T15:04:05.000000000Z"))
-  sigBytes := ed25519.Sign(s.cfg.IssuerPrivateKey, []byte(canonStr))
-  crl.ListSignature = hex.EncodeToString(sigBytes)
   ```
-- **Verification Search:** A grep for `ListSignature` across the entire codebase finds only its struct declaration (`registry_identity.go:L28`) and issuance assignment (`service.go:L85`).
-- **Finding:** **ZERO verification functions exist for `RegistryKeyRevocationList`**. The signature is produced by the service but is never parsed or verified by any client or verifier.
+- **Signing Key Ownership:**
+  - `s.cfg.IssuerPrivateKey` is loaded from `ISSUER_PRIVATE_KEY_HEX` in `internal/config/config.go:L140-L158`.
+  - It is the private key of the local Registry node service instance (matching `s.cfg.IssuerPublicKey`).
+- **Signature Preimage & Authentication Consequences:**
+  - The signed preimage `canonStr` contains **only `registry_id` and `updated_at`**.
+  - `RevokedKeys` is **completely omitted from the signed preimage**.
+  - **Explicit Statement:**
+    > **Signature yang dihasilkan oleh mekanisme tersebut tidak mengikat isi `RevokedKeys`. Keberhasilan verifikasi signature hanya membuktikan integritas field yang benar-benar tercakup dalam signature preimage, bukan integritas daftar key yang dicabut.**
+  - **Verification:** Exactly **0 verification functions** exist for `ListSignature` across the entire repository.
+  - `NO ALTERNATIVE AUTHENTICATION MECHANISM FOUND IN EXAMINED SCOPE` protects `RevokedKeys`.
 
 #### Evidence `E-SUP-03`: Unimplemented Dual-Horizon Time Evaluation
 - **Files:** `internal/service/service.go` (line 306), `internal/domain/ownership.go` (line 108)
-- **Factual Trace:**
-  - `revoked_at` exists exclusively as an arbitrary key in an audit logging map in `service.go:L306`:
-    ```go
-    _ = s.logAudit(ctx, domain.OpRevoke, id, operatorIdentity, requestID, map[string]interface{}{
-        "reason_code": reasonCode,
-        "revoked_at":  now,
-    })
-    ```
-  - `recorded_at` exists exclusively as a database column and struct field in `OwnershipEvent` (`ownership.go:L108`).
-  - **Absence of Dual-Horizon Logic:** There is **zero code** comparing `revoked_at` (signer time) with `recorded_at` (ledger recording time) in any verifier. The Dual-Horizon Time Rule exists as an architectural invariant in PLAN §16.16, but is completely unimplemented in source code.
+- **Finding:** `revoked_at` exists only in audit log metadata (`service.go:L306`); `recorded_at` exists only as a database column in `OwnershipEvent`. There is **zero code** comparing `revoked_at` with `recorded_at` in any verifier. Dual-Horizon time evaluation is **completely unimplemented** in source code.
 
 ---
 
@@ -359,78 +315,33 @@ func (r *RegistryIdentity) CanonicalJCS() string {
 
 #### Evidence `F-SUP-01`: Structure & Scope Subsetting of `DelegationAssertion`
 - **File:** `internal/domain/identity.go` (lines 124–144), `internal/engine/identity/delegation.go` (lines 13–115)
-- **Struct Definition:**
-```go
-type DelegationAssertion struct {
-	SpecVersion        string   `json:"spec_version"`
-	AssertionType      string   `json:"assertion_type"` // "DELEGATION"
-	AssertionID        string   `json:"assertion_id"`
-	SubjectID          string   `json:"subject_id"`
-	DelegatorSubjectID string   `json:"delegator_subject_id"`
-	DelegatorLevel     int      `json:"delegator_level"`
-	ParentPublicKey    string   `json:"parent_public_key"`
-	DelegatePublicKey  string   `json:"delegate_public_key"`
-	DelegatedScope     []string `json:"delegated_scope"`
-	AllowSubdelegation bool     `json:"allow_subdelegation"`
-	MaxDelegationDepth int      `json:"max_delegation_depth"`
-	CurrentDepth       int      `json:"current_depth"`
-	IssuedAt           string   `json:"issued_at"`
-	EffectiveAt        string   `json:"effective_at"`
-	ExpiresAt          string   `json:"expires_at"`
-	Nonce              string   `json:"nonce"`
-	SignatureAlgorithm string   `json:"signature_algorithm"`
-	Signature          string   `json:"signature"`
-}
-```
 - **Preimage Fields:** All fields except `Signature` are canonicalized via RFC 8785 JCS in `VerifyDelegationAssertion:L50-L73` and verified using `ParentPublicKey`.
-- **Scope Subsetting:** `CheckScopeSubsetting` (`delegation.go:L84-L97`) ensures that every scope string in `childScopes` is present in `parentScopes`.
 - **Depth Limiting:** `CheckSubdelegationDepth` (`delegation.go:L100-L114`) prohibits Level-2 keys from delegating (`DelegatorLevel >= 2 || CurrentDepth >= 2`).
 
 #### Evidence `F-SUP-02`: Absence of `ALBUM_MEMBERSHIP_SIGNING` and `album_id` Binding
-- **Search Queries:**
-  1. `grep -rnw "ALBUM_MEMBERSHIP_SIGNING" .` -> **0 matches**.
-  2. `grep -rni "album_id" internal/domain/identity.go internal/engine/identity/` -> **0 matches**.
-- **Factual Trace:**
-  1. `DelegatedScope` is a slice of arbitrary strings (`[]string`).
-  2. The only constants defined in `internal/domain/identity.go:L208-L209` are:
-     ```go
-     const (
-         ScopeRevocation = "SCOPE_REVOCATION"
-         ScopeDelegation = "SCOPE_DELEGATION"
-     )
-     ```
-  3. `DelegationAssertion` has **zero fields for `album_id`**.
-  4. There is no caller in `player-desktop`, `player-mobile`, or `verify-desktop` that invokes `ResolveDelegatedAuthorityChain` or `VerifyDelegationAssertion` in connection with Album Manifest verification.
-- **Conclusion for AA:** **`NOT FOUND IN EXAMINED SCOPE`**. Generic delegation exists, but Album-specific capability, `album_id` scoping, and production verifier wiring are entirely absent.
+- **Findings:**
+  - `ALBUM_MEMBERSHIP_SIGNING` has **0 matches** across the repository.
+  - `DelegationAssertion` contains generic `DelegatedScope []string` and has **zero fields for `album_id`**.
+  - No caller in `player-desktop`, `player-mobile`, or `verify-desktop` connects delegation verification to Album Manifest parsing.
+  - **Conclusion:** **`NOT FOUND IN EXAMINED SCOPE`**.
 
 ---
 
 ## 4. TEST EXECUTION RECONCILIATION SUMMARY
 
-The previous report mentioned "43 tests" without detailing the breakdown between top-level tests, nested subtests, and package boundaries. 
-
-The exact reconciliation is documented in [PE02_A1_TEST_RECONCILIATION.md](file:///opt/antigravity/projects/nexa/scratch/pe02_a1_supplement/PE02_A1_TEST_RECONCILIATION.md) and summarized below:
-
 - **Command Executed:**
   ```bash
   GOTMPDIR=/opt/antigravity/projects/nexa/scratch/gotmp go test -count=1 -v ./tests/identity/... ./tests/audit/sprint14/... ./internal/engine/ownership/... ./internal/engine/federation/...
   ```
-- **Top-Level Tests Run:** **39 tests** (all PASS)
-  - `tests/identity`: 14 top-level tests
-  - `tests/audit/sprint14`: 16 top-level tests
-  - `internal/engine/ownership`: 1 top-level test (`TestGoldenOwnershipScenarios`)
-  - `internal/engine/federation`: 8 top-level tests
-- **Nested Subtests Run:** **19 subtests** (all PASS)
-  - `tests/audit/sprint14`: 8 subtests (`JCS-AUDIT-VEC-01` through `08`)
-  - `internal/engine/ownership`: 11 subtests (`OWN-CERT-01_And_02` through `OWN-FEDERATION-01B`)
-- **Total Test Invocations:** **58 invocations** (39 top-level + 19 nested).
-- **Explanation of Discrepancy ("43"):** In the previous report, the author combined 14 (`tests/identity` top-level) + 18 (historical `tests/audit/sprint14` count including 2 assertion vectors) + 11 (`internal/engine/ownership` subtests) = 43, while omitting the 8 tests of `internal/engine/federation`. The reconciliation confirms 100% test passing across 39 top-level tests and 19 nested subtests.
-
----
-
-## 5. REPRODUCIBLE SEARCH SCOPE & METHODOLOGY
-
-All search queries, paths, exit codes, and limitations are fully documented in [PE02_A1_SEARCH_SCOPE_SUPPLEMENT.md](file:///opt/antigravity/projects/nexa/scratch/pe02_a1_supplement/PE02_A1_SEARCH_SCOPE_SUPPLEMENT.md).
-- Search tooling: GNU ripgrep / grep with `--exclude-dir=.git`.
-- All scopes were bounded within `/opt/antigravity/projects/nexa`.
-- Exact commands and raw outputs confirm that negative findings (`NOT FOUND`) are exhaustive within the repository.
+- **Reconciled Test Counts:**
+  - **Top-Level Tests Run:** **39 tests** (all PASS)
+    - `tests/identity`: 14 tests
+    - `tests/audit/sprint14`: 16 tests
+    - `internal/engine/ownership`: 1 test (`TestGoldenOwnershipScenarios`)
+    - `internal/engine/federation`: 8 tests
+  - **Nested Subtests Run:** **19 subtests** (all PASS)
+    - `tests/audit/sprint14`: 8 subtests (`JCS-AUDIT-VEC-01` through `08`)
+    - `internal/engine/ownership`: 11 subtests (`OWN-CERT-01_And_02` through `OWN-FEDERATION-01B`)
+  - **Total Test Invocations:** **58 invocations** (39 top-level + 19 nested).
+- **Correction of Previous Claim:**
+  The previous statement that "all tests specifically test Organization" was inaccurate. Tests in `ownership` test asset certificates and transfers; tests in `federation` test dynamic registry consensus; JCS and Subject ID tests verify subject-agnostic cryptographic primitives. Only identity verification tests in `tests/identity/` and `tests/audit/sprint14/` specifically instantiate `IdentityAssertion` with `subject_type: "ORGANIZATION"`.

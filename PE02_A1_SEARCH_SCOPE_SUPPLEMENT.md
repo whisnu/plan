@@ -1,4 +1,4 @@
-# NEXA PE-02 A1 — SEARCH SCOPE & METHODOLOGY SUPPLEMENT
+# NEXA PE-02 A1 — SEARCH SCOPE & METHODOLOGY SUPPLEMENT (CORRECTED)
 
 - **Repository:** `whisnu/nexa`
 - **Branch:** `main`
@@ -22,57 +22,75 @@
   - Zero results for any trust-anchor store structs or functions.
 - **Conclusion:** **`NOT FOUND`**. The verifier is entirely stateless and does not check Genesis Root Keys against any trusted anchor list.
 
-### Group B: Individual Creator Key Rotation and Succession
-- **Search Goal:** Identify whether `SubjectTypeIndividual` has any separate logic, rotation mechanism, or dedicated tests.
+### Group B: Individual Creator Key Rotation and Active Key Resolution
+- **Search Goal:** Identify whether `SubjectTypeIndividual` has any separate logic, rotation mechanism, or dedicated tests, and whether `ResolveActiveSigningAuthorityAt` restricts by subject type.
 - **Commands Executed:**
   ```bash
   grep -rn --exclude-dir=.git "SubjectTypeIndividual" internal pkg tests
+  grep -rn --exclude-dir=.git "ResolveActiveSigningAuthorityAt" internal pkg tests
   grep -rn --exclude-dir=.git -E "IndividualRotation|IndividualLineage|IndividualKey" internal pkg tests
   ```
 - **Results:**
+  - `ResolveActiveSigningAuthorityAt` does not accept `subject_type` and does not branch on subject type (`internal/engine/identity/active_key.go:L93-L154`).
+  - `ActiveKeyAuthorizationAssertion` has no `subject_type` field and binds to any `SubjectID` URN (`internal/domain/identity.go:L99-L114`).
   - `SubjectTypeIndividual` appears only at its declaration (`internal/domain/identity.go:L30`) and in an enum validation check (`internal/engine/identity/verifier.go:L77`).
   - Exactly **0 tests** in `tests/identity/` or `tests/audit/sprint14/` pass `SubjectTypeIndividual`.
-  - Zero functions exist for individual rotation.
-- **Conclusion:** **`NOT FOUND`**. Individual Creator key rotation does not exist in Nexa; the identity engine only implements Organization Level-1 key authorization.
+- **Conclusion:** **Source code supports a generic active-key resolver for both Individual and Organization subject types; there is no source-level barrier prohibiting Individual Creator active key authorization. However, test evidence demonstrating assertion issuance specifically for Individual Creators is currently absent from the test suite.**
 
 ### Group C: Album-wide Ownership & Publisher-Origin Authority
-- **Search Goal:** Search for multi-asset ownership certificates, compilation rights, or album publisher authority.
+- **Search Goal:** Search for multi-asset ownership certificates, compilation rights, or album publisher authority across all code directories.
+- **Examined Directories in Initial Pass:** `internal/`, `pkg/`.
+- **Additional Directories Examined in Supplement Pass:**
+  - `cmd/` (CLI tools and daemons)
+  - `marketplace/` (Marketplace backend and frontend services)
+  - `studio-desktop/` (Nexa Studio authoring app)
+  - `player-desktop/` (Nexa Player Electron desktop app)
+  - `verify-desktop/` (Nexa Verify Desktop app)
+  - `mobile/` (React Native mobile apps and packages)
+  - `storage/` (Storage engine and daemons)
+  - `sdk/` (C, .NET, Java, Python, TypeScript SDKs)
+  - `migrations/` (Database migration scripts)
 - **Commands Executed:**
   ```bash
-  grep -RIn --exclude-dir=.git -i "album" internal pkg
-  grep -rn --exclude-dir=.git -E "AlbumOwnership|PublisherOrigin|MultiAssetOwnership" internal pkg apps
+  grep -RIn --exclude-dir=.git --exclude-dir=node_modules --exclude-dir=vendor --exclude-dir=evidence --exclude-dir=docs --exclude-dir=scratch -i -E "album|collection|multi.?asset|asset.?list|asset_ids|member_ids" cmd internal pkg marketplace studio-desktop player-desktop verify-desktop mobile storage sdk migrations
+  grep -RIn --exclude-dir=.git --exclude-dir=node_modules -E "type Ownership[A-Za-z]+ struct" .
   ```
 - **Results:**
-  - `grep -RIn --exclude-dir=.git -i "album" internal pkg`: Exit code `1` (**0 matches across entire Go codebase**).
-  - All ownership types in `internal/domain/ownership.go` take scalar `AssetID string`.
-- **Conclusion:** **`NOT FOUND IN EXAMINED SCOPE`**. Multi-asset / Album-wide ownership mechanisms do not exist in native Nexa code.
+  - `collection` matched only standard library references (C# `System.Collections.Generic`, JS `which-collection`, open-source license texts).
+  - All ownership structures (`OwnershipCertificate`, `OwnershipTransfer`, `OwnershipDelegation`, `OwnershipEvent`) reside strictly in `internal/domain/ownership.go` and `pkg/nexa/ownership.go`, and require scalar `AssetID string`.
+  - Zero structures, interfaces, schemas, or API endpoints exist for Album-wide ownership or publisher-origin authority.
+- **Conclusion:** **`NOT FOUND IN REPOSITORY AT REVISION fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956` across all relevant product code directories.**
 
-### Group D: Offline Registry Attestations
-- **Search Goal:** Determine if Registries can emit static offline attestations or if `Evaluator` can verify registry claims without HTTP calls.
+### Group D: Offline Registry Attestations & `SupportedFeatures` Preimage
+- **Search Goal:** Determine if `SupportedFeatures` is bound by `RegistryIdentity.IdentitySignature` and if Registries emit offline attestations.
 - **Commands Executed:**
   ```bash
-  grep -rn --exclude-dir=.git -E "OfflineRegistry|RegistryAttestation|RegistryProof" internal pkg
+  grep -rn --exclude-dir=.git "SupportedFeatures" internal pkg sdk
+  grep -rn --exclude-dir=.git "CanonicalJCS" internal/domain/
   grep -rn --exclude-dir=.git "queryRegistry" internal pkg
   ```
 - **Results:**
+  - `CanonicalJCS()` in `internal/domain/registry_identity.go:L32-L37` strictly excludes `SupportedFeatures`.
   - `queryRegistry` is exclusively an HTTP query function using `http.Client.Do` (`internal/engine/federation/evaluator.go:L192-L300`).
   - If `len(cfg.Registries) == 0`, `Evaluator.Evaluate` returns `TrustResult: UNKNOWN` and `EvidenceCompleteness: NONE`.
-- **Conclusion:** **`NOT FOUND`**. There is no offline Registry proof verification support.
+- **Conclusion:** **`SupportedFeatures` is NOT bound by `IdentitySignature` (`EXCLUDED`). Offline Registry proof verification is `NOT FOUND`.**
 
-### Group E: Revocation Verification and Dual-Horizon Time Rule
-- **Search Goal:** Find verification logic for `RegistryKeyRevocationList` and any comparison between `revoked_at` and `recorded_at`.
+### Group E: Revocation Verification, `RevokedKeys` Preimage & Dual-Horizon Time Rule
+- **Search Goal:** Find verification logic for `RegistryKeyRevocationList`, analyze signature preimage for `RevokedKeys`, and check for `revoked_at` vs `recorded_at` evaluation.
 - **Commands Executed:**
   ```bash
   grep -rn --exclude-dir=.git "ListSignature" internal pkg apps
+  grep -rn --exclude-dir=.git "RevokedKeys" internal pkg
+  grep -rn --exclude-dir=.git "IssuerPrivateKey" internal/
   grep -rn --exclude-dir=.git "revoked_at" internal pkg apps
   grep -rn --exclude-dir=.git "recorded_at" internal pkg apps
   ```
 - **Results:**
-  - `ListSignature` appears only in `internal/domain/registry_identity.go:L28` and `internal/service/service.go:L85`. No function ever verifies it.
-  - `revoked_at` appears only in `service.go:L306` inside an audit log map (`"revoked_at": now`).
-  - `recorded_at` appears only as an event store column in `OwnershipEvent`.
-  - Zero functions compare `revoked_at` against `recorded_at`.
-- **Conclusion:** **`NOT FOUND`**. Standalone revocation assertion verifiers and Dual-Horizon verifier logic are entirely absent from executable code.
+  - `ListSignature` is signed in `service.go:L85` with `s.cfg.IssuerPrivateKey` (local registry node private key).
+  - Signed preimage `canonStr` in `service.go:L83` signs ONLY `registry_id` and `updated_at`. Field `RevokedKeys` is completely omitted from the preimage.
+  - Zero functions in the codebase verify `ListSignature`.
+  - `revoked_at` appears only as an audit log metadata field (`service.go:L306`); `recorded_at` appears only as an event store column. No verifier logic compares them.
+- **Conclusion:** **`RevokedKeys` is NOT bound by `ListSignature` (`EXCLUDED`). Verifier functions for CRL and Dual-Horizon evaluation logic are `NOT FOUND IN EXAMINED SCOPE`.**
 
 ### Group F: Capability `ALBUM_MEMBERSHIP_SIGNING` and Album ID Binding
 - **Search Goal:** Find definition or usage of `ALBUM_MEMBERSHIP_SIGNING` and any field binding `DelegationAssertion` to `album_id`.
