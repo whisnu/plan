@@ -1793,7 +1793,7 @@ Untuk memastikan kepatuhan mutlak atas mandat AUDIT-NEW-08 dan mencegah pemetaan
 | Path traversal saat ekstraksi ZIP (`../`, `..\`, absolute path, leading slashes) | ZIP Extractor | `ERR_ZIP_INVALID` | PKWARE APPNOTE §4.4.17; POSIX.1 | AC-02 |
 | Duplikasi nama file di manifes / benturan case-insensitive pada deklarasi manifest | Manifest Validator | `ERR_MANIFEST_MALFORMED` | §5.1 Skema Manifest; AC-01 | AC-01 |
 | Duplikasi key JSON di manifest (literal atau Unicode escape) | Strict JSON Parser | `ERR_MANIFEST_DUPLICATE_KEY` | RFC 8259; RFC 8785; NC-03 | AC-05 |
-| Ketidakcocokan bijeksi 1:1 deklarasi manifest
+| Ketidakcocokan bijeksi 1:1 deklarasi manifest vs entri ZIP (berkas member yang dideklarasikan tidak ditemukan, atau terdapat entri berkas reguler ekstra/asing yang tidak dideklarasikan) | Packaging Validator | `ERR_ZIP_ENTRY_MISMATCH` | §5.2 Tahap 5; AC-02, AC-13 | AC-02, AC-13 |
 | Hard cap compressed-size ZIP wrapper yang telah diratifikasi terlampaui | ZIP Wrapper Extractor | `ERR_ZIP_QUOTA_EXCEEDED` | B-07 ratified resource quota; §6.7 | AC-13 |
 | Hard cap expanded bytes per-entry atau kumulatif yang telah diratifikasi terlampaui | ZIP Wrapper Extractor | `ERR_ZIP_QUOTA_EXCEEDED` | B-07 ratified resource quota; §6.7 | AC-13 |
 | Hard cap physical-entry/member count yang telah diratifikasi terlampaui | ZIP Wrapper Extractor | `ERR_ZIP_QUOTA_EXCEEDED` | B-07 ratified resource quota; §6.7 | AC-13 |
@@ -3295,7 +3295,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
   - Batas 2 GiB pada `container.go:L106` adalah batas payload kontainer tunggal, bukan batas kuota wrapper ZIP.
 - **Bukti Test (Test Evidence):**
   - *Status:* **`NOT AVAILABLE / NOT RUN`** (Tidak ada test ZIP parser atau adversarial extraction bomb test di codebase).
-- **Status Parameter Kuota:** Kandidat 500 MB compressed, 4 GB cumulative expanded, 200 physical entries, dan rasio 10:1/100:1 bukan hard cap normatif. Batas 2 GiB pada `container.go:L106` adalah batas payload kontainer `.nx` individual, bukan dekompresi wrapper ZIP. Semua hard cap wrapper menunggu benchmark/threat model/kapasitas B-07. Sebelumnya dicatat sebagai
+- **Status Parameter Kuota:** Kandidat 500 MB compressed, 4 GB cumulative expanded, 200 physical entries, dan rasio 10:1/100:1 bukan hard cap normatif. Batas 2 GiB pada `container.go:L106` adalah batas payload kontainer `.nx` individual, bukan dekompresi wrapper ZIP. Semua hard cap wrapper menunggu benchmark/threat model/kapasitas B-07. Catatan angka lama di atas merupakan proposal historis, bukan spesifikasi aktif.
 - **Status Keseluruhan PSV-06 / PSV-R07:** **`NOT PRESENT IN THE EXAMINED SCOPE`** (Parser/extractor ZIP Album dan penegakan kuota belum ada di source tree).
 
 ---
