@@ -4336,3 +4336,124 @@ This section integrates the temporary Programmer report PE-02_SOURCE_EVIDENCE_AN
 4. Sequence remains: Gate A PASS → Gate B PASS → separate explicit PO authorization. Gate B may not be held BLOCKED merely because the implementation gaps it is intended to authorize remain unimplemented. Conversely, neither Gate A nor Gate B PASS alone authorizes implementation.
 5. Only PE-02_HANDLING_ALBUM_IMPLEMENTATION_PLAN.md is the canonical retained plan. The temporary source-evidence report may be deleted by PO after review; no one may require it as a second permanent plan artifact.
 6. Sprint 16 and PE-01 remain CLOSED/FROZEN; Sprint 17 remains NOT STARTED; no implementation is authorized by this integration.
+
+### 16.19 Architecture Baseline — Existing Capability, Required New Capability, and Normative Decisions
+
+**Purpose and phase boundary**
+
+Bagian ini mengonsolidasikan hasil A1 dan keputusan arsitektur AA sebagai Architecture Baseline untuk perencanaan implementasi Album Handling. Album Handling belum tersedia sebagai kemampuan produk yang selesai; kemampuan tersebut adalah target yang akan dirancang, dibangun, diuji, dan diintegrasikan melalui PE-02 setelah otorisasi implementasi yang terpisah.
+
+PE-02 pada status saat ini berada dalam **PLANNING**, bukan IMPLEMENTATION. Karena itu:
+- A1 adalah *architecture-enabling evidence assessment*: memahami fondasi Nexa yang benar-benar dilaporkan tersedia, membatasi klaim existing capability, dan mengidentifikasi gap yang harus direncanakan.
+- A1 bukan audit yang mensyaratkan Album Manifest, Album Signer, Album Membership Authority, Album persistence, atau Album verifier sudah ada.
+- Ketiadaan fitur Album-spesifik merupakan *required new capability* jika memang ditetapkan dalam kontrak PE-02; hal itu bukan otomatis kegagalan desain atau alasan mengulang source investigation.
+- Source evidence digunakan secara proporsional untuk mencegah desain bergantung pada asumsi yang salah. Klaim source tetap dibatasi pada repository, revision, direktori, dan pencarian yang dinyatakan oleh Programmer.
+- Penetapan kontrak arsitektur adalah tanggung jawab AA sesuai hierarki otoritas §1.2/§3.1. Programmer tidak diberi kewenangan untuk mengisi gap dengan desain sepihak.
+
+Bagian ini tidak mengubah keputusan PO, kontrak PE-01, Sprint 16 frozen baseline, Zero-DDL, maupun status otorisasi. Bagian ini juga tidak menyatakan bahwa kemampuan baru telah diimplementasikan.
+
+#### 16.19.1 Existing Capability — fondasi Nexa yang dilaporkan tersedia
+
+Klasifikasi berikut adalah kondisi existing berdasarkan evidence Programmer yang telah diintegrasikan pada §16.18 dan batas assessment A1. Ini bukan klaim bahwa AA telah melakukan independent source/runtime verification atas seluruh repository.
+
+| Area | Existing capability / evidence yang dilaporkan | Batas yang wajib dipertahankan |
+|---|---|---|
+| Identity Subject | Organization Subject ID, Genesis-root identity, root recovery/lineage, dan Active Level-1 key resolution dilaporkan tersedia. | Individual Creator subject/lifecycle hanya PARTIAL pada evidence yang diserahkan; jangan mengklaim end-to-end Individual Creator flow telah terbukti. |
+| Identity cryptography | Identity assertion menggunakan JCS/Ed25519 pada mekanisme yang diperiksa. | Setiap proof type tetap mengikuti native signed payload/preimage-nya sendiri; jangan menganggap semua objek Nexa memakai satu preimage generik. |
+| Organization tests | Existing identity/audit test invocations dilaporkan PASS pada scope yang diserahkan. | Test primitive/subject-agnostic tidak boleh dilabeli Organization-specific. Test tersebut tidak membuktikan Album capability. |
+| Registry identity | RegistryIdentity memiliki signed canonical fields sebagaimana source mapping A1; signing dan verification memakai canonicalization yang sama. | `SupportedFeatures` tidak termasuk preimage yang ditunjukkan; keberhasilan IdentitySignature tidak mengautentikasi field tersebut secara kriptografis. |
+| CRL/revocation | Source excerpt menunjukkan CRL signature preimage mencakup `registry_id` dan `updated_at`. Konfigurasi memuat `ISSUER_PRIVATE_KEY_HEX` dan `ISSUER_PUBLIC_KEY_HEX`. | `RevokedKeys` tidak tercakup dalam preimage yang ditampilkan. Pasangan kriptografis, pemilik/otoritas key, distribusi trust, dan verifier eksternal tidak boleh dianggap terbukti apabila evidence tidak menunjukkannya. |
+| Registry/federation resolution | Registry identity/federation primitives dan evaluator online dilaporkan tersedia dalam scope pemeriksaan. | Registry identity bukan dengan sendirinya Registry trust proof. Online classification bukan bukti freshness; offline self-contained proof/verifier tidak boleh diasumsikan tersedia. |
+| Ownership evidence | OwnershipCertificate dengan scope asset-level/scalar `asset_id` dilaporkan ada dalam source scope yang diperiksa. | Album-wide rights/ownership authority tidak boleh diinferensikan dari ownership satu member. Status negatif hanya bounded ke examined scope. |
+| Delegation | Generic delegation/key-lineage primitives dilaporkan tersedia, termasuk batas hierarki yang telah diperiksa. | Generic delegation tidak otomatis memberikan purpose `ALBUM_MEMBERSHIP_SIGNING`, exact `album_id` scope, atau Album Signer authority. |
+| Existing member .nx / PE-01 | Member `.nx` tetap memiliki integrity, Genesis/ownership, Registry, license, dan playback trust lifecycle masing-masing sesuai baseline PE-01. | Album wrapper/Manifest tidak menggantikan atau mengubah standalone member trust. |
+| Existing storage/transaction | PostgreSQL acquisition/entitlement dan local transaction/row-lock primitives dilaporkan tersedia. | Belum terbukti sebagai durable multi-member checkout receipt, immutable mapping, idempotency/reconciliation, atau member-level recovery yang disyaratkan B-04. |
+| Existing client lifecycle | Desktop audio local ended listener dilaporkan ada. | Belum membuktikan normalized viewer-completion event, event identity/deduplication, resource release, dan next-member JIT untuk semua platform/payload. |
+
+**Evidence qualification:** istilah PRESENT/PARTIAL/NOT FOUND dalam tabel di atas adalah klasifikasi terhadap evidence yang diserahkan dan examined scope, bukan pernyataan universal mengenai seluruh repository, semua branch, semua deployment, atau seluruh runtime.
+
+#### 16.19.2 Required New Capability — kemampuan PE-02 yang harus dirancang dan dibangun
+
+Kemampuan berikut merupakan target pembangunan Album Handling. Keberadaannya tidak dipersyaratkan pada source Nexa sebelum perencanaan selesai.
+
+| Work package | Required new capability | Normative baseline / dependency | Planning disposition |
+|---|---|---|---|
+| WP-01 — Commercial bundle execution and recovery | Durable per-member execution receipt, immutable correlation/mapping, idempotency, status reconciliation, partial fulfillment, member-level recovery/refund. | §16.8, §16.8.1, approved Model B, immutable Checkout Manifest SSOT, independent member acquisitions, `bundle_checkout_id` independent identity, Zero-DDL. | Contract specified; Zero-DDL storage feasibility and external operation-status integration remain open dependencies. |
+| WP-02 — Child member integrity mapping | Persist/retrieve exact child `.nx` `member_sha256` and map it to the correct Album member/acquisition/entitlement without changing wrapper-hash semantics. | §16.2–§16.3, B-05/NC-09, existing `acquired_package_sha256` remains wrapper-domain unless separately proven. | Byte-domain contract specified; existing durable field/storage mapping remains to be resolved without DDL. |
+| WP-03 — ZIP capacity and resource acceptance | Reproducible four-payload-class benchmark, adversarial/boundary tests, measured resource envelope, and deployment-safe bounded limits. | §16.6–§16.7 and §16.14; no universal numeric cap inferred before measurements. | Benchmark protocol specified; measured capacity and production numeric limits remain pending. |
+| WP-04 — Membership authority and verifier | Per-Album authority designation, exact capability/purpose, signed Tier-2 carrier, Album Signer lifecycle, federated resolution, embedded proof verification, and production Manifest verifier integration. | §16.5 and §16.16.4A/§16.16.4B; existing Identity subject/key foundations; no new trust root. | Normative semantic contract specified; Album-specific implementation and tests are post-authorization. |
+| WP-05 — Album creation, identity, persistence and publication | Stable Album identity, ordered member association, Forge New and Select Existing flows, collective persistence/reload/recovery, Manifest/evidence generation and publication integration. | §5.4, §16.2, NC-01/NC-06, Zero-DDL, existing Studio/storage/publication constraints. | Product/manifest semantics specified; concrete compatible persistence/publication integration remains a planning dependency to resolve without inventing DDL. |
+| WP-06 — Viewer completion and Auto-Next | Normalized `VIEWER_COMPLETED` event, per-instance identity/deduplication, release of current member resources/authorization, and fresh JIT authorization for the next member. | §5.2, §16.11, NC-13/AC-32; PO-approved sequential Auto-Next behavior. | Lifecycle contract specified; platform/payload event wiring and acceptance coverage are post-authorization implementation work. |
+
+No work package above authorizes source, schema, migration, endpoint, configuration, or runtime changes. Implementation and implementation test execution remain post-authorization.
+
+#### 16.19.3 Normative Architecture Decisions — decisions already established
+
+The following decisions are the active architecture baseline and must not be reopened or weakened by implementation convenience:
+
+1. **Album product model:** Album is a logical collection of independent canonical `.nx` members. ZIP is only the transport/packaging envelope; no `album.nx` or new .nx container is created.
+2. **Canonical Manifest:** one closed-schema JSON Manifest with the exact top-level field set and ordered `members[]` defined in §16.2 and the detailed Tier-1/Tier-2 evidence structure in §16.16.4A/§16.16.4B. Unknown fields, duplicate JSON keys, unsupported schema versions, and invalid bindings fail closed.
+3. **Three distinct authority/signature tiers:** Tier-1 Origin Declaration proves who may designate Album Membership Authority for the exact Album; Tier-2 Authority Evidence Carrier proves that the designated Membership Authority authorizes a separate Album Signer for exact `album_id` and exact `ALBUM_MEMBERSHIP_SIGNING` purpose; Tier-3 Album Signer signs the complete canonical Manifest. Inner native proof signatures retain their own native preimage semantics.
+4. **Per-Album Membership Authority:** an explicitly designated existing Nexa Identity Subject (Individual Creator or Organization) is bound to exact `album_id`. Subject class, Creator status, ownership of one member, Registry operator status, key possession, generic delegation, or valid signature alone is insufficient.
+5. **Embedded Evidence / A1 Complete Evidence Closure:** complete Tier-1 origin/rights/identity/key-lineage proof material and complete Tier-2 signer/delegation proof material are embedded as structured objects in the Manifest. External URI, sidecar, detached file, or network fetch cannot substitute for proof required for basic offline verification.
+6. **No self-rooting:** embedded certificates and keys are proof material, not trust anchors. Verification must terminate at an existing independently provisioned Nexa trust anchor. No Album-specific root, hidden global authority, hardcoded ecosystem root, or Manifest-selected trust anchor.
+7. **Cryptographic binding:** outer Manifest signature is Ed25519 over RFC 8785 JCS UTF-8 of the complete Manifest after removing only the top-level `signature` property. It binds the complete Tier-1 and Tier-2 evidence objects, their inner signatures, signer, and ordered members.
+8. **Ownership and licensing separation:** Album-wide rights/ownership authority is not inferred from member ownership or license entitlement. Licensing Authority remains a separate decision domain and active license remains mandatory for playback authorization.
+9. **Dual-Horizon revocation:** internal `revoked_at` and public authoritative `recorded_at` retain their approved distinct semantics. Offline issuance-time evidence does not prove current non-revocation; freshness remains a separate visible result dimension.
+10. **Offline status truth:** the approved indicator `AUTHENTICATED (OFFLINE EVIDENCE — VERIFIED AGAINST EMBEDDED CLOSURE)` describes successful verification of embedded issuance evidence against an existing local trust anchor. It must not be represented as current Registry freshness or current non-revocation.
+11. **Stage 8a/8b/8c:** Stage 8a is passive read-only digest diagnostics and may inspect queued/next member without authorization side effects. Stage 8b requires PE-01 integrity, Genesis/ownership, active license, and matching digest. Stage 8c can register decrypted buffer only for the current member.
+12. **Player and Verify isolation:** Player authorization remains current-member JIT only; pre-verification of a queued member cannot authorize playback. Verify's result is not playback authorization. Preserve the PO-approved Verify behavior in §5.3/§10.3. Do not introduce Album aggregate status if PO-approved Option B excludes it.
+13. **Member integrity:** `member_sha256` is the SHA-256 of the exact final child `.nx` bytes; wrapper ZIP hash and payload-internal digest remain separate byte domains.
+14. **ZIP/filesystem safety:** bounded staged extraction, strict ZIP validation, path traversal/symlink/special-file rejection, descriptor-relative no-follow Safe-Open, atomic promotion, and cleanup are mandatory. Numeric resource limits remain benchmark-derived.
+15. **Marketplace semantics:** preserve independent member acquisitions/entitlements, approved Model B, immutable Checkout Manifest SSOT, partial fulfillment/member-level recovery, automatic refund policy after objectively terminal unfulfillable state, and distinct `bundle_checkout_id`, `payment_order_id`, `acquisition_id`, Album ID, and member ID.
+16. **Zero-DDL and frozen baselines:** no new DDL or schema migration may be assumed. Sprint 16 and PE-01 remain frozen; no regression of standalone member behavior.
+
+These are architecture/product constraints, not claims that the implementation exists.
+
+#### 16.19.4 Architecture closure ledger — what is decided and what remains to be resolved in planning
+
+| Area | Decision/contract status | Remaining planning closure before Gate A/B evaluation |
+|---|---|---|
+| Album logical model, ZIP envelope, member order | DECIDED / SPECIFIED | Cross-section traceability and AC/NC consistency only. |
+| Manifest top-level field set, signature envelope, strict parsing, JCS signed set | DECIDED / SPECIFIED | Ensure every schema/path/field reference in earlier sections and AC register matches §16.2/§16.4/§16.16.4B. Do not invent new fields or alternate envelopes. |
+| Tier-1/Tier-2/Tier-3 authority and embedded evidence closure | PO APPROVED / AA CONTRACT SPECIFIED | Ensure no contradiction with earlier evidence-ledger or source-mapping language. Exact native proof object compatibility must be treated as bounded implementation integration evidence; if a proof cannot be serialized/verified under its native semantics, AA must resolve that specific compatibility defect before Gate B PASS. |
+| Existing trust anchors and offline verifier | PRINCIPLE DECIDED | Existing trust-anchor provisioning/verification compatibility must be represented accurately. Embedded keys cannot bootstrap trust. Current freshness remains separate. |
+| Organization/Individual subject and Album capability | PRODUCT SUBJECT CLASSES APPROVED; ALBUM CAPABILITY SPECIFIED | Individual Creator existing lifecycle is partial; reuse/complete required integration in WP-04. Do not claim current end-to-end support. |
+| CRL/revocation key chain | EXISTING EVIDENCE PARTIAL | Preserve NOT VERIFIED elements for key-pair relationship, authority, distribution, and verifier where evidence is insufficient. This is not permission to weaken the Dual-Horizon contract. |
+| B-04 durable transaction/recovery | PRODUCT MODEL AND AA SEMANTICS DECIDED | Resolve exact Zero-DDL durable store/mapping and external License Daemon status/reconciliation interface. If no compatible mechanism exists, retain BLOCKED and escalate the precise Zero-DDL incompatibility; no silent DDL. |
+| B-05 child hash storage | BYTE-DOMAIN DECIDED | Resolve exact Zero-DDL persistence and retrieval mapping. Wrapper hash cannot be repurposed. |
+| B-07 ZIP numeric capacity | BENCHMARK METHOD DECIDED | Numeric limits require reproducible measurements and capacity rationale; do not invent values. |
+| NC-06 Album persistence/Studio | PRODUCT FLOW AND IDENTITY REQUIREMENT SPECIFIED | Resolve concrete existing compatible storage/publication mapping and recovery behavior within Zero-DDL. |
+| NC-13 viewer lifecycle | EVENT CONTRACT SPECIFIED | Platform/payload completion source, event identity, deduplication, resource release, and integration acceptance evidence belong to WP-06. |
+| NC-15/NC-16 error and identifier consistency | AA CONTRACTS SPECIFIED IN §16.9/§16.13 | Reconcile stable registry/identifier references and all cross-register mappings. |
+| AC/NC/B/Work Package traceability | NOT YET GLOBALLY CLOSED | Perform AA-owned cross-section consistency pass; do not delegate another broad repository investigation. |
+
+A planning dependency may remain OPEN/BLOCKED without implying the feature must already exist. It must, however, have a bounded decision, named work package, dependency, and objective acceptance evidence. Where the unresolved matter is an indispensable architecture choice (not a post-authorization implementation detail), AA must resolve it in this canonical PLAN before declaring the applicable gate passed.
+
+#### 16.19.5 Required planning sequence and gate interpretation
+
+The remaining sequence is:
+
+1. **A1 evidence assessment:** sufficient for architecture planning when existing capabilities and evidence limitations are accurately bounded. The five A1 supplement documents are supporting assessment artifacts; they do not replace this canonical PLAN.
+2. **Architecture Baseline:** this section classifies existing foundations, required new capabilities, and normative decisions.
+3. **AA-owned contract/traceability reconciliation:** reconcile all active Manifest, NC, blocker, AC, WP, dependency, and gate statements in this single canonical PLAN. Resolve any indispensable pre-authorization architecture decision here.
+4. **Gate A evaluation:** assess product truth, canonical plan consistency, complete contract definitions, PO decision traceability, and absence of material contradiction. Gate A does not require Album Handling code to exist.
+5. **Gate B evaluation:** assess whether work packages are bounded, dependencies explicit, Zero-DDL/compatibility constraints understood, and post-authorization implementation/test acceptance criteria executable. Gate B does not require the new capabilities, runtime wiring, measured post-authorization benchmark deliverables, or implementation tests to exist merely because they are future work. It may remain BLOCKED only for a concrete unresolved prerequisite to safe execution, not because the implementation has not yet happened.
+6. **Separate PO implementation authorization:** only after Gate A PASS and Gate B PASS may the PO decide whether to authorize implementation. Neither gate result itself grants authorization.
+
+No additional broad Programmer investigation is required merely to prove Album Handling exists. Any future source request must be tied to a specific, material compatibility question that cannot be resolved from the bounded A1 evidence and existing plan. The default next work is AA-owned planning and contract reconciliation.
+
+#### 16.19.6 Governance status — unchanged
+
+- Current phase: **PLANNING PE-02 Album Handling**.
+- Album Handling: **NOT YET IMPLEMENTED — TARGET CAPABILITY TO BE BUILT**.
+- Sprint 16: **CLOSED / FINAL ACCEPTED / FROZEN**.
+- PE-01: **CLOSED / FROZEN**.
+- Sprint 17: **NOT STARTED**.
+- Gate A: **NOT PASSED** pending AA-owned plan consistency/independent re-audit.
+- Gate B: **BLOCKED** pending concrete pre-authorization readiness closure; not because Album implementation is absent.
+- PE-02 implementation: **NOT AUTHORIZED**.
+- No source code, schema, migration, endpoint, configuration, or runtime change is authorized by this Architecture Baseline.
+
+**AA disposition:** Architecture Baseline established as the planning classification and consolidation layer. The next AA task is the canonical PLAN cross-section/traceability reconciliation, followed by gate evaluation. Programmer's A1 documentation correction handoff is not reopened by this section.
+
