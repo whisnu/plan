@@ -188,52 +188,52 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 +--------------------------------------------------------------------+-----------------------------------------------+
 | Kategori Klasifikasi Status Utama (Total Tepat 34 AC)              | Cakupan ID AC & Rincian Ketergantungan        |
 +--------------------------------------------------------------------+-----------------------------------------------+
-| 1. [TEST-PLANNED — SPECIFICATION READY] (11 AC)                    | AC-04, AC-11, AC-12, AC-17, AC-18,     |
-|    Skenario uji dan kriteria penerimaan fail-closed terdefinisi     | AC-19, AC-23, AC-24, AC-25, AC-30, AC-31 |
-|    lengkap pada tingkat spesifikasi teknis rencana dokumen tanpa   |                                                |
-|    terhambat dependensi spesifikasi usulan atau celah arsitektur.  | *Catatan Verifikasi & Keputusan PO:*          |
+| 1. [TEST-PLANNED — SPECIFICATION READY] (12 AC)                    | AC-04, AC-09, AC-11, AC-12, AC-17,    |
+|    Skenario uji dan kriteria penerimaan fail-closed terdefinisi     | AC-18, AC-19, AC-23, AC-24, AC-25,    |
+|    lengkap pada tingkat spesifikasi teknis rencana dokumen tanpa   | AC-30, AC-31                         |
+|    terhambat dependensi spesifikasi usulan atau celah arsitektur.  |                                                |
+|                                                                    | *Catatan Verifikasi & Keputusan PO:*          |
 |                                                                    | - AC-17: Kepatuhan skema statis DDL dipatuhi; |
 |                                                                    |   runtime live DB berstatus NOT VERIFIED.     |
 |                                                                    | - AC-25: Keputusan PO CONF-02 (Pilihan B      |
 |                                                                    |   APPROVED: Tanpa Status Agregat di Verify).  |
 |                                                                    |                                                |
-|                                                                    |                                                |
 |                                                                    | - AC-30..31: Larangan Campuran & Failure      |
 |                                                                    |   Handling Ulangi/Lewati Disahkan.            |
-|                                                                    | - AC-33..34: Keputusan PO Manual Next Desktop |
-|                                                                    |   & Mobile Lite disahkan; eksekusi Album tetap|
-|                                                                    |   blocked oleh autentisitas membership CONF-01.|
+|                                                                    | - AC-33..34: Membership policy CONF-01        |
+|                                                                    |   disetujui PO; eksekusi Album tetap blocked  |
+|                                                                    |   oleh source authority/lifecycle evidence B-09.|
 +--------------------------------------------------------------------+-----------------------------------------------+
-| 2. [TEST-PLANNED — EXECUTION BLOCKED] (23 AC)                      | Sub-Kategori 2a: [MODUL ENGINE PENDING] (2):  |
+| 2. [TEST-PLANNED — EXECUTION BLOCKED] (22 AC)                      | Sub-Kategori 2a: [MODUL ENGINE PENDING] (2):  |
 |    Skenario uji terencana, namun eksekusi pengujian terblokir      |   - AC-05 (B-01: Strict JSON Parser Engine)   |
 |    oleh modul implementasi internal yang belum dikoding, usulan    |   - AC-06 (B-02: RFC 8785 JCS Serializer)     |
-|                                                                    | Sub-Kategori 2b: [BLOCKED BY ARCH / SPEC] (21)|
-|                                                                    |   - AC-01 (NC-01: Strict Unknown Fields; universal schema pending) |
-|                                                                    |   - AC-02 (NC-01: Universal Manifest / Member Path) |
-|                                                                    |   - AC-03 (B-08: Exact Signed-Content / Verifier) |
-|                                                                    |   - AC-07 (NC-04/B-09: Membership policy approved; signer lifecycle pending) |
-|                                                                    |   - AC-08 (NC-04/B-09: Signer Revocation / Freshness) |
-|    gap pemuatan kembali Album, prasyarat normatif JIT &            |   - AC-09 (NC-05/NEW-01: Field Hash Unres)    |
-|    implementasi autentisitas membership dan lifecycle signer belum tersedia, blocker arsitektur aktif,     |   - AC-10 (NC-05/A-05: Taksonomi Error Gen)   |
-|    atau spesifikasi lifecycle non-audio yang belum terdefinisi.    |   - AC-13 (B-07/NC-07: Usulan Kuota ZIP)      |
-|                                                                    |   - AC-14 (B-04/CONF-03: Gap 2PC Eksternal)   |
-|                                                                    |   - AC-15 (B-04/CONF-03: Gap Replay Token)    |
-|                                                                    |   - AC-16 (B-05/NC-09: Semantik Hash DB)      |
-|                                                                    |   - AC-20 (B-06/NC-12: Safe-Open TOCTOU)      |
-|                                                                    |   - AC-21 (B-06/NC-12: Post-Open Descr)       |
-|                                                                    |   - AC-22 (NC-13/CONF-01: JIT Prereq / Sig)   |
-|                                                                    |   - AC-26 (NC-15: Formalisasi Taksonomi Error) |
-|                                                                    |   - AC-27 (NC-16: Child ID Formula / DDL Evidence) |
-|                                                                    |   - AC-28 (NC-01/06: Gap Identitas Album)     |
-|                                                                    |   - AC-29 (NC-06: Gap Reload Kolektif Album)  |
-|                                                                    |   - AC-32 (NC-13: Auto-Next Lifecycle Gap)   |
-|                                                                    |   - AC-33 (NC-14: Desktop Membership Gate)  |
-|                                                                    |   - AC-34 (NC-14: Mobile Membership Gate)   |
+|                                                                    | Sub-Kategori 2b: [BLOCKED BY ARCH / SPEC] (20)|
+|                                                                    |   - AC-01 (NC-01: schema envelope/metadata and parser implementation) |
+|                                                                    |   - AC-02 (NC-01: manifest name/location and complete schema) |
+|                                                                    |   - AC-03 (B-08: exact signed-content/verifier implementation) |
+|                                                                    |   - AC-07 (B-09: existing subject/key/capability evidence integration) |
+|                                                                    |   - AC-08 (B-09: revocation/freshness source evidence) |
+|                                                                    |   - AC-10 (NC-05: Genesis error taxonomy)    |
+|    gap pemuatan kembali Album, prasyarat normatif JIT &            |   - AC-13 (B-07: measured ZIP quota benchmark pending) |
+|    implementasi autentisitas membership dan lifecycle signer belum tersedia, blocker arsitektur aktif,     |   - AC-14 (B-04: transaction/storage feasibility) |
+|    atau spesifikasi lifecycle non-audio yang belum terdefinisi.    |   - AC-15 (B-04: idempotency/replay/settlement) |
+|                                                                    |   - AC-16 (B-05: child hash storage mapping proof) |
+|                                                                    |   - AC-20 (B-06: Safe-Open TOCTOU)            |
+|                                                                    |   - AC-21 (B-06: post-open descriptor security)|
+|                                                                    |   - AC-22 (NC-13: JIT prerequisite integration) |
+|                                                                    |   - AC-26 (NC-15: error taxonomy cross-register) |
+|                                                                    |   - AC-27 (NC-16: receipt/DDL compatibility evidence) |
+|                                                                    |   - AC-28 (NC-06: Album identity/persistence) |
+|                                                                    |   - AC-29 (NC-06: Album reload/reconstruction) |
+|                                                                    |   - AC-32 (NC-13: Auto-Next viewer source feasibility) |
+|                                                                    |   - AC-33 and AC-34 (NC-14: membership verifier/lifecycle integration) |
+|                                                                    |   - (Remaining AC mapping is maintained in §8/§9; no new AC is added) |
+|                                                                    |                                                |
+| 3. [PO DECISION REQUIRED] (0 AC)                                   | Tidak ada keputusan PO aktif yang tertunda.   |
 +--------------------------------------------------------------------+-----------------------------------------------+
-| 3. [PO DECISION REQUIRED] (0 AC)                                   | Tidak ada PO decision item aktif pada kelompok ini.       |
-|    Kriteria keberhasilan atau penerimaan kontrak secara substantif | Tidak ada item AC yang menunggu keputusan PO. |
-|    —                |                                               |
+| TOTAL                                                               | 12 + 22 + 0 = 34 AC                       |
 +--------------------------------------------------------------------+-----------------------------------------------+
+
 ```
 
 #### Rekonsiliasi Individual Wajib Seluruh 34 Acceptance Criteria (DEF-01, Mandat Konsolidasi PO)
@@ -2151,11 +2151,11 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 | 4. B-05 — child hash contract | Byte-domain full-file `.nx`, producer/consumer, wrapper-hash separation, dan test vectors ditetapkan AA §16.3. Residual: bukti mapping ke storage/acquisition existing tanpa DDL |
 | 5. B-06 — filesystem / POSIX TOCTOU | Safe-Open contract, descriptor-relative staging, no-follow, post-open validation, atomic promotion, cleanup, threat model, dan adversarial test plan ditetapkan AA §16.6. Platform implementation/test execution setelah otorisasi |
 | 6. B-09 — signer/membership | Semantic/verification contract dan negative test design ditetapkan AA §16.5. Residual Gate B: identifikasi source otoritatif existing Nexa untuk key binding, Album Membership Signing capability, trust resolution, revocation/freshness; tanpa endpoint/schema/trust root baru |
-| 7. B-07 / NC-07 — ZIP quota & extraction security | Tetapkan benchmark envelope empat payload (Music, Video, Document, Image), threat model, metrik dan hasil benchmark, kapasitas sistem, hard limits per lapisan, per-entry/cumulative enforcement, serta expected adversarial cases sebelum Gate B PASS. Hard cap ditetapkan setelah benchmark dan pengujian adversarial; nilai proposal tidak boleh dinyatakan normatif lebih dahulu. PSV-R07 telah ditutup. Angka 50 Album members hanya UX guidance dan bukan hard product limit. ZIP extractor implementation/test execution dilakukan setelah otorisasi |
-| 8. NC-01 / AC-01 — universal manifest schema | Unknown-field rejection telah disahkan PO; schema universal multi-payload, version/required-field contract, dan field/path yang belum normatif harus ditetapkan sebelum Gate B PASS. Parser implementation dilakukan setelah otorisasi |
-| 9. NC-05 / AC-09/10 — audio hash & Genesis taxonomy | Tetapkan satu identitas field/byte-domain audio hash dan taxonomy Genesis yang terukur; 3-Way Identity Binding AUDIT-NEW-10 telah diselesaikan, bukan blocker PO yang dibuka kembali |
+| 7. B-07 / NC-07 — ZIP quota & extraction security | Benchmark protocol empat payload, workload, metrik, repeatability, boundary/adversarial suite, dan evidence format ditetapkan AA §16.14. Numeric caps per dimensi tetap BLOCKED sampai benchmark deployment-representative menghasilkan capacity envelope; ZIP extractor implementation/tests setelah otorisasi |
+| 8. NC-01 / AC-01 — universal manifest schema | Manifest envelope, ordered members, payload discriminator, dan audio field contract telah ditetapkan AA §16.2/§16.12. Complete JSON Schema, manifest file name/location, schema-version release, dan signer schema placement masih harus direkonsiliasi sebelum Gate B PASS; parser implementation setelah otorisasi |
+| 9. NC-05 / AC-09/10 — audio hash & Genesis taxonomy | AC-09 SPEC READY: members[].audio_payload_sha256, payload discriminator, exact encrypted audio byte-domain, 64-lowercase-hex encoding ditetapkan AA §16.12. AC-10 Genesis error taxonomy dan source mapping tetap residual; tidak mengubah PE-01 error semantics |
 | 10. NC-06 / AC-28/29 — Album identity/persistence/reload | Tetapkan Album ID, member relation, persistence, reload/reconstruction, integrity, dan recovery tanpa DDL sebelum Gate B PASS |
-| 11. NC-13 / AC-22/32 — JIT Stage 8a & Auto-Next | Stage 8a permission/dependency and side-effect boundary are closed by PO/AA (§16.1). Stage 8b requires 7b + 7c + matching digest; 8c only current member after 8b. Residual: canonical audio payload hash field/path and source feasibility of per-viewer completion events for Auto-Next; no artificial timeout |
+| 11. NC-13 / AC-22/32 — JIT Stage 8a & Auto-Next | Stage 8a permission/dependency/side-effect closed by PO/AA (§16.1). Stage 8b requires 7b + 7c + matching digest; 8c only current member after 8b. AC-32 residual: source feasibility and platform/payload completion event tests under §16.11/§16.15; no artificial timeout |
 | 12. NC-15 / AC-26 — error taxonomy | Dimensi error, unknown-vs-invalid, stage/object/retryability mapping, evidence reference, dan user disposition ditetapkan AA §16.9. Final stable code registry wajib diselaraskan lintas seluruh AC/NC dan UI/API contract sebelum Gate A PASS |
 | 13. Otorisasi resmi pelaksanaan implementasi        | TIDAK DIBERIKAN (NOT AUTHORIZED)             |
 +----------------------------------------------------+----------------------------------------------+
@@ -2170,17 +2170,17 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 ### 13.1 Evaluasi Kesiapan (Readiness Conclusion)
 Berdasarkan isi dokumen, laporan Programmer, dan batas bukti yang tersedia bagi Auditor, kesiapan sistem dirinci ke dalam 8 kategori kesiapan. Klasifikasi di bawah ini adalah status readiness, bukan pengganti urutan PSV: seluruh fakta implementasi yang menjadi dependency blocker source-dependent tetap harus diperiksa Programmer terlebih dahulu sesuai §7.1 dan §15.3.
 1. **Laporan inspeksi repositori lokal Programmer (`REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`):** Programmer melaporkan inspeksi atas DDL `schema.postgres.sql`, engine packaging Go `container.go`, modul Ed25519 SDK `crypto.ts`, handler NX Player `main.js`, ketiadaan 2PC di Marketplace `server.js`, dan status git commit `fc08a5c...`. Auditor belum memeriksa repositori `whisnu/nexa` atau bukti primer tersebut; seluruh klaim inspeksi tetap `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE` bagi audit independen ini.
-2. **Hal yang Berstatus Spesifikasi Konseptual (`SPECIFIED — PENDING IMPL`):** Draf JSON Schema audio berstatus proposed/non-normative; sintaksis Draft 7 tidak menjadikannya kontrak normatif, batas 199 track belum disahkan, dan schema universal multi-payload serta metadata persistence masih unresolved (NC-01/AC-01; §5.1), serializer RFC 8785 JCS, invariant Safe-Open, taksonomi 20 error code, dan formula derivasi ID.
+2. **Hal yang Berstatus Spesifikasi Konseptual (`SPECIFIED — PENDING IMPL`):** Schema universal kini memiliki canonical manifest envelope, ordered members, payload_type discriminator, dan audio digest field/path pada §16.2/§16.12; schema file envelope/name/location, complete JSON Schema/version constraints, signer evidence schema placement, serta persistence mapping masih perlu rekonsiliasi. Batas 199 track tetap non-normative. JCS engine, Safe-Open implementation, error registry cross-layer, dan existing ID/receipt integration tetap pending.
 3. **Inventaris dan Klasifikasi Kesiapan Seluruh Acceptance Criteria (Total Tepat 34 AC) (DEFECT-01):**
    Seluruh 34 AC terpetakan secara lengkap dan eksklusif berdasarkan register otoritatif §8 (setiap AC berada tepat di satu kelompok utama tanpa penghitungan ganda):
-    - *Kelompok 1: 11 AC Spesifikasi Siap Uji (`[TEST-PLANNED — SPECIFICATION READY]`)*: AC-04, AC-11, AC-12, AC-17, AC-18, AC-19, AC-23, AC-24, AC-25, AC-30, AC-31 (AC-30 dan AC-31 memenuhi keputusan PO larangan album campuran dan failure handling; AC-17 DDL statis dilaporkan Programmer, sedangkan live DB belum diverifikasi independen).
-    - *Kelompok 2: 23 AC Rencana Uji Terblokir Eksekusi (`[TEST-PLANNED — EXECUTION BLOCKED]`)*:
+     - *Kelompok 1: 12 AC Spesifikasi Siap Uji (`[TEST-PLANNED — SPECIFICATION READY]`)*: AC-04, AC-09, AC-11, AC-12, AC-17, AC-18, AC-19, AC-23, AC-24, AC-25, AC-30, AC-31.
+     - *Kelompok 2: 22 AC Rencana Uji Terblokir Eksekusi (`[TEST-PLANNED — EXECUTION BLOCKED]`)*:
      - *Sub-Kategori 2a: Modul Implementasi Belum Tersedia (`[IMPLEMENTATION MODULE PENDING]` - 2 AC)*: AC-05 (B-01: Strict JSON Parser belum dikoding), AC-06 (B-02: RFC 8785 JCS Serializer belum dikoding).
-      - *Sub-Kategori 2b: Terblokir Gap Arsitektur, Usulan Spesifikasi, Taksonomi, Identitas Field, Prasyarat JIT & Provenance Membership Manifest, Identitas Album & Gap Lifecycle Auto-Next Multi-Payload (`[BLOCKED BY ARCHITECTURE / PROPOSED SPEC / TAXONOMY / NORMATIVE FIELD IDENTITY / JIT PREREQUISITES / ALBUM IDENTITY / LIFECYCLE GAP]` - 21 AC)*: AC-01 (NC-01: universal schema pending), AC-02 (NC-01: manifest name/location and member array/path pending), AC-03 (B-08: exact signed-content/canonical byte-domain/verifier contract), AC-07 (NC-04/B-09: membership policy approved; signer lifecycle pending), AC-08 (NC-04/B-09: signer revocation/freshness pending), AC-09 (NC-05: audio hash object/field/byte-domain pending), AC-10 (NC-05: Genesis error taxonomy pending), AC-13 (B-07: ZIP quota benchmark/ratification pending), AC-14 (B-04: transaction/fulfillment contract), AC-15 (B-04: idempotency/replay/settlement contract), AC-16 (B-05: child acquisition hash semantics), AC-20 (B-06: Safe-Open/TOCTOU mitigation), AC-21 (B-06: post-open descriptor security), AC-22 (NC-13: Stage 8a prerequisites and membership verifier dependency), AC-26 (NC-15: error taxonomy), AC-27 (NC-16: child ID formula/encoding/DDL evidence), AC-28 (NC-06: Album identity/persistence), AC-29 (NC-06: Album reload/reconstruction), AC-32 (NC-13: Auto-Next multi-payload lifecycle), AC-33 and AC-34 (NC-14: membership verifier/lifecycle; PO policy already approved).
+       - *Sub-Kategori 2b: Terblokir Gap Arsitektur/Implementasi/Evidence (20 AC)*: AC-01 (NC-01: complete universal schema/manifest envelope), AC-02 (NC-01: manifest filename/location and schema release), AC-03 (B-08: implementation/cross-language verifier), AC-07/08 (B-09: existing identity/capability/revocation evidence integration), AC-10 (NC-05: Genesis error taxonomy), AC-13 (B-07: benchmark and numeric capacity limits), AC-14/15 (B-04: transaction/storage/idempotency proof), AC-16 (B-05: existing child-hash storage mapping), AC-20/21 (B-06: Safe-Open implementation/adversarial tests), AC-22 (NC-13: JIT integration), AC-26 (NC-15: stable error registry cross-register), AC-27 (NC-16: receipt/DDL compatibility evidence), AC-28/29 (NC-06: persistence/reload proof), AC-32 (NC-13: viewer source feasibility), AC-33/34 (NC-14: verifier/lifecycle integration).
    - *Kelompok 3: 0 AC Menunggu Keputusan Resmi Product Owner (`[PO DECISION REQUIRED]`)*: Tidak ada PO decision item aktif pada kelompok ini.
-   *(Rekonsiliasi agregat: 11 + 23 + 0 = 34 AC; kecocokan angka tidak dengan sendirinya membuktikan konsistensi semantik lintas-bab §1.5, §1.6, §2.1, §2.2, §8, §9, dan §12).*
+    *(Rekonsiliasi agregat aktif: 12 + 22 + 0 = 34 AC. AC-09 berpindah dari Execution Blocked ke Specification Ready setelah field/path dan byte-domain ditetapkan AA §16.12. Tidak ada AC yang menunggu keputusan PO.)*
 4. **Hal yang Belum Diverifikasi (`NOT VERIFIED — EVIDENCE NOT AVAILABLE`):** Pengujian fisik runtime mobile iOS/Android dan Usage Service cluster.
-5. **Rangkuman Ketergantungan Blocker Teknis & Arsitektur:** Kontrak desain B-03/B-05/B-06/B-08 telah ditetapkan AA; B-01/B-02 merupakan implementation tasks post-authorization. Residual readiness utama adalah source-backed Zero-DDL storage B-04, benchmark-gated resource limits B-07, existing identity/authority integration B-09, canonical audio payload field/path dan Auto-Next completion NC-13, serta sinkronisasi seluruh register dan evidence. PSV residual R-02 s.d. R-10, termasuk R-09A/R-09A-1/R-10A, telah ditutup pada tingkat pembuktian yang dilaporkan di §15.11.3; jangan mengulang PSV yang sama. Pekerjaan berikutnya adalah menyelesaikan kontrak target, implementasi, adversarial tests, dan runtime evidence yang masih hilang. PSV baru hanya boleh diminta secara targeted bila ada pertanyaan faktual source-level baru yang material.
+5. **Rangkuman Ketergantungan Blocker Teknis & Arsitektur:** AA telah menetapkan Stage 8a contract, B-03/B-04 transaction design/B-05 child hash byte-domain/B-06 Safe-Open/B-08 signature/JCS/B-09 signer semantics, NC-05 audio field/path, NC-15 taxonomy dimensions, dan NC-16 member_execution_key formula. Residual readiness utama: source-backed Zero-DDL storage/receipt B-04/B-05, measured ZIP capacity limits B-07, existing Identity/authority integration B-09, complete schema/envelope/versioning NC-01, persistence/reload NC-06, stable error registry NC-15, JIT and viewer source feasibility NC-13. PSV R-02 s.d. R-10 telah ditutup; tidak ada pengulangan PSV. Gate A memerlukan cross-register reconciliation dan independent re-audit.
 6. **Rangkuman Ketergantungan Keputusan Otoritatif PO:** Tidak ada PO decision blocker aktif untuk CONF-01 atau pemilihan model B-04. CONF-01 policy fail-closed dan CONF-02 Pilihan B telah disahkan. CONF-03 direklasifikasi sebagai kontrak teknis B-04 yang masih terbuka. Residual PSV R-02 s.d. R-10 beserta R-09A/R-09A-1/R-10A telah dinyatakan CLOSED pada §15.11.3; tidak ada PSV ulang menyeluruh. Keputusan PO/Architecture Authority berikutnya hanya diminta bila muncul pertanyaan normatif baru yang benar-benar belum ditetapkan. **Klarifikasi B-09:** kedua kelas Identity Subject—Individual Creator dan Organization—telah disetujui PO pada 2026-11-10. Tidak ada lagi pertanyaan PO mengenai kelayakan kelas subject. Kontrak semantik subject/key, explicit Album Membership Signing capability, Federated Trust resolution, lifecycle/freshness, verifier, dan negative tests telah ditetapkan AA §16.5. Yang tetap harus dibuktikan adalah lokasi/issuer authority evidence yang benar-benar tersedia pada implementasi Nexa dan jalur integrasinya.
 7. **Kualifikasi Kelulusan Gate:** Gate A berstatus **`NOT PASSED — PRODUCT TRUTH RECONCILIATION APPLIED; SUBSTANTIVE BLOCKERS REMAIN; INDEPENDENT RE-AUDIT REQUIRED`**; Gate B berstatus **`BLOCKED`**.
 8. **Status Otorisasi Implementasi PE-02:** **`NOT AUTHORIZED`** (Dilarang keras memulai implementasi kode atau migrasi database).
@@ -3909,7 +3909,7 @@ Status: Stage 8a product permission CLOSED — PO APPROVED; dependency/order and
 
 1. Album adalah logical collection dengan identitas stabil, bukan container .nx baru. ZIP hanya transport envelope; setiap child .nx tetap independen.
 2. Canonical manifest adalah satu JSON object closed-schema dengan top-level fields: schema_version, album_id, signer, members, signature. Signature adalah detached envelope dan dikecualikan dari signed JCS payload.
-3. signer memuat subject identity dan key reference. members adalah ordered array. Setiap member memuat member_id immutable, file_name, member_sha256, dan member_size_bytes.
+3. signer memuat subject identity dan key reference. members adalah ordered array. Setiap member memuat member_id immutable, file_name, member_sha256, member_size_bytes, dan payload_type. Untuk MUSIC_AUDIO, member wajib memuat audio_payload_sha256; field tersebut tidak berlaku untuk tiga payload class lain (lihat §16.12).
 4. member_sha256 adalah SHA-256 seluruh byte fisik child .nx final. Ia berbeda dari ZIP wrapper hash dan payload-internal hash. Producer menghitung setelah child .nx final ditutup; consumer menghitung ulang atas file hasil extraction.
 5. Nama file adalah flat basename sesuai keputusan PO AUDIT-NEW-06/07: case dipertahankan dan uniqueness memakai deterministic ASCII case-fold. ZIP directory entries diperbolehkan; symlink/special entries ditolak. Himpunan regular .nx entries harus bijektif dengan deklarasi members: tidak boleh ada missing, undeclared, duplicate, atau ambiguous member.
 6. Urutan playback mengikuti urutan deklarasi members, bukan urutan ZIP directory entry. album_id/member_id tidak sama dengan acquisition_id, payment_order_id, bundle_checkout_id, asset_id, atau certID. ID tidak diturunkan dari urutan UI, ZIP order, timestamp, signer key, atau filename saja.
