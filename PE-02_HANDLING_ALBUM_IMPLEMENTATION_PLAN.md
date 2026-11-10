@@ -2089,7 +2089,7 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 | 4. B-05 — child hash contract | PSV B-05 telah diselesaikan; tetapkan byte-domain per-member `.nx`, producer/consumer, dan kontrak child mapping tanpa mengubah Zero-DDL |
 | 5. B-06 — filesystem / POSIX TOCTOU | PSV source review lintas platform telah diselesaikan; tetapkan mitigasi desain, threat model, residual-risk statement, serta adversarial test plan/expected results sebelum Gate B PASS; eksekusi adversarial/runtime tests dilakukan setelah otorisasi dan implementasi |
 | 6. B-09 — signer/membership | PSV signer/membership telah diselesaikan; kebijakan fail-closed telah disahkan PO; tetapkan identity binding, authority, trust lifecycle, verifier contract, dan test design tanpa mengulang PSV yang sama. Implementasi dan test execution dilakukan setelah otorisasi |
-| 7. B-07 / NC-07 — ZIP quota & extraction security | Tetapkan hard limits, threat model, benchmark basis, per-entry/cumulative enforcement, dan expected adversarial cases sebelum Gate B PASS; PSV-R07 telah ditutup. ZIP extractor implementation/test execution dilakukan setelah otorisasi |
+| 7. B-07 / NC-07 — ZIP quota & extraction security | Tetapkan hard limits, threat model, benchmark basis, per-entry/cumulative enforcement, dan expected adversarial cases sebelum Gate B PASS; PSV-R07 telah ditutup. PO menetapkan apakah 50 Album members adalah hard product limit atau UX guidance. ZIP extractor implementation/test execution dilakukan setelah otorisasi |
 | 8. NC-01 / AC-01 — universal manifest schema | Unknown-field rejection telah disahkan PO; schema universal multi-payload, version/required-field contract, dan field/path yang belum normatif harus ditetapkan sebelum Gate B PASS. Parser implementation dilakukan setelah otorisasi |
 | 9. NC-05 / AC-09/10 — audio hash & Genesis taxonomy | Tetapkan satu identitas field/byte-domain audio hash dan taxonomy Genesis yang terukur; 3-Way Identity Binding AUDIT-NEW-10 telah diselesaikan, bukan blocker PO yang dibuka kembali |
 | 10. NC-06 / AC-28/29 — Album identity/persistence/reload | Tetapkan Album ID, member relation, persistence, reload/reconstruction, integrity, dan recovery tanpa DDL sebelum Gate B PASS |
@@ -2450,11 +2450,13 @@ Bagian ini menggantikan pola sebelumnya yang menyerahkan hampir seluruh masalah 
 
 Tidak ada lagi PO decision blocker untuk AC-01, CONF-01, AUDIT-NEW-10 issuer authority/subdelegation, Model B, SSP/Largest Remainder, `bundle_checkout_id`, Immutable Checkout Manifest, partial fulfillment, refund obligation, automatic refund, atau Mandatory Exception Resolution. Keputusan tersebut telah disahkan dan harus diterapkan tanpa diajukan ulang.
 
+**Satu keputusan produk PO yang masih terbuka di luar kategori 34 AC:** REQ-B03-06 — apakah batas 50 Album members merupakan **hard product limit** atau hanya **UX guidance**. Status 12 Spec Ready + 22 Execution Blocked + 0 PO Decision Required pada §13.1.1 hanya menghitung status 34 AC; angka tersebut tidak berarti tidak ada pertanyaan kebijakan produk di luar register AC.
+
 Sisa pekerjaan dan kewenangannya:
 1. **Architecture Authority:** menyelesaikan kontrak teknis B-04/NC-08, B-05/NC-09, B-06/NC-12, B-07/NC-07, B-08/NC-02, B-09/NC-04, NC-01 schema universal, NC-05 audio hash/Genesis taxonomy, NC-06 Album identity/persistence/reload, dan NC-13 JIT/Auto-Next berdasarkan keputusan PO serta bukti yang sudah tersedia.
 2. **Programmer:** tidak mengulang PSV-R02–R10/R09A/R09A-1/R10A yang telah ditutup. PSV baru hanya untuk pertanyaan source-level faktual yang spesifik dan material; setelah itu setiap temuan wajib diklasifikasikan PSV vs non-PSV. Defect dokumen/non-PSV dikoreksi langsung pada PLAN kanonikal, bukan dikirim kembali kepada Programmer.
 3. **Lead Security / Architecture Authority:** menetapkan mitigasi B-06 dan evaluasi residual risk berdasarkan desain serta adversarial tests lintas platform; source PSV yang sama tidak diulang.
-4. **Product Owner:** hanya diminta keputusan baru bila desain teknis memerlukan perubahan terhadap perilaku produk yang telah disahkan atau menyentuh baseline frozen. Tidak boleh diminta merancang detail implementasi teknis.
+4. **Product Owner:** memutuskan apakah batas 50 Album members adalah hard product limit atau UX guidance (REQ-B03-06). Keputusan produk baru lainnya hanya diminta bila desain teknis memerlukan perubahan terhadap perilaku produk yang telah disahkan atau menyentuh baseline frozen; PO tidak diminta merancang detail implementasi teknis.
 
 ### 13.11.2 Prasyarat bukti primer — bukan keputusan desain
 
