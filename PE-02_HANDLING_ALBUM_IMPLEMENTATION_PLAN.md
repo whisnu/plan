@@ -2427,7 +2427,7 @@ Bagian ini mengonsolidasikan enam temuan audit terbaru dan **mengesampingkan red
 
 ### 13.11.1 Baseline Rekomendasi Desain Teknis — Bukan Daftar Delegasi kepada PO
 
-Bagian ini menggantikan pola sebelumnya yang menyerahkan hampir seluruh masalah teknis sebagai pertanyaan kepada PO. Analisis dan rancangan awal merupakan tanggung jawab penyusun plan. Status di bawah ini adalah rekomendasi teknis yang harus diuji terhadap Product Truth dan repository; pencantuman rekomendasi tidak menjadikannya keputusan PO, bukti implementasi, atau otorisasi coding.
+Bagian ini menggantikan pola sebelumnya yang menyerahkan hampir seluruh masalah teknis sebagai pertanyaan kepada PO. Analisis dan rancangan awal merupakan tanggung jawab penyusun plan. Tabel memisahkan ketentuan normatif yang telah disahkan PO (misalnya TD-01/TD-02/TD-04/TD-11) dari rekomendasi mekanisme teknis yang masih harus ditetapkan Architecture Authority. Pencantuman rekomendasi teknis tidak menjadikannya keputusan PO, bukti implementasi, atau otorisasi coding.
 
 | ID | Area / blocker | Rekomendasi desain yang harus menjadi baseline evaluasi | Batas dan status yang tetap berlaku |
 |:---:|:---|:---|:---|
