@@ -901,12 +901,12 @@ White Paper v5.6 menjadi Product Truth untuk otorisasi JIT atas setiap kontainer
    - **8a. Verifikasi Digest SHA-256 Audio (Audio Digest Verification)**:
      - *Objek Data*: Payload biner bitstream audio mentah terenkripsi di dalam kontainer `.nx` trek aktif.
      - *Prasyarat I/O Fisik Minimum*: Deskriptor berkas aman yang dibuka atomik dari Tahap 6 (`fs.openSync` dengan `O_RDONLY | O_NOFOLLOW`) dan integritas kemasan fisik kontainer PE-01 dari Tahap 7a (`NexaContainer.unpack(data)`).
-       *Peringatan Batas Normatif*: Prasyarat I/O fisik ini TIDAK BOLEH dinyatakan secara kategoris sebagai satu-satunya prasyarat Tahap 8a. Status ketergantungan normatif Stage 8a terhadap validasi Genesis (Stage 7b) dan lisensi aktif pengguna (Stage 7c) masih berstatus `UNRESOLVED`. Kemampuan teknis menghitung hash atas bitstream mentah tanpa kunci dekripsi TIDAK SAMA DENGAN izin produk untuk melanjutkan pemeriksaan digest jika Stage 7b atau 7c tidak sah.
+       *Peringatan Batas Normatif*: Prasyarat I/O fisik ini TIDAK BOLEH dinyatakan secara kategoris sebagai satu-satunya prasyarat Tahap 8a. Izin produk Stage 8a telah disahkan PO pada 2026-11-10: pemeriksaan diagnostik pasif diperbolehkan tanpa playback authorization, dekripsi, buffer registration, atau perubahan status otorisasi secara implisit. Stage 8a tidak menggantikan atau melewati Genesis, active-license, maupun trust checks. Kemampuan teknis menghitung hash atas bitstream mentah tanpa kunci dekripsi TIDAK SAMA DENGAN izin produk untuk melanjutkan pemeriksaan digest jika Stage 7b atau 7c tidak sah.
      - *Pemeriksaan*: Menghitung digest SHA-256 atas bitstream audio mentah biner kontainer `.nx` dan mencocokkannya secara eksak dengan deklarasi hash bitstream audio pada manifes album (notasi konseptual: lokasi dan field deklarasi hash belum ditetapkan; status field identity: `UNRESOLVED — FIELD IDENTITY NOT ESTABLISHED BY NORMATIVE CONTRACT; STOP AND CLARIFY`; dilarang menganggap kedua nama sebagai alias yang sama-sama diterima atau fallback). Jika tidak cocok, proses dibatalkan fail-closed dengan melempar **`ERR_CONTAINER_HASH_MISMATCH`**.
      - *Batasan Status Diagnostik & Isolasi Hak Putar*: Pemeriksaan digest ini adalah pemeriksaan integritas fisik atas bitstream mentah. Keberhasilan pencocokan digest 8a **TIDAK PERNAH** memberikan hak otorisasi pemutaran (*no playback authorization*), tidak mengizinkan dekripsi payload (8b), dan tidak mengizinkan pendaftaran buffer (8c).
      - *Status Ketergantungan Normatif Genesis (7b) dan Lisensi Aktif (7c)*:
-       - **Dependensi terhadap Validasi Genesis (7b)**: Secara teknis biner, bitstream payload diekstrak dan dihitung hash-nya tanpa membaca sertifikat genesis (`sdk.ts#L137-L151`). Namun, kontrak produk Nexa yang dibekukan (White Paper v5.6, PE-01) belum mengatur secara normatif apakah kegagalan validasi Genesis pada Stage 7b menghentikan seluruh proses atau tetap mengizinkan digest diagnostik. Perancang dilarang menetapkan status `NOT REQUIRED` tanpa kontrak normatif. Status: **`UNRESOLVED — GENESIS VALIDATION DEPENDENCY NOT ESTABLISHED BY NORMATIVE CONTRACT (PO / ARCHITECTURE DECISION REQUIRED)`**.
-       - **Dependensi terhadap Lisensi Aktif (7c)**: Standar POSIX.1-2017 maupun White Paper v5.6 tidak memuat aturan bisnis apakah verifikasi digest diagnostik bitstream mentah memerlukan lisensi aktif pengguna. Perancang dilarang menetapkan status `NOT REQUIRED` tanpa kontrak normatif. Kemampuan teknis mengekstraksi bitstream tidak boleh disamakan dengan izin produk untuk menjalankan pemeriksaan. Status: **`UNRESOLVED — ACTIVE LICENSE DEPENDENCY FOR DIAGNOSTIC DIGEST NOT ESTABLISHED BY NORMATIVE CONTRACT (PO / ARCHITECTURE DECISION REQUIRED)`**.
+       - **Dependensi terhadap Validasi Genesis (7b)**: Secara teknis biner, bitstream payload diekstrak dan dihitung hash-nya tanpa membaca sertifikat genesis (`sdk.ts#L137-L151`). Namun, kontrak produk Nexa yang dibekukan (White Paper v5.6, PE-01) belum mengatur secara normatif apakah kegagalan validasi Genesis pada Stage 7b menghentikan seluruh proses atau tetap mengizinkan digest diagnostik. Perancang dilarang menetapkan status `NOT REQUIRED` tanpa kontrak normatif. Status: **`PO-APPROVED DIAGNOSTIC-ONLY — Genesis 7b tidak menjadi prasyarat komputasi digest pasif; Genesis tetap wajib untuk Stage 8b/8c`**.
+       - **Dependensi terhadap Lisensi Aktif (7c)**: Standar POSIX.1-2017 maupun White Paper v5.6 tidak memuat aturan bisnis apakah verifikasi digest diagnostik bitstream mentah memerlukan lisensi aktif pengguna. Perancang dilarang menetapkan status `NOT REQUIRED` tanpa kontrak normatif. Kemampuan teknis mengekstraksi bitstream tidak boleh disamakan dengan izin produk untuk menjalankan pemeriksaan. Status: **`PO-APPROVED DIAGNOSTIC-ONLY — active license 7c tidak menjadi prasyarat komputasi digest pasif; license tetap wajib untuk Stage 8b/8c`**.
    - **8b. Dekripsi Payload Audio (Decryption)**:
      - *Prasyarat Mutlak*: Keberhasilan verifikasi digest 8a **DAN** validasi Genesis Certificate 7b **DAN** status otorisasi lisensi pemutaran aktif pengguna terverifikasi sah pada Tahap 7c (*active entitlement / valid user license*).
      - *Larangan Dekripsi Otomatis*: Dekripsi payload audio **TIDAK BOLEH** dianggap otomatis sebagai kelanjutan dari keberhasilan digest. Dekripsi **DILARANG KERAS** dilakukan hanya karena berkas berhasil diekstrak, Safe-Open berhasil, manifes valid, atau digest cocok.
@@ -927,7 +927,7 @@ White Paper v5.6 menjadi Product Truth untuk otorisasi JIT atas setiap kontainer
         3. Jika Stage 8b gagal, alur eksekusi wajib dihentikan secara fail-closed sebelum Stage 8c dijalankan.
         4. Buffer audio yang didaftarkan pada Stage 8c harus merupakan hasil dekripsi yang sah dari Stage 8b untuk *current member*.
         5. Tidak boleh ada buffer registration untuk anggota yang belum menjadi *current member*.
-     - *Larangan Keras Pre-Verifikasi*: Background pre-verification terhadap anggota album berikutnya dalam antrean **DILARANG KERAS** memicu buffer registration atau menghasilkan otorisasi implisit untuk anggota album yang belum menjadi *current member*. Status izin diagnostik pre-verifikasi pada Stage 8a sendiri berstatus **`UNRESOLVED — BACKGROUND PRE-VERIFICATION PERMISSION NOT ESTABLISHED BY NORMATIVE CONTRACT (PO / ARCHITECTURE DECISION REQUIRED)`**.
+     - *Larangan Keras Pre-Verifikasi*: Background pre-verification terhadap anggota album berikutnya dalam antrean **DILARANG KERAS** memicu buffer registration atau menghasilkan otorisasi implisit untuk anggota album yang belum menjadi *current member*. Status izin diagnostik pre-verifikasi pada Stage 8a sendiri berstatus **`PO-APPROVED — PASSIVE DIAGNOSTIC BACKGROUND PRE-VERIFICATION ALLOWED; NO DECRYPTION / BUFFER REGISTRATION / PLAYBACK AUTHORIZATION`**.
    - *Error Code*: `ERR_CONTAINER_HASH_MISMATCH` (pada 8a), `ERR_PLAYBACK_UNAUTHORIZED` (pada 8b).
    - *AC Penguji*: **AC-09** (8a), **AC-22, AC-23, AC-24** (8b, 8c).
 
@@ -938,18 +938,18 @@ Tabel berikut merinci status dependensi setiap prasyarat terhadap ketiga sub-tah
 |---|:---:|:---:|:---:|---|
 | **Deskriptor Berkas Aman (Tahap 6)** | `REQUIRED` | `REQUIRED` | `REQUIRED` | POSIX.1-2017 `O_RDONLY \| O_NOFOLLOW`; `fs_safe.ts#L30-L55` (E-07). Prasyarat I/O fisik minimum untuk membaca bitstream mentah. |
 | **Integritas Kontainer PE-01 (Tahap 7a)** | `REQUIRED` | `REQUIRED` | `REQUIRED` | Format kemasan PE-01 (`internal/container/container.go#L35-L80`). Diperlukan untuk unpacking offset header, payload, dan trailer signature. |
-| **Validasi Genesis Certificate (Tahap 7b)** | `UNRESOLVED` | `REQUIRED` | `REQUIRED` | `UNRESOLVED — GENESIS VALIDATION DEPENDENCY NOT ESTABLISHED BY NORMATIVE CONTRACT (PO / ARCHITECTURE DECISION REQUIRED)`. Kemampuan teknis biner mengekstrak bitstream tanpa membaca genesis (`sdk.ts#L137-L151`) tidak boleh disamakan dengan izin produk untuk melanjutkan pemeriksaan digest jika 7b gagal. Dilarang menetapkan `NOT REQUIRED` tanpa kontrak normatif. Untuk dekripsi (8b) dan buffer (8c), validasi kepemilikan genesis mutlak `REQUIRED`. |
-| **Evaluasi Active License (Tahap 7c)** | `UNRESOLVED` | `REQUIRED` | `REQUIRED` | `UNRESOLVED — ACTIVE LICENSE DEPENDENCY FOR DIAGNOSTIC DIGEST NOT ESTABLISHED BY NORMATIVE CONTRACT (PO / ARCHITECTURE DECISION REQUIRED)`. Secara fisik bitstream mentah terenkripsi aman di-digest tanpa lisensi, namun kontrak produk Nexa belum memutuskan apakah ketiadaan lisensi aktif pengguna menghentikan alur pemeriksaan digest atau mengizinkan kelanjutan digest murni diagnostik. Dilarang menetapkan `NOT REQUIRED` tanpa kontrak normatif. Untuk dekripsi (8b) dan buffer (8c), lisensi aktif mutlak `REQUIRED` (fail-closed `ERR_PLAYBACK_UNAUTHORIZED`). |
+| **Validasi Genesis Certificate (Tahap 7b)** | `UNRESOLVED` | `REQUIRED` | `REQUIRED` | `PO-APPROVED DIAGNOSTIC-ONLY — Genesis 7b tidak menjadi prasyarat komputasi digest pasif; Genesis tetap wajib untuk Stage 8b/8c`. Kemampuan teknis biner mengekstrak bitstream tanpa membaca genesis (`sdk.ts#L137-L151`) tidak boleh disamakan dengan izin produk untuk melanjutkan pemeriksaan digest jika 7b gagal. Dilarang menetapkan `NOT REQUIRED` tanpa kontrak normatif. Untuk dekripsi (8b) dan buffer (8c), validasi kepemilikan genesis mutlak `REQUIRED`. |
+| **Evaluasi Active License (Tahap 7c)** | `UNRESOLVED` | `REQUIRED` | `REQUIRED` | `PO-APPROVED DIAGNOSTIC-ONLY — active license 7c tidak menjadi prasyarat komputasi digest pasif; license tetap wajib untuk Stage 8b/8c`. Secara fisik bitstream mentah terenkripsi aman di-digest tanpa lisensi, namun kontrak produk Nexa belum memutuskan apakah ketiadaan lisensi aktif pengguna menghentikan alur pemeriksaan digest atau mengizinkan kelanjutan digest murni diagnostik. Dilarang menetapkan `NOT REQUIRED` tanpa kontrak normatif. Untuk dekripsi (8b) dan buffer (8c), lisensi aktif mutlak `REQUIRED` (fail-closed `ERR_PLAYBACK_UNAUTHORIZED`). |
 | **Digest Stage 8a Cocok** | `Hasil pemeriksaan` | `REQUIRED` | `REQUIRED` | White Paper v5.6 §Distribution; draf deklarasi hash manifest dengan parent array dan field path belum ditetapkan (identitas field normatif audio_sha256 vs tracks[] [notasi draf audio non-normatif; bukan path manifest universal].sha256 unresolved; STOP AND CLARIFY). Keberhasilan pencocokan digest bitstream mentah adalah hasil pemeriksaan fisik yang REQUIRED untuk dekripsi 8b dan pendaftaran buffer 8c; dekripsi 8b dilarang keras sebelum digest bitstream mentah terbukti cocok. Keberhasilan Stage 8a saja tidak cukup untuk mengizinkan Stage 8c. |
 | **Stage 8b Berhasil** | `Tidak berlaku` | `Hasil dekripsi` | `REQUIRED` | Aturan dependensi Stage 8b menuju Stage 8c: (1) Stage 8c hanya boleh dilakukan setelah Stage 8b berhasil; (2) Keberhasilan Stage 8a saja tidak cukup untuk mengizinkan Stage 8c; (3) Jika Stage 8b gagal, alur pemrosesan wajib dihentikan fail-closed sebelum Stage 8c dijalankan; (4) Buffer yang didaftarkan pada Stage 8c harus merupakan hasil dekripsi yang sah dari Stage 8b untuk *current member*; (5) Tidak boleh ada buffer registration untuk anggota yang belum menjadi *current member*. |
 | **Trek Merupakan Current Member** | `UNRESOLVED / CONDITIONAL` | `CONDITIONAL` | `REQUIRED` | Apakah Stage 8a mensyaratkan status current member atau diizinkan berjalan untuk antrean trek berikutnya bergantung pada keputusan izin pre-verifikasi diagnostik (`UNRESOLVED`). Stage 8b hanya dieksekusi saat transisi pemutaran trek aktif. Stage 8c secara mutlak `REQUIRED` hanya untuk trek yang sedang aktif diputar. |
-| **Background Pre-Verification untuk Anggota Berikutnya** | `UNRESOLVED` | `NOT ALLOWED` | `NOT ALLOWED` | `UNRESOLVED — BACKGROUND PRE-VERIFICATION PERMISSION NOT ESTABLISHED BY NORMATIVE CONTRACT (PO / ARCHITECTURE DECISION REQUIRED)`. Kemampuan teknis biner mengekstrak bitstream tidak boleh disamakan dengan izin produk untuk menjalankan digest antrean berikutnya. Namun, Stage 8b secara mutlak `NOT ALLOWED` (dilarang dekripsi) dan Stage 8c secara mutlak `NOT ALLOWED` (dilarang buffer registration) untuk trek yang belum menjadi current member. |
+| **Background Pre-Verification untuk Anggota Berikutnya** | `UNRESOLVED` | `NOT ALLOWED` | `NOT ALLOWED` | `PO-APPROVED — PASSIVE DIAGNOSTIC BACKGROUND PRE-VERIFICATION ALLOWED; NO DECRYPTION / BUFFER REGISTRATION / PLAYBACK AUTHORIZATION`. Kemampuan teknis biner mengekstrak bitstream tidak boleh disamakan dengan izin produk untuk menjalankan digest antrean berikutnya. Namun, Stage 8b secara mutlak `NOT ALLOWED` (dilarang dekripsi) dan Stage 8c secara mutlak `NOT ALLOWED` (dilarang buffer registration) untuk trek yang belum menjadi current member. |
 
 > **Pemisahan Tiga Lapisan Kebutuhan Pre-Verifikasi & Batas Keamanan Stage 8 (AUDIT-NEW-01 PO Clarification):**
 > Dokumen ini secara tegas memisahkan tiga lapisan yang berbeda dan melarang penyamaan antara kemampuan komputasi dengan izin tata kelola produk:
 > 1. **Technical Capability (Kemampuan Teknis Komputasi)**: Secara teknis biner filesystem dan parser, sistem mampu membuka deskriptor aman berkas kontainer `.nx` anggota album berikutnya dalam antrean dan menghitung hash SHA-256 bitstream terenkripsi tanpa kunci dekripsi.
 > 2. **Diagnostic Permission (Izin Diagnostik Produk)**: Kontrak produk Nexa yang disahkan (White Paper v5.6, Roadmap v4.8) **belum menetapkan** apakah Player diizinkan mengeksekusi pemeriksaan digest diagnostik atas berkas antrean sebelum berkas tersebut diputar. Status izin diagnostik ini ditetapkan secara jujur dan tidak memihak sebagai:
->    **`UNRESOLVED — BACKGROUND PRE-VERIFICATION PERMISSION NOT ESTABLISHED BY NORMATIVE CONTRACT (PO / ARCHITECTURE DECISION REQUIRED)`**.
+>    **`PO-APPROVED — PASSIVE DIAGNOSTIC BACKGROUND PRE-VERIFICATION ALLOWED; NO DECRYPTION / BUFFER REGISTRATION / PLAYBACK AUTHORIZATION`**.
 >    Dokumen tidak menyatakan pre-verifikasi sebagai `ALLOWED`, dan tidak mengarang larangan sepihak sebagai `NOT ALLOWED`.
 > 3. **Playback Authorization (Otorisasi Pemutaran & Batas Keamanan Stage 8b/8c)**: Background pre-verification dalam kondisi apa pun **DILARANG KERAS** menghasilkan otorisasi pemutaran, dilarang melakukan dekripsi payload audio (Stage 8b), dan dilarang mendaftarkan buffer audio (Stage 8c). Pendaftaran buffer audio hanya dan selalu berlaku eksklusif untuk trek yang sedang aktif diputar oleh pengguna (*current member*).
 >
@@ -2327,7 +2327,7 @@ Bagian ini mengonsolidasikan enam temuan audit terbaru dan **mengesampingkan red
 ### Pemeriksaan preservasi setelah koreksi
 1. AC-07 tetap `PO DECISION REQUIRED`; AC-08 tetap `EXECUTION BLOCKED`; NC-04 tetap `PARTIALLY SPECIFIED / GAP UNRESOLVED`; CONF-01 tetap terbuka.
 2. Opsi A/B/C tidak dihidupkan kembali sebagai kebijakan. Penyebutannya yang tersisa hanya catatan historis yang secara eksplisit menyatakan bukan kerangka keputusan aktif, serta pernyataan bahwa opsi tersebut telah dihapus.
-3. AC-22 tetap terblokir parsial oleh prasyarat JIT, izin diagnostik Stage 8a, identitas field hash, dan autentisitas membership manifest; CONF-01 bukan gerbang playback global.
+3. Izin produk Stage 8a telah selesai. Sisa AC-22 adalah kontrak teknis payload hash/byte-domain dan pemisahan diagnostik dari authorization; CONF-01 bukan gerbang playback global.
 4. Stage 8b tetap memerlukan digest 8a yang cocok, Genesis 7b sah, dan lisensi aktif 7c; Stage 8c tetap hanya setelah Stage 8b berhasil dan hanya untuk current member.
 5. Tidak ada endpoint Registry, signer authority, schema, database field, atau lifecycle baru yang diciptakan. Tidak ada perubahan pada keputusan PO positif, PE-01, atau Sprint 16.
 6. Agregat readiness tetap 12 AC Spec Ready + 20 AC Execution Blocked + 2 AC PO Decision Required = 34 AC; Gate A tetap `NOT PASSED`; Gate B tetap `BLOCKED`; implementasi PE-02 tetap `NOT AUTHORIZED`.
@@ -2370,7 +2370,7 @@ Bagian ini mengonsolidasikan enam temuan audit terbaru dan **mengesampingkan red
 1. Nama array/field path koleksi anggota tetap unresolved; tidak ada pemilihan `members[] [contoh identifier koleksi non-normatif; bukan path manifest disahkan]`, `tracks[] [notasi draf audio non-normatif; bukan path manifest universal]`, atau struktur pengganti.
 2. Identitas field hash audio tetap unresolved; AC-09 tidak dinaikkan menjadi Spec Ready.
 3. NC-04, B-09, CONF-01, B-08, dan lifecycle revocation AC-08 tetap pada status sebelumnya.
-4. Stage 8a diagnostic/background permission tetap unresolved; Stage 8b/8c dan JIT current-member boundary tidak diubah.
+4. Stage 8a diagnostic/background permission telah disahkan PO pada 2026-11-10; Stage 8b/8c dan JIT current-member boundary tetap tidak berubah.
 5. Keputusan PO yang telah disahkan, kontrak PE-01, Sprint 16, dan baseline frozen tidak diubah.
 6. Tidak ada endpoint Registry, signer authority, schema, database field, lifecycle, atau kebijakan baru yang diciptakan.
 7. Gate A tetap `NOT PASSED`; Gate B tetap `BLOCKED`; PE-02 Implementation tetap `NOT AUTHORIZED`; Sprint 16/PE-01 tetap `CLOSED / FROZEN`; Sprint 17 tetap `NOT STARTED`.
@@ -3883,3 +3883,139 @@ Hasil pemeriksaan pada §15.9 menunjukkan seluruh workstream R-02 s.d. R-10 tela
 - PE-01: **CLOSED / FROZEN**.
 - Sprint 17: **NOT STARTED**.
 - Tidak ada keputusan PO atau Architecture Authority baru yang dihasilkan oleh review ini.
+
+
+## 16. ARCHITECTURE AUTHORITY — PE-02 TECHNICAL CONTRACT DETERMINATIONS (2026-11-10)
+
+Bagian ini adalah keputusan teknis Architecture Authority untuk mengisi kontrak PE-02. Bagian ini tidak mengubah keputusan PO, White Paper/Roadmap, Zero-DDL, PE-01, Sprint 16, dan tidak memberikan otorisasi implementasi. Kontrak Nexa yang sudah ada tetap menjadi fondasi; ketentuan Album adalah ekstensi yang tidak membentuk trust root atau container .nx baru.
+
+### 16.1 Stage 8a — keputusan PO selesai; kontrak teknis AA
+
+Keputusan PO 2026-11-10: passive background inspection / diagnostic digest diperbolehkan. Izin ini tidak memberi playback authorization, tidak mengizinkan dekripsi atau buffer registration, tidak melewati Genesis, active-license, atau trust checks, dan tidak mengubah status otorisasi secara implisit. Persetujuan produk bukan otorisasi implementasi.
+
+Kontrak AA:
+1. Stage 8a adalah operasi read-only untuk menghitung SHA-256 atas byte-domain payload audio mentah terenkripsi yang dideklarasikan oleh kontrak payload. Tidak ada dekripsi.
+2. Stage 8a boleh dijalankan untuk current member maupun queued/next member sebagai pre-verification diagnostik. Hasil queued member hanya diagnostic evidence yang terikat pada identitas member/file, digest, byte length, dan provenance pembacaan. Hasil itu bukan entitlement, authorization token, trust assertion, atau playback status.
+3. Genesis 7b dan active license 7c bukan prasyarat untuk komputasi digest diagnostik pasif. Ini bukan bypass: hasil 8a tidak dapat digunakan untuk Stage 8b tanpa validasi 7b dan 7c yang sah.
+4. Stage 8b wajib mensyaratkan integritas container PE-01 (7a), Genesis/ownership validation (7b), active license (7c), dan digest 8a yang cocok. Kegagalan atau status unknown/unavailable pada prasyarat wajib menghentikan dekripsi secara fail-closed.
+5. Stage 8c hanya boleh mendaftarkan buffer hasil dekripsi 8b untuk current member. Background pre-verification tidak boleh membuat playback session, menambahkan authorized track, atau menghasilkan otorisasi yang dapat dipakai ulang.
+6. Digest cocok tidak memperbaiki signature, Genesis, ownership, Registry, Album membership, atau license yang invalid/unknown. Stage 8a tidak mengubah trust, ownership, entitlement, atau playback state.
+7. Jika manifest membership belum authenticated, hasil diagnostik atas file dari arsip tidak boleh dilabeli sebagai hasil verifikasi anggota Album. File yang dipilih/disediakan independen tetap dapat diperiksa sebagai standalone PE-01.
+8. Negative tests: queued digest tanpa authorization side effect; Genesis invalid tetap memblokir 8b; license absent/expired/revoked memblokir 8b; digest mismatch memblokir 8b; tidak ada decrypt/buffer/session untuk queued member; current member tetap menjalani JIT penuh; hasil diagnostik tidak menjadi authorization setelah perubahan license/Genesis/trust.
+
+Status: Stage 8a product permission CLOSED — PO APPROVED; dependency/order and side-effect contract SPECIFIED BY AA; implementation and test execution POST-AUTHORIZATION.
+
+### 16.2 NC-01 / NC-06 — canonical Album Membership Manifest and identity
+
+1. Album adalah logical collection dengan identitas stabil, bukan container .nx baru. ZIP hanya transport envelope; setiap child .nx tetap independen.
+2. Canonical manifest adalah satu JSON object closed-schema dengan top-level fields: schema_version, album_id, signer, members, signature. Signature adalah detached envelope dan dikecualikan dari signed JCS payload.
+3. signer memuat subject identity dan key reference. members adalah ordered array. Setiap member memuat member_id immutable, file_name, member_sha256, dan member_size_bytes.
+4. member_sha256 adalah SHA-256 seluruh byte fisik child .nx final. Ia berbeda dari ZIP wrapper hash dan payload-internal hash. Producer menghitung setelah child .nx final ditutup; consumer menghitung ulang atas file hasil extraction.
+5. Nama file adalah flat basename sesuai keputusan PO AUDIT-NEW-06/07: case dipertahankan dan uniqueness memakai deterministic ASCII case-fold. ZIP directory entries diperbolehkan; symlink/special entries ditolak. Himpunan regular .nx entries harus bijektif dengan deklarasi members: tidak boleh ada missing, undeclared, duplicate, atau ambiguous member.
+6. Urutan playback mengikuti urutan deklarasi members, bukan urutan ZIP directory entry. album_id/member_id tidak sama dengan acquisition_id, payment_order_id, bundle_checkout_id, asset_id, atau certID. ID tidak diturunkan dari urutan UI, ZIP order, timestamp, signer key, atau filename saja.
+7. Manifest, signature, Album ID, ordered member declarations, dan evidence references harus persisten dan dapat direkonstruksi. Jika storage existing tidak membuktikan durability, immutability, deterministic lookup, dan recovery, persistence tetap blocked; tidak boleh menambah DDL.
+8. AC-01: unknown fields ditolak. Extension hanya melalui schema version/namespace eksplisit dan allowlist. Unsupported version ditolak, bukan diparse sebagian.
+
+### 16.3 B-05 — child .nx hash contract
+
+1. Child hash adalah SHA-256 atas exact complete byte sequence file .nx individual setelah final packaging, mencakup header, manifest, payload, dan signature trailer sesuai file fisik yang didistribusikan.
+2. Producer menghitung hash dari file final yang sama dengan file yang dikirim/disimpan; consumer menghitung ulang dari file hasil extraction sebelum member dinyatakan cocok dengan deklarasi.
+3. ZIP wrapper SHA-256 hanya membuktikan wrapper delivery package dan tidak dapat menggantikan hash individual child .nx.
+4. acquired_package_sha256 yang evidence-nya menyatakan wrapper ZIP tetap wrapper-domain sampai source evidence dan kontrak eksplisit membuktikan lain. Jangan mengubah semantik field existing atau menambah DDL. Jika field existing tidak dapat menampung child hash tanpa konflik, child hash berada dalam manifest/evidence object durable yang sesuai Zero-DDL.
+5. Test vectors: child identik; mutasi satu byte pada header/manifest/payload/trailer; wrapper re-compression dengan child tetap; child replacement dalam wrapper yang sama; dan mismatch member-to-acquisition mapping.
+
+Status: target byte-domain SPECIFIED BY AA; existing field/storage mapping harus dibuktikan dalam B-04 tanpa DDL.
+
+### 16.4 B-08 — signed-content, JCS, and Ed25519 verifier
+
+1. Signature-Stripped JCS berarti signature envelope tidak termasuk bytes yang ditandatangani; seluruh semantic manifest content tetap termasuk.
+2. Signed payload adalah RFC 8785 JCS UTF-8 bytes dari canonical manifest object setelah hanya property signature dihilangkan. Tidak ada field lain yang boleh dihilangkan, dinormalisasi diam-diam, atau diurutkan secara custom di luar RFC 8785.
+3. Signed field set mencakup schema_version, album_id, signer (subject ID dan key reference), dan seluruh members[] termasuk member ID, filename, child SHA-256, dan byte length. Dengan demikian signer identity, membership, order, filename, dan child integrity binding terikat oleh signature.
+4. Signature envelope memakai Ed25519 dan key reference yang harus identik dengan key reference pada signed signer object. Envelope tidak dapat mengganti signer/key tanpa membuat signature gagal.
+5. Verifier: strict-parse JSON (duplicate keys ditolak); validate closed schema/version; reconstruct Signature-Stripped JCS; verify Ed25519; resolve signer identity/key/authority/lifecycle melalui B-09; lalu validate archive/member bijection dan child hashes. Kegagalan signature manifest bukan kegagalan integritas standalone PE-01 member.
+6. Cross-language vectors wajib mencakup Unicode/escaping, integer boundaries, object-key ordering, absent/null, array order, duplicate keys, unknown fields, altered signer/key reference, altered member order/name/hash/size, malformed signature, wrong key, dan envelope mutation.
+7. B-01 strict parser dan B-02 JCS serializer adalah implementation tasks post-authorization; spesifikasi byte-domain dan test vectors ditetapkan di sini.
+
+Status: B-08 SPECIFIED BY AA; engine implementation and test execution post-authorization.
+
+### 16.5 B-09 / NC-04 — Album Signer identity, authority, lifecycle
+
+1. Subject classes yang disetujui PO adalah Individual Creator dan Organization. Kelayakan subject tidak otomatis memberikan Album Membership Signing Authority.
+2. Subject identity diselesaikan melalui Nexa Identity yang existing. Organization Subject ID mengikuti Roadmap v4.8: immutable Subject ID berbasis Genesis Root Key; root tidak direassign dan current root hanya melalui verified recovery lineage. Tidak dibuat Album-specific root identity.
+3. Signing key harus terikat secara terverifikasi pada Subject ID melalui existing identity/key-resolution authority. Key possession atau signature validity saja tidak membuktikan subject binding maupun authority.
+4. Album Membership Signing Authority adalah capability eksplisit untuk purpose/scope ALBUM_MEMBERSHIP_SIGNING. Capability tidak boleh disimpulkan dari Creator/Organization status, asset ownership, CONTAINER_PACKAGING delegation, Registry operator status, atau valid signature saja.
+5. Federated Trust resolution mempertahankan registry/federation provenance. Tidak ada hidden global authority atau hardcoded ecosystem root. Conflict, unknown issuer, unavailable federation, stale evidence, key mismatch, unsupported scope, expired/revoked authority, dan incomplete lineage tidak menghasilkan authenticated membership.
+6. Lifecycle mencakup registration/binding, activation, validity, rotation, recovery, revocation, dan historical verification. Verifier membedakan signature validity saat penandatanganan dari current authority/revocation saat evaluasi. Offline verifier hanya menyimpulkan status berdasarkan evidence/snapshot terakhir dan wajib menyatakan freshness limitation.
+7. CONF-01: signer unknown/invalid/incompletely identity-bound, authority evidence absent/invalid, atau manifest signature invalid menghasilkan Album Membership NOT AUTHENTICATED. Ini tidak membatalkan standalone .nx integrity/status dan bukan global playback gate PE-01.
+8. Album Signer authority terpisah dari CONTAINER_PACKAGING delegation. Dual-Horizon Time Rule yang disetujui untuk CONTAINER_PACKAGING tidak otomatis berlaku pada Album Signer.
+9. Negative tests: unknown subject; key tidak terikat; valid key tanpa membership-signing capability; wrong purpose/scope; federation conflict; stale/unavailable trust; expired/revoked/rotated key; invalid recovery lineage; signer-envelope mismatch; dan standalone .nx valid ketika Album membership gagal.
+
+Status: semantic contract SPECIFIED BY AA. Exact existing Nexa authority/evidence issuer dan integration point wajib dikonfirmasi dari implementasi Identity/Federated Trust sebelum readiness; jangan mengarang Registry endpoint, table, atau credential type.
+
+### 16.6 B-03 / B-06 — secure ZIP extraction and Safe-Open
+
+1. ZIP diproses melalui bounded staged extraction, tidak langsung ke direktori final/user-visible.
+2. Central directory dan local headers harus konsisten. Reject malformed offsets, unsupported/encrypted entries, multi-disk archive, symlink/special mode, duplicate normalized names, traversal, absolute path, drive/UNC prefix, NUL/control characters, file-directory collision, dan compression method yang tidak didukung.
+3. Hanya regular file dan directory entry diterima. Directory entry hanya struktural. Case filename dipertahankan; uniqueness mengikuti ASCII case-fold PO decision.
+4. Gunakan private staging root dengan restrictive permissions, no-follow creation, exclusive create, streaming byte counters per-entry dan cumulative, entry counter, ratio monitoring, cancellation, dan cleanup. Jangan mempercayai declared uncompressed size saja.
+5. Pembuatan file harus relatif terhadap staging-root directory handle yang sudah terbuka (openat/equivalent), no-follow, exclusive, dan descriptor validation pasca-open. Resolve setiap path component tanpa mengikuti symlink.
+6. POSIX: fstat descriptor (regular-file type, ukuran, device/inode bila relevan); jangan validasi pathname lalu membuka ulang berdasarkan nama. Platform non-POSIX memakai handle-based no-follow/reparse-point protection yang ekuivalen dan harus menyatakan jaminan race-nya secara eksplisit.
+7. Setelah extraction, flush/close, hitung child hashes, validasi manifest-to-file bijection, lalu promote staging secara atomik hanya setelah seluruh pemeriksaan lulus. Pada kegagalan, cleanup descriptor-relative; tidak boleh meninggalkan output parsial yang dipercaya.
+8. Threat model/test mencakup concurrent rename/symlink substitution, traversal, case collision, decompression bomb, oversized/sparse entry, disk exhaustion, malformed headers, TOCTOU, cleanup race, dan concurrent extraction.
+
+Status: B-03/B-06 design SPECIFIED BY AA. B-03 hard resource limits mengikuti B-07. Platform adversarial/runtime test execution post-authorization.
+
+### 16.7 B-07 — benchmark-gated ZIP resource policy
+
+1. Tidak ada angka proposal 500 MB compressed, 4 GB expanded, 200 entries, 10:1 atau 100:1 yang normatif sebelum benchmark. 50 members tetap UX guidance, bukan hard limit.
+2. Benchmark mencakup Music, Video, Document, Image; ukuran small/median/large; incompressible/highly compressible; mixed workloads; malformed/adversarial archives.
+3. Ukur peak RSS, CPU, wall-clock extraction, bytes read/written, temporary disk peak, file descriptors, cancellation latency, throughput, dan concurrent jobs. Catat hardware/OS/runtime/storage profile dan repeatability.
+4. Turunkan batas terpisah untuk wrapper bytes, expanded cumulative bytes, per-entry bytes, entry count, path/name length, compression ratio, path depth, concurrency, dan staging disk budget. Selaraskan dengan kapasitas deployment dan PE-01 independent 2 GiB per-container limit.
+5. Adversarial tests harus membuktikan enforcement saat streaming; boundary limit−1/limit/limit+1; ratio bombs; declared-size mismatch; integer overflow; disk full; cancellation; cleanup; concurrency.
+6. Sebelum benchmark, runtime wajib memakai bounded deployment configuration yang konservatif dan gagal tertutup bila konfigurasi aman tidak tersedia. Tidak boleh mengarang universal numeric hard cap.
+
+Status: methodology SPECIFIED BY AA; numeric hard caps BENCHMARK PENDING.
+
+### 16.8 B-04 / NC-08 — transaction, immutable checkout manifest, recovery
+
+1. Immutable Checkout Manifest adalah SSOT Commercial Intent: checkout composition, buyer/currency, member list, SSP snapshot, dan price allocation. Immutable setelah issuance.
+2. Setiap member memiliki durable execution record/receipt keyed by bundle_checkout_id + immutable member identity + operation identity. Record append-only membuktikan state transition/evidence; tidak mengubah checkout manifest.
+3. bundle_checkout_id, payment_order_id, acquisition_id, Album ID, dan member ID tetap identifier berbeda. Mapping harus eksplisit dan persisten; dilarang inferensi dari row order, timestamp, buyer equality, atau playlist order.
+4. State per-member: NOT_STARTED → ACQUISITION_PENDING → ACQUISITION_CONFIRMED → ENTITLEMENT_PENDING → ENTITLEMENT_CONFIRMED → FULFILLED. Failure/uncertainty memakai RETRYABLE, TERMINAL_FAILURE, REFUND_PENDING, REFUNDED, EXCEPTION_REQUIRED, atau UNKNOWN_EXTERNAL_RESULT sesuai evidence/policy.
+5. Setiap side effect memakai idempotency key stabil dari checkout identity, member identity, operation type, dan operation version. Timeout tidak membuat key baru. License Daemon unknown result wajib status lookup/reconciliation sebelum resend.
+6. Transaksi PostgreSQL hanya atomik untuk local records. Tidak ada asumsi distributed 2PC atau rollback side effect eksternal. Persist intent sebelum external call; catat receipt setelah; reconcile ambiguous result; compensation hanya jika external system terbukti menyediakan operasi compensation.
+7. Aggregate checkout status diturunkan dari seluruh member execution records. FULLY_FULFILLED mensyaratkan acquisition dan entitlement evidence semua member. Partial fulfillment mempertahankan member sukses. Refund dan Mandatory Exception Resolution mengikuti kebijakan PO.
+8. Zero-DDL absolut. Storage adapter harus memakai mekanisme existing yang membuktikan durability, deterministic lookup, immutability/overwrite protection, concurrency, retention, backup/recovery, dan reconciliation. Tidak boleh memakai temporary file/cache volatil sebagai authority. Jika source evidence tidak mengidentifikasi durable store existing yang patuh, B-04 tetap blocked pada source-backed feasibility, bukan pada kekosongan desain.
+9. Tests: duplicate callbacks/fulfillment, timeout sebelum/sesudah external commit, crash pada setiap boundary, partial success, retry, unknown daemon result, refund idempotency, manifest/projection divergence, corrupted/missing receipt, restart recovery, dan concurrent workers.
+
+Status: transaction/recovery contract SPECIFIED BY AA; existing Zero-DDL durable storage dan source-backed mapping masih harus dibuktikan.
+
+### 16.9 NC-05 / NC-15 / NC-16 — payload hash, error taxonomy, identifiers
+
+1. Pisahkan tiga hash domain: ZIP wrapper hash; complete child .nx hash (member_sha256); payload-internal hash Stage 8a. Ketiganya tidak saling menggantikan.
+2. Stage 8a audio digest adalah SHA-256 atas exact encrypted audio bitstream byte sequence dari payload region PE-01 sebelum dekripsi. Ini bukan full .nx hash dan bukan wrapper hash. Deklarasi manifest harus mengikat digest pada audio payload object dan schema version. audio_sha256 dan tracks[].sha256 tidak boleh dianggap alias. Canonical JSON path dan cardinality payload object harus konsisten dengan universal multi-payload schema sebelum AC-09 dinaikkan menjadi Spec Ready.
+3. Error taxonomy mempertahankan dimensi terpisah: container format/signature, payload digest, Genesis certificate, ownership chain, packaging authorization, Registry trust, license entitlement, Album membership, filesystem containment, resource quota, transaction/recovery. UNKNOWN/UNAVAILABLE bukan INVALID.
+4. Setiap reason code machine-readable dan versioned; UI text localized terpisah. Setiap error memetakan originating stage, affected object, retryability, user action, evidence reference, serta apakah memblokir membership, standalone verification, atau playback.
+5. Child acquisition identity diturunkan dari bundle_checkout_id dan immutable member identity melalui versioned, domain-separated canonical preimage. Jangan memakai signer key, filename, row order, atau timestamp. Jika ID existing dibuat server dan tidak dapat diprediksi, gunakan immutable execution receipt untuk memetakan member identity ke acquisition ID aktual; jangan memaksakan formula baru ke schema existing.
+6. Encoding/length harus cocok dengan tipe dan panjang DDL existing; collision ditangani detect-and-fail, bukan overwrite. Bukti DDL/source diperlukan sebelum AC-16/AC-27 dinyatakan implementation-ready.
+
+### 16.10 AA disposition and remaining feasibility
+
+| Item | AA disposition | Residual dependency |
+|---|---|---|
+| Stage 8a permission/order | CLOSED — PO DECISION + AA CONTRACT | Implementation/tests after authorization |
+| B-01 strict parser | Specification defined; implementation task | Code/tests after authorization |
+| B-02 JCS engine | Specification defined; implementation task | Code/vectors after authorization |
+| B-03 ZIP extraction | SPECIFIED BY AA | B-07 resource limits; implementation later |
+| B-04 transaction/recovery | SPECIFIED BY AA | Existing Zero-DDL durable store and source-backed mapping |
+| B-05 child hash | SPECIFIED BY AA | Existing field/storage mapping proof |
+| B-06 Safe-Open | SPECIFIED BY AA | Platform implementation/adversarial tests later |
+| B-07 ZIP quotas | Methodology specified; numeric limits pending | Four-class benchmark/capacity evidence |
+| B-08 signature/JCS | SPECIFIED BY AA | Implementation and cross-language tests later |
+| B-09 Album Signer | Semantic contract specified by AA | Existing identity/key/authority evidence source and lifecycle integration proof |
+| NC-01/NC-06 | Target schema/identity contract specified | Source-backed persistence feasibility |
+| NC-05/NC-15/NC-16 | Partially specified | Canonical payload path/cardinality and existing ID/DDL compatibility evidence |
+
+Keputusan dan kontrak AA di atas menggantikan status lama yang menyebut Stage 8a background diagnostic permission, Genesis/active-license prerequisite untuk digest computation, atau desain teknis B-03/B-04/B-05/B-06/B-08/B-09 masih menunggu keputusan PO. Snapshot audit historis dipertahankan sebagai histori, bukan status aktif.
+
+Gate A tetap memerlukan rekonsiliasi seluruh cross-register dan independent re-audit. Gate B menilai implementation readiness, bukan menunggu kode PE-02 atau post-authorization runtime tests selesai. Seluruh keputusan AA ini tidak memberikan otorisasi implementasi; otorisasi tetap keputusan PO terpisah setelah Gate A dan Gate B PASS.
