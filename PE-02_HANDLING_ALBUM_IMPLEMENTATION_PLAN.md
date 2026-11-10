@@ -1267,7 +1267,7 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
   1. Format, makna, dan verifikasi Creator packaging signature pada masing-masing kontainer `.nx` (NC-06 / AC-04);
   2. Format, makna, atau kewenangan Genesis Ownership Certificate (NC-05 / AC-10);
   3. Verifikasi Registry Authority Certificate pada masing-masing `.nx`.
-- **Status Blocker**: Model konstruksi telah diputuskan PO/Architecture Authority sebagai Signature-Stripped JCS. B-08 tetap `OPEN / BLOCKED` hanya untuk exact signed-content field set, canonical byte-domain, verifier contract, dan negative/adversarial tests; AC-03 tetap execution-blocked sampai kontrak tersebut lengkap. B-08 tetap `OPEN / BLOCKED` hanya untuk finalisasi exact signed-content field set, canonical byte-domain, verifier contract, dan negative/adversarial tests; AC-03 tetap execution-blocked sampai kontrak tersebut lengkap.
+- **Status Blocker**: Model konstruksi telah diputuskan PO/Architecture Authority sebagai Signature-Stripped JCS. B-08 tetap `OPEN / BLOCKED` hanya untuk exact signed-content field set, canonical byte-domain, verifier contract, dan negative/adversarial tests; AC-03 tetap execution-blocked sampai kontrak tersebut lengkap.
 
 
 
@@ -2450,7 +2450,7 @@ Bagian ini mengonsolidasikan enam temuan audit terbaru dan **mengesampingkan red
 2. Pertahankan model multi-registry/federated trust dan prinsip **No Single Root of Trust**. Jangan menciptakan otoritas global tunggal atau mempromosikan Creator self-signed evidence menjadi Registry Verified.
 3. Pertahankan trust semantics White Paper v5.6: **UNKNOWN / INCOMPLETE** bukan **INVALID**; kegagalan integritas/signature/hash dan authoritative revocation tetap hard-block sesuai kontrak yang berlaku. Keputusan tentang autentisitas membership Album tidak boleh diam-diam mengubah trust atau playback policy member .nx standalone.
 4. Pertahankan kontrak standalone .nx, Genesis Ownership Evidence, Registry/sidecar, Licensing Authority, Player memory/streaming boundary, dan baseline PE-01/Sprint 16. Tidak ada keputusan PE-02 yang boleh membuka atau mengubah baseline frozen.
-5. White Paper v5.6 dan Roadmap v4.8 tidak menetapkan Album ZIP wrapper, Album Manifest schema, Album Signer, signature envelope, atau signer lifecycle. Detail tersebut tetap proposal/unresolved sampai otoritas yang tepat menetapkannya secara tertulis.
+5. White Paper v5.6 dan Roadmap v4.8 tidak menetapkan Album ZIP wrapper, Album Manifest schema, Album Signer, maupun signer lifecycle. Model konstruksi Signature-Stripped JCS telah diputuskan PO/Architecture Authority; detail schema/signed-content dan signer lifecycle tetap harus ditetapkan secara tertulis oleh otoritas yang tepat.
 
 ### 13.11.1 Baseline Rekomendasi Desain Teknis — Bukan Daftar Delegasi kepada PO
 
