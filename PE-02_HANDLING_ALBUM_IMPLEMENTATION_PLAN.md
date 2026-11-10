@@ -329,7 +329,7 @@ Dokumen ini mengonsolidasikan 7 akomodasi positif dari V5-REV1 dan secara jujur 
 | **B-08** | Signed-content construction untuk Album Manifest. | Model Signature-Stripped JCS telah diputuskan PO/Architecture Authority; blocker tersisa adalah exact signed field set, canonical byte-domain, verifier contract, dan negative/adversarial test specification. |
 | **B-09 / NC-04 / CONF-01** | Kebijakan membership fail-closed telah disahkan PO; identity binding, authority, trust store, dan lifecycle signer tetap merupakan gap teknis B-09. | Policy resolved; implementasi identity/lifecycle signer tetap OPEN/BLOCKED. |
 | **CONF-02** | Hierarki status agregat NX Verify. | **SELESAI / PO DECISION APPROVED (OPTION B)**: PO mengesahkan Pilihan B (tanpa status agregat Album di NX Verify; verifikasi individual member primer); AC-25 SPEC READY. AC-33/AC-34 tetap EXECUTION BLOCKED sampai implementasi/verifikasi membership dan signer lifecycle B-09 tersedia; kebijakan fail-closed telah diputuskan PO. |
-| **Acceptance Criteria** | Status AC tidak seragam jika dependensi berbeda. | Setiap AC mewarisi status dependensi riil (34 AC aktif: 12 Spec Ready + 22 Execution Blocked (termasuk AC-01 [strict unknown-field policy disahkan; universal schema/parser pending], AC-07 [membership policy fail-closed disahkan; signer lifecycle B-09 pending], AC-22, AC-28, AC-29, dan AC-32) + 0 PO Decision Required = 34 AC; direkonsiliasi dari snapshot historis 27 AC). |
+| **Acceptance Criteria** | Status AC tidak seragam jika dependensi berbeda. | Setiap AC mewarisi status dependensi riil (34 AC aktif: 11 Spec Ready + 23 Execution Blocked, termasuk AC-01 [strict unknown-field policy disahkan; universal schema/parser pending], AC-07 [membership policy fail-closed disahkan; signer lifecycle B-09 pending], AC-22, AC-27, AC-28, AC-29, dan AC-32) + 0 PO Decision Required = 34 AC; direkonsiliasi dari snapshot historis 27 AC. |
 | **Evidence Ledger** | Klaim bukti harus sesuai ruang lingkup inspeksi riil. | Membatasi bukti pada kode statis Linux server; menandai mobile & live DB `NOT VERIFIED`. |
 | **Traceability Matrix** | Keterlacakan dua arah harus konsisten. | Seluruh NC, AC, B, F, E, G, dan CONF terpetakan dua arah tanpa tebakan. |
 
@@ -2445,7 +2445,7 @@ Bagian ini mengonsolidasikan enam temuan audit terbaru dan **mengesampingkan red
 **Disposisi:** Koreksi dokumen dan klasifikasi AC-33/AC-34 diterapkan secara terbatas pada file kanonikal yang sama. Ini bukan persetujuan Gate A, bukan pembukaan Gate B, dan bukan otorisasi implementasi.
 
 ## 13.9 REKONSILIASI PRODUCT TRUTH DAN KONSISTENSI LINTAS-BAGIAN — 2026-11-08
-**CATATAN SNAPSHOT HISTORIS:** Bagian ini mencatat status pada 2026-11-08. Pernyataan bahwa CONF-01/AC-01 masih unresolved dan agregat 12/20/2 telah superseded oleh keputusan PO berikutnya; status aktif adalah 12 Spec Ready + 22 Execution Blocked + 0 PO Decision Required sebagaimana §13.1.1.
+**CATATAN SNAPSHOT HISTORIS:** Bagian ini mencatat status pada 2026-11-08. Pernyataan bahwa CONF-01/AC-01 masih unresolved dan agregat 12/20/2 telah superseded oleh keputusan PO berikutnya; status aktif adalah 11 Spec Ready + 23 Execution Blocked + 0 PO Decision Required sebagaimana §13.1.1.
 
 
 **Ruang lingkup:** Koreksi terarah sesuai mandat handover Product Truth Reconciliation. Perubahan hanya pada file kanonikal ini; tidak membuka corrective cycle baru dan tidak memberikan otorisasi implementasi.
@@ -2516,7 +2516,7 @@ Bagian ini menggantikan pola sebelumnya yang menyerahkan hampir seluruh masalah 
 
 Tidak ada lagi PO decision blocker untuk AC-01, CONF-01, AUDIT-NEW-10 issuer authority/subdelegation, Model B, SSP/Largest Remainder, `bundle_checkout_id`, Immutable Checkout Manifest, partial fulfillment, refund obligation, automatic refund, atau Mandatory Exception Resolution. Keputusan tersebut telah disahkan dan harus diterapkan tanpa diajukan ulang.
 
-**Keputusan PO REQ-B03-06 telah diselesaikan:** 50 Album members hanya UX guidance, bukan hard product limit. Status 12 Spec Ready + 22 Execution Blocked + 0 PO Decision Required pada §13.1.1 hanya menghitung status 34 AC; keputusan REQ-B03-06 dicatat terpisah karena berada di luar register AC. Tidak ada lagi keputusan PO yang terbuka terkait angka 50.
+**Keputusan PO REQ-B03-06 telah diselesaikan:** 50 Album members hanya UX guidance, bukan hard product limit. Status 11 Spec Ready + 23 Execution Blocked + 0 PO Decision Required pada §13.1.1 hanya menghitung status 34 AC; keputusan REQ-B03-06 dicatat terpisah karena berada di luar register AC. Tidak ada lagi keputusan PO yang terbuka terkait angka 50.
 
 Sisa pekerjaan dan kewenangannya:
 1. **Architecture Authority:** menyelesaikan kontrak teknis B-04/NC-08, B-05/NC-09, B-06/NC-12, B-07/NC-07, B-08/NC-02, B-09/NC-04, NC-01 schema universal, NC-05 audio hash/Genesis taxonomy, NC-06 Album identity/persistence/reload, dan NC-13 JIT/Auto-Next berdasarkan keputusan PO serta bukti yang sudah tersedia.
