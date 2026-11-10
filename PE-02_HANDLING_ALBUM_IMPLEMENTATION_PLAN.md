@@ -2299,11 +2299,34 @@ Invariant: ketiga identitas adalah peran semantik berbeda dan tidak diwajibkan i
 
 - **Genesis Creator — ROOT / INITIAL AUTHORITY:** dapat melakukan self-packaging (containerSigKey == genesisPubKey) tanpa delegation tambahan, atau menerbitkan OwnershipDelegation dengan scope CONTAINER_PACKAGING kepada pihak pengemas yang ditunjuk.
 - **Designated Packaging Authority — DERIVED AUTHORITY:** Label, Studio, atau pihak pengemas lain hanya sah berdasarkan rantai delegation yang valid, dapat diverifikasi, terikat pada asset/Genesis yang tepat, dan berakar pada Genesis Creator. Penerima delegation tidak otomatis memperoleh kewenangan untuk mendelegasikan kembali.
-- **Sub-delegation:** Genesis Creator dapat secara eksplisit mengizinkan penerima delegation melakukan sub-delegation, direpresentasikan oleh sub_delegation_allowed = true. Jika izin tersebut tidak diberikan atau tidak dapat diverifikasi, sub-delegation tidak sah. Setiap sub-delegation harus tetap dapat ditelusuri ke delegation root Genesis Creator dan tidak boleh memperluas scope atau masa berlaku dari mandat induknya. Batas kedalaman/rekursi sub-delegation merupakan kontrak teknis yang masih harus ditetapkan sebelum implementation readiness.
+- **Sub-delegation:** Genesis Creator dapat secara eksplisit mengizinkan penerima delegation melakukan sub-delegation, direpresentasikan oleh sub_delegation_allowed = true. Jika izin tersebut tidak diberikan atau tidak dapat diverifikasi, sub-delegation tidak sah. Setiap sub-delegation harus tetap dapat ditelusuri ke delegation root Genesis Creator dan tidak boleh memperluas scope atau masa berlaku dari mandat induknya. Batas kedalaman sub-delegation ditetapkan pada A.2: tepat satu tingkat sub-delegation, dengan Level 2 sebagai terminal packager dan tanpa delegasi lanjutan.
 - **Current Owner / Rights Holder — RESTRICTED / GENERALLY EXCLUDED:** kepemilikan edisi, hak koleksi, atau consumption/playback license tidak dengan sendirinya memberikan hak untuk menerbitkan kontainer .nx baru atau mendelegasikan CONTAINER_PACKAGING. Pengecualian hanya berlaku bila bukti transfer secara eksplisit mengalihkan seluruh hak master/IP yang relevan, termasuk hak penerbitan/pengemasan master, dari Genesis Creator kepada penerima. Ownership transfer biasa tidak cukup.
 - **Authority derivation:** seluruh jalur pihak ketiga harus membuktikan rantai otorisasi dari Genesis Creator. Validitas matematis tanda tangan containerSigKey hanya membuktikan integritas kontainer; hal itu tidak menggantikan pembuktian kewenangan pengemasan.
 - **Failure taxonomy:** delegation hilang, tidak valid, tidak berakar pada Genesis Creator, scope/asset tidak cocok, kedaluwarsa, dicabut, atau sub-delegation tidak diizinkan harus menghasilkan kegagalan packaging_authorization (mis. UNTRUSTED / UNAUTHORIZED PACKAGING). Kegagalan ini tidak otomatis mengubah hasil genesis_certificate atau ownership_chain menjadi invalid.
 - **Batas klaim produk:** aturan ini adalah kontrak kewenangan produk dan keamanan NEXA. Penetapan siapa pemegang hak cipta/hak ekonomi menurut hukum positif tetap bergantung pada fakta kontrak dan yurisdiksi; sistem harus memverifikasi bukti pengalihan hak yang relevan, bukan mengasumsikannya hanya dari status Current Owner.
+
+
+
+#### A.2 Batas kedalaman delegation — Model 3-Level Hierarchy (keputusan PO/Architecture Authority)
+
+**Keputusan normatif: OPSI A — APPROVED / RESOLVED.** Rantai kewenangan CONTAINER_PACKAGING dibatasi maksimal tiga level hierarki, yaitu Level 0 sampai Level 2. Hanya satu tingkat sub-delegation yang diperbolehkan. Level 2 adalah terminal; tidak ada Level 3.
+
+| Level | Entitas / peran | Hak menerbitkan delegation |
+|---|---|---|
+| **Level 0 — Root** | Genesis Creator (genesisPubKey) | Dapat menerbitkan delegation CONTAINER_PACKAGING kepada Level 1 dengan sub_delegation_allowed = true bila memang mengizinkan sub-delegation. |
+| **Level 1 — Primary Delegatee** | Designated Packaging Authority (mis. Label/Studio/Agregator) | Dapat menerbitkan tepat satu sub-delegation kepada Level 2 hanya jika delegation Level 0 secara eksplisit mengizinkannya. Delegasi Level 1 → Level 2 wajib menetapkan sub_delegation_allowed = false. |
+| **Level 2 — Terminal Packager** | Mastering House / Audio Engineer / pihak pengemas terminal | Dapat melakukan packaging dan menandatangani kontainer sesuai scope mandat. Dilarang menerbitkan delegation atau sub-delegation lanjutan. |
+
+**Invariants dan validasi:**
+1. Rantai sah maksimum adalah Genesis Creator (L0) → Designated Packaging Authority (L1) → Terminal Packager (L2). Direct delegation L0 → packager tetap sah sebagai jalur tanpa sub-delegation; batas maksimum tidak mewajibkan adanya L1 dan L2 sekaligus.
+2. L1 hanya boleh menerbitkan sub-delegation bila izin eksplisit dari L0 terbukti dalam delegation induk yang valid. Ketiadaan, nilai false, atau status izin yang tidak dapat diverifikasi berarti sub-delegation ditolak.
+3. L2 wajib bersifat terminal. Setiap assertion yang mengklaim delegator/recipient pada L2 menerbitkan delegasi berikutnya harus ditolak sebagai invalid delegation chain.
+4. Sub-delegation tidak boleh memperluas asset binding, delegated_scope, kewenangan, atau masa berlaku melebihi mandat induk. Setiap hop harus memvalidasi signature, issuer/delegator authority, subject/delegatee identity, asset/Genesis binding, scope, validity interval, serta revocation/freshness sesuai kontrak trust.
+5. Ketika L2 menandatangani kontainer, verifier harus dapat membangun dan memvalidasi rantai bukti L0 → L1 → L2. Tanda tangan kontainer oleh L2 tidak menggantikan kedua bukti delegation tersebut.
+6. Verifier wajib menerapkan batas maksimum ini sebelum melakukan evaluasi rantai yang tidak terbatas; input dengan kedalaman di atas Level 2 ditolak secara fail-closed. Batas tetap berlaku pada seluruh implementasi TypeScript, Go, Desktop/Mobile Player, Verify, dan Registry-facing verification.
+7. Self-packaging L0 dan direct delegation L0 → L1 tetap didukung sesuai A.1; model tiga level adalah batas maksimum, bukan kewajiban membentuk tiga identitas berbeda pada setiap packaging.
+
+**Rasional keputusan PO:** batas kedalaman tetap dan kecil menyederhanakan verifikasi offline, membatasi kompleksitas rantai, memperjelas akuntabilitas, serta mengurangi risiko penyalahgunaan kunci pada rantai subkontraktor yang tidak terbatas. Referensi DEC-14-DELEG-01, ORG-DELEG-003, dan cuplikan CheckSubdelegationDepth yang disampaikan PO dicatat sebagai dasar keselarasan desain yang dikemukakan PO; pemeriksaan independen terhadap file sumber dan commit terkait tidak diklaim dalam rekonsiliasi ini.
 
 
 #### B. Target verification flow
