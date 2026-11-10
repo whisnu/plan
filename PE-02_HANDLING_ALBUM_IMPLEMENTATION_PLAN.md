@@ -15,7 +15,7 @@
 >   - **B-06 / NC-12:** **`SAFE-OPEN / TOCTOU DESIGN SPECIFIED BY AA; PLATFORM TEST EXECUTION POST-AUTHORIZATION`**.
 >   - **B-07 / NC-07:** **`AA BENCHMARK PROTOCOL SPECIFIED; NUMERIC RESOURCE LIMITS BLOCKED PENDING MEASURED CAPACITY EVIDENCE; PSV-R07 CLOSED`** (empat kelas payload, workload, metrik, boundary tests, dan format evidence ditetapkan pada §16.7 dan §16.14; tidak ada angka universal yang diasumsikan).
 >   - **B-08 / NC-02:** **`SIGNATURE-STRIPPED JCS / SIGNED FIELD SET / ENVELOPE / VERIFIER CONTRACT SPECIFIED BY AA; IMPLEMENTATION AND TESTS POST-AUTHORIZATION`**.
->   - **B-09 / NC-04 / CONF-01:** **`SEMANTIC CONTRACT SPECIFIED BY AA; EXISTING IDENTITY / AUTHORITY EVIDENCE ISSUER AND LIFECYCLE INTEGRATION PROOF PENDING`** (Model B, subject classes, fail-closed membership, subject/key binding requirements, explicit Album Membership Signing capability, Federated Trust resolution, lifecycle, dan negative tests telah ditetapkan; sumber otoritatif existing Nexa harus dibuktikan, tanpa membuat trust root atau endpoint baru).
+>   - **B-09 / NC-04 / CONF-01:** **`ALBUM-SPECIFIC CAPABILITY NOT DEFINED BY WHITE PAPER / ROADMAP; EXISTING IDENTITY PRIMITIVES EXIST; IMPLEMENTATION REQUIREMENT MANDATORY IF SOURCE PROOF ABSENT`** (Organization Identity subject/key lifecycle foundations are established in Sprint 14; no Album Signer or `ALBUM_MEMBERSHIP_SIGNING` capability contract is defined in any inventoried WP/Roadmap version. Programmer must prove whether existing authority/scope machinery can express and verify it. Any missing capability, evidence carrier, issuer authorization, lifecycle binding, or verifier wiring is a mandatory PE-02 implementation requirement in §16.16; no new trust root or identity model.)
 >   - **NC-14 / CONF-02:** **`PO DECISION APPROVED (OPTION B)`** (Keputusan PO Disahkan: NX Verify Tidak Menampilkan Status Agregat Album; Hasil Verifikasi Individual Member Tetap Menjadi Hasil Utama).
 
 ---
@@ -1234,7 +1234,7 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
 | **NC-01** | Skema Manifest Album & Binding Anggota (universal schema belum lengkap) | `PARTIALLY SPECIFIED / NON-NORMATIVE AUDIO DRAFT` | `NOT IMPLEMENTED` | `BLOCKED — UNIVERSAL SCHEMA & IMPLEMENTATION GAP` | Kebijakan unknown fields telah diputuskan PO: reject unknown fields secara fail-closed (AC-01). Draf audio tetap bukan schema normatif universal; schema multi-payload dan field universal masih harus diselesaikan. |
 | **NC-02** | AC-03 | IETF RFC 8032; RFC 8785; AA §16.4 | §6.2; signed-content contract | `[CONTRACT SPECIFIED BY AA; IMPLEMENTATION / TESTS POST-AUTHORIZATION]` | Exact signed field set, JCS byte domain, detached Ed25519 envelope, verifier flow and cross-language vectors specified §16.4 |
 | **NC-03** | Strict JSON Parser & RFC 8785 JCS Serializer | `SPECIFIED` | `NOT IMPLEMENTED` | `BLOCKED BY B-01, B-02` | Terblokir implementasi B-01 & B-02. Duplicate key: Nexa parser policy (AC-05, AC-06). |
-| **NC-04** | AC-07, AC-08 | Roadmap v4.8 §5.5; White Paper v5.6 §19.6; PO CONF-01; AA §16.5 | Roadmap organization identity invariants; §16.5/§16.15 | AC-07/08 `[TEST-PLANNED — EXECUTION BLOCKED BY B-09 SOURCE INTEGRATION]` | Subject classes and fail-closed membership policy approved; AA subject/key/authority/lifecycle semantics specified; existing issuer/capability evidence and caller integration remain unproven |
+| **NC-04** | AC-07, AC-08 | Roadmap v4.8 §5.5; White Paper v5.6 §19.6; all-version WP/RM inventory; PO CONF-01; AA §16.5/§16.15/§16.16 | §16.5; §16.15; §16.16 | AC-07/08 `[TEST-PLANNED — EXECUTION BLOCKED BY B-09 CAPABILITY / SOURCE INTEGRATION]` | Existing Organization Identity subject/key lifecycle primitives are normative foundations; Album-specific `ALBUM_MEMBERSHIP_SIGNING` capability, authority evidence issuance and verifier integration are not defined by WP/RM and must be proven in source or implemented per §16.16 |
 | **NC-05** | AC-09, AC-10 | White Paper v5.6 §Genesis; AA §16.12; AUDIT-NEW-10 | §6.9; §16.9/§16.12; E-01 | AC-09 `[TEST-PLANNED — SPEC READY]`; AC-10 `[TEST-PLANNED — EXECUTION BLOCKED BY GENESIS ERROR TAXONOMY / IMPLEMENTATION]` | Audio digest field/path and byte-domain specified by AA; Genesis error taxonomy remains separate residual |
 | **NC-06** | AC-04, AC-11, AC-12, AC-28, AC-29, AC-31 | White Paper v5.6 §Container/Studio; PO §2.3/§2.4; AA §16.2/§16.15 | §5.4/§5.5; E-02; §16.15 | AC-04/11/12/31 `[TEST-PLANNED — SPEC READY]`; AC-28/29 `[TEST-PLANNED — SOURCE FEASIBILITY BLOCKED]` | Album identity/member manifest contract specified by AA; existing persistence, association, reload and recovery must be proven without DDL |
 | **NC-07** | Batas Keamanan Ekstraksi Arsip ZIP Wrapper | `PARTIALLY SPECIFIED — ENTRY/PATH/TYPE POLICY SET; RESOURCE QUOTAS BENCHMARK-GATED` | `NOT IMPLEMENTED` | `PROPOSED SPEC — BENCHMARK-GATED; NO HARD CAP RATIFIED` | Kandidat awal 500 MB compressed / 4 GB expanded / 200 physical entries dan rasio 10:1 atau 100:1 hanya input benchmark, bukan hard cap normatif. Benchmark envelope empat payload, threat model, adversarial tests, dan capacity evidence harus dievaluasi Architecture Authority sebelum hard caps per-layer/per-entry/cumulative ditetapkan. |
@@ -2860,7 +2860,7 @@ Butir berikut tidak boleh dinyatakan terbukti hanya dari PLAN, laporan lama, nam
 | B-05 / NC-09 | Periksa schema/DDL aktual, producer-consumer mapping, persistence, byte-domain, dan seluruh penggunaan hash terkait. | Lakukan PSV terlebih dahulu; jangan mengubah status blocker menjadi siap hanya karena nama kolom ditemukan. |
 | B-06 / NC-12 | Periksa source filesystem dan test keamanan per platform. | Lakukan PSV terlebih dahulu; mitigasi desain tertulis tidak sama dengan implementasi dan test yang lulus. |
 | B-08 | Finalisasi exact signed-content field set, Signature-Stripped JCS byte-domain, serialization, verifier contract, dan negative/adversarial test design. | Model sudah diputuskan; gunakan PSV-R09/R09A/R09A-1 yang telah ditutup. PSV tambahan hanya jika muncul fakta source-level baru yang material dan belum dicakup. |
-| B-09 / NC-04 / CONF-01 | Periksa bukti teknis signer/membership, identity binding, dan lifecycle jika implementasi tersedia. | Lakukan PSV terlebih dahulu; kebijakan atau kontrak identitas/lifecycle yang tetap belum ditetapkan setelah PSV dieskalasikan kepada PO/Architecture Authority. |
+| B-09 / NC-04 / CONF-01 | Existing Identity subject/key binding verifier for Individual Creator and Organization; organization Genesis-root Subject ID and recovery-lineage resolution; current active-key-at-time resolution; concrete capability/scope issuance and authority evidence including issuer, subject, key, purpose/scope, validity, revocation, and federation provenance; caller-to-verifier integration call path; source/tests proving that Album Signer capability is distinct from CONTAINER_PACKAGING | Both approved subject classes can be resolved; signer key is bound to the exact Subject ID; ALBUM_MEMBERSHIP_SIGNING is explicitly issued/authorized, temporally valid and revocable; federated provenance/conflict is resolved fail-closed; caller uses the authoritative verifier; standalone PE-01 remains independent | If all predicates exist, cite exact source and tests. If any predicate is absent, report NOT FOUND with searched scope and make the missing capability/evidence/lifecycle/verifier work mandatory PE-02 implementation under §16.16; B-09 remains BLOCKED pending implementation and evidence. No new trust root, endpoint, credential type, or schema may be invented during evidence collection |
 
 Daftar ini adalah target pemeriksaan minimum, bukan izin melakukan full clone, membuat repository duplikat, mengubah source code, menjalankan migrasi, atau mengubah database. Gunakan akses baca dan retrieval terarah. Jangan meminta ZIP repository penuh.
 
@@ -4006,7 +4006,7 @@ Status: transaction/recovery contract SPECIFIED BY AA; existing Zero-DDL durable
 | B-06 Safe-Open | SPECIFIED BY AA | Platform implementation/adversarial tests later |
 | B-07 ZIP quotas | Benchmark protocol specified by AA | Measured four-class benchmark/capacity evidence; numeric limits remain blocked |
 | B-08 signature/JCS | SPECIFIED BY AA | Implementation and cross-language tests later |
-| B-09 Album Signer | Semantic contract specified by AA | Existing identity/key/authority evidence source and lifecycle integration proof |
+| B-09 Album Signer | Existing Organization Identity and Federated Trust primitives are protected foundations; Album-specific capability issuance/evidence and verifier integration are not specified in WP/Roadmap | Programmer source evidence must prove whether the existing authority model can issue, bind, resolve, and revoke ALBUM_MEMBERSHIP_SIGNING for both approved subject classes. If any predicate is absent, §16.16 mandates implementation within PE-02 after separate PO authorization |
 | NC-01/NC-06 | Target schema/identity contract specified | Source-backed persistence feasibility |
 | NC-05/NC-15/NC-16 | AA semantic contract specified; canonical audio field and member execution key specified in §16.12–§16.13 | Source evidence for payload-byte extraction and existing receipt/acquisition mapping; implementation tests post-authorization |
 
@@ -4085,4 +4085,69 @@ Bagian ini menetapkan tepat bukti yang harus ditunjukkan; bukan mandat untuk men
 
 Evidence format: each claim must identify repository, branch, commit SHA, exact path and line range, source excerpt, relevant DDL/migration, exact test command, exit code, and raw test output. A source absence claim must state the searched scope and exact search terms/command. Static source existence is not runtime proof; a test file is not a passing test; a Programmer-reported result is not independent Auditor verification.
 
-Role boundary: no new PSV is requested for already-closed search scopes. Programmer may provide the source evidence listed above as a bounded evidence handoff; AA evaluates architectural compatibility, and Auditor independently validates the evidence. Any source gap that can only be closed by code change remains an implementation task and cannot be performed before separate PO authorization.
+Role boundary: no new PSV is requested for already-closed search scopes. This is a bounded source-evidence handoff, not a request to repeat PSV-R10/R10A. Programmer must report positive evidence and explicit NOT FOUND results for every predicate in §16.15. A NOT FOUND result is not a terminal disposition: it activates the mandatory PE-02 implementation work package in §16.16; it must not be left as an unspecified future investigation. AA evaluates architectural compatibility, and Auditor independently validates the returned evidence. No code/DDL changes are authorized by this evidence handoff.
+
+
+
+### 16.16 B-09 — all-version Product Truth audit and mandatory Album Signer capability implementation
+
+#### 16.16.1 Audit of all inventoried White Paper and Roadmap versions
+
+The Library inventory and the historical archive `WPdanRM.zip` were inspected. The archive contains the following version history:
+
+- White Paper: v1, v3, v5, v5.1, v5.2, v5.3, v5.4, v5.5; current standalone Library document v5.6.
+- Development Roadmap: v1, v1.0, v2.0, v3.1, v4.0, v4.1, v4.2, v4.3, v4.4, v4.5, v4.6, v4.7; current standalone Library document v4.8.
+- Supporting identity/revocation documents in the archive: `registry_api_v0.3.md`, `revocation_v0.3.md`, their patch files, and `Korelasi-Whitepaper+RoadmapDev.md`.
+
+The historical progression is:
+
+1. White Paper v1/v3 and early Roadmap versions define container Creator/issuer/certificate and Registry revocation foundations. They do not define Organization Identity or Album Signer capability.
+2. Roadmap v2.0 introduces Sprint 14 — Organization Identity as an objective; Roadmap v3.1/v4.0/v4.1 keep it planned. These versions do not specify Album membership signing authority.
+3. Roadmap v4.3 and White Paper v5/v5.1 establish the architectural separation of Organization Identity from Organization Trust, Asset Ownership, and Licensing Authority, while Sprint 14 is still planned or being prepared.
+4. Roadmap v4.4 onward records Sprint 14 as CLOSED and independently verified. White Paper v5.2 onward records the closed Organization Identity baseline and its invariants.
+5. White Paper v5.3/v5.4/v5.5/v5.6 and Roadmap v4.5/v4.6/v4.7/v4.8 preserve the Organization Identity baseline. The current detailed invariants include immutable Organization Subject ID derived from Genesis Root Public Key, immutable Genesis Root Key, timestamp-resolved Current Root, 2-Step recovery with digest match and Ed25519/JCS proof, one active Level-1 signing key per Subject at a timestamp with monotonic sequence, bounded Root → Active → Delegated authority with scope-subsetting and no Level-2 subdelegation, and revocation by Current Root or explicit `SCOPE_REVOCATION` delegation.
+6. The documents also preserve separation between Organization Identity, Organization Trust, Asset Ownership, and Licensing Authority; Sprint 15 consumes the authoritative Sprint 14 production path and publisher-key provenance without creator-key fallback.
+
+**Finding:** Across all inventoried White Paper/Roadmap versions, no normative Album Signer entity, no `ALBUM_MEMBERSHIP_SIGNING` purpose/scope, no explicit issuance/registration mechanism for that capability, and no Album Manifest membership-verifier integration contract are defined. The Organization Identity and Federated Trust foundations are real protected architectural foundations, but they do not, by themselves, prove that a key is authorized to sign Album membership declarations. Generic delegation scope-subsetting and `SCOPE_REVOCATION` do not prove that the specific Album capability has been issued or can be resolved.
+
+This finding does not require a new organization identity, a new trust root, a global authority, or a new Registry model. It requires the Album-specific signing capability to be expressed through the existing Nexa identity/authority/federation model. The capability is not inherited from Creator/Organization eligibility, ownership, `CONTAINER_PACKAGING`, Registry operator status, or possession of a valid Ed25519 key.
+
+#### 16.16.2 Mandatory source-evidence decision
+
+Programmer must inspect the existing implementation and prove, separately, each of these predicates:
+
+1. Individual Creator subject resolution and exact key-to-subject binding.
+2. Organization Subject ID resolution from Genesis Root Public Key, Current Root lineage, and timestamp-correct Active Level-1 key.
+3. A concrete existing authority/scope mechanism that can explicitly issue or delegate the exact purpose `ALBUM_MEMBERSHIP_SIGNING` to a key bound to the subject.
+4. Issuer authorization to grant that capability, including the authoritative issuer identity and its own trust provenance; no self-asserted capability.
+5. Evidence representation and verification of subject ID, key reference, purpose/scope, issuer, validity interval, issuance time, and revocation/lifecycle state.
+6. Delegation enforcement: scope-subsetting, bounded depth, no unauthorized subdelegation, and separation from `CONTAINER_PACKAGING`.
+7. Federated Trust resolution across Registry authorities, including issuer discovery/provenance, conflict, unknown/unavailable issuer, stale evidence, and fail-closed behavior.
+8. Rotation, recovery, revocation, historical-at-signing verification, current-at-evaluation verification, and offline freshness limitations.
+9. Actual caller-to-verifier production path from Album Manifest verification to authoritative identity/authority resolution. A library or helper that is not wired into the production verifier is insufficient.
+10. Negative and positive tests for both approved subject classes, including valid identity without Album capability, wrong scope, wrong subject/key, revoked/expired/rotated key, invalid recovery lineage, unknown/conflicting issuer, stale offline evidence, and a valid standalone PE-01 member when Album membership fails.
+
+For each predicate, evidence must include repository, branch, exact commit SHA, exact path and line range, raw source excerpt, caller/callee chain, relevant DDL or serialized evidence shape, exact test command, exit code, and raw test output. Tests must be tied to the source path under review. Search evidence must include exact search terms/commands and searched directories. "Not found" without search scope is not accepted.
+
+#### 16.16.3 Mandatory implementation work package when evidence is absent
+
+For every predicate in §16.16.2 that Programmer cannot prove, the missing capability is a **mandatory PE-02 implementation requirement**, not a deferred question and not a reason to close B-09 as merely "evidence pending". The implementation work package must include the missing items below as applicable:
+
+1. Extend the existing Nexa Identity/authority model so an authorized issuer can explicitly grant the purpose/scope `ALBUM_MEMBERSHIP_SIGNING` to an already identity-bound Individual Creator or Organization signing key. Reuse existing Subject ID and key lifecycle; do not create an Album-specific identity root.
+2. Provide a verifiable authority-evidence representation through the existing supported evidence/credential mechanism, or define the minimum compatible extension if the existing mechanism cannot represent the required issuer, subject, key, purpose/scope, validity, and revocation facts. Any new serialized fields, schema, API, or migration must be explicitly designed and approved in the PE-02 plan before implementation; Programmer must not invent them during the evidence-only handoff.
+3. Enforce issuer authorization and delegation rules, including scope-subsetting, bounded Root → Active → Delegated chain, no Level-2 subdelegation, explicit revocation authority, and separation from `CONTAINER_PACKAGING`.
+4. Implement authoritative federated resolution and provenance handling for the capability; unknown, conflicting, unavailable, stale, expired, revoked, mismatched, or incomplete evidence must never authenticate Album membership.
+5. Wire Album Manifest verification to the authoritative subject/key/capability/lifecycle verifier. A disconnected helper, static allowlist, hardcoded key, local-only trust root, creator-key fallback, or caller-supplied authority claim does not satisfy this requirement.
+6. Implement lifecycle and temporal semantics: activation, validity, rotation, recovery, revocation, historical signature-time evaluation, current evaluation, and explicit offline freshness limitations.
+7. Add cross-language/production-path tests and adversarial negative tests for Individual Creator and Organization; prove that missing capability cannot false-pass and that failure of Album membership does not invalidate standalone PE-01 member integrity/status or create a global playback gate.
+8. Add non-regression tests for existing Sprint 10–15 Identity/Federated Trust semantics, Organization Identity immutable Subject ID and key lineage, Registry Identity ≠ Registry Trust, and PE-01 standalone behavior.
+
+The exact carrier, API, persistence shape, and source integration point are intentionally not guessed here. If the evidence pass shows the existing model cannot carry the capability, AA must complete the minimal compatible contract in this same canonical PLAN before implementation authorization. This is not permission for Programmer to design or implement during the current evidence handoff.
+
+#### 16.16.4 Status and gate effect
+
+- B-09 remains OPEN/BLOCKED until the complete source-evidence predicates are proven or the mandatory missing implementation is completed and independently verified.
+- AC-07, AC-08, AC-33, and AC-34 remain execution-blocked until the production verifier path and all required authority/lifecycle evidence are implemented and tested.
+- The source-evidence handoff itself is evidence gathering only. It does not authorize code, schema, database, endpoint, configuration, or runtime changes.
+- If implementation is required, it can begin only after Gate A PASS, Gate B PASS, and a separate explicit PO implementation authorization. Plan approval or this handoff is not implementation authorization.
+- Sprint 16 and PE-01 remain CLOSED/FROZEN; Sprint 17 remains NOT STARTED.
