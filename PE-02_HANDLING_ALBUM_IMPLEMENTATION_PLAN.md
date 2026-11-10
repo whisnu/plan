@@ -4110,6 +4110,10 @@ The historical progression is:
 
 **Finding:** Across all inventoried White Paper/Roadmap versions, no normative Album Signer entity, no `ALBUM_MEMBERSHIP_SIGNING` purpose/scope, no explicit issuance/registration mechanism for that capability, and no Album Manifest membership-verifier integration contract are defined. The Organization Identity and Federated Trust foundations are real protected architectural foundations, but they do not, by themselves, prove that a key is authorized to sign Album membership declarations. Generic delegation scope-subsetting and `SCOPE_REVOCATION` do not prove that the specific Album capability has been issued or can be resolved.
 
+Supporting legacy Registry documents `registry_api_v0.3.md` and `revocation_v0.3.md` were also included in the archive review. Their issuer/signature/revocation contract concerns existing `.nxcert` certificate issuance and revocation; it does not define an Organization Subject capability or Album membership signing authority. Those mechanisms must not be repurposed by inference as proof of `ALBUM_MEMBERSHIP_SIGNING`.
+
+Any older PE-02 proposal that uses a local `trusted_signers.json`, interactive user consent, a hardcoded signer key, or a local trust list is not an authoritative substitute for this B-09 contract. Such data may not grant Album Membership Signing Authority, establish issuer provenance, or override Federated Trust. If retained for a separately approved non-authoritative cache/presentation purpose, it cannot change the membership authentication result.
+
 This finding does not require a new organization identity, a new trust root, a global authority, or a new Registry model. It requires the Album-specific signing capability to be expressed through the existing Nexa identity/authority/federation model. The capability is not inherited from Creator/Organization eligibility, ownership, `CONTAINER_PACKAGING`, Registry operator status, or possession of a valid Ed25519 key.
 
 #### 16.16.2 Mandatory source-evidence decision
