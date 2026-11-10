@@ -2901,8 +2901,6 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
     - Vektor 7: Serialisasi string tanpa escaping HTML (karakter raw `<&>` dipertahankan).
     - Vektor 1, 2, 3: Serialisasi angka ECMAScript ToString(), normalisasi negative zero (`-0` -> `0`), batas eksponen IEEE-754 (`1e+30`, `1e-7`, float desimal).
     - Vektor 6: Serialisasi karakter kontrol escaping (\b, \t, \n, \f, \r, \\, \").
-`, `
-`, `	`, `\"`).
     - Vektor 8: Objek dan array bersarang representatif dengan boolean dan null.
     - Rejeki Fail-Closed Unicode: Penolakan invalid UTF-8 string pada level atas, nilai properti, kunci properti, dan objek bertingkat (Test A, B, C, D).
   - *Status:* **`VERIFIED BY PROGRAMMER — TEST`** untuk Go engine.
