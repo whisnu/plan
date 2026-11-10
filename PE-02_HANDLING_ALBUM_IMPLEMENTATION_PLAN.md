@@ -1440,6 +1440,8 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
 
 **Status keputusan:** **STRONGLY APPROVED / NORMATIVE ARCHITECTURE DECISION — B-04 / NC-08**. Product Owner menyetujui Immutable Checkout Manifest sebagai satu-satunya sumber kebenaran normatif (*Single Source of Truth*) untuk komposisi Commercial Bundle Checkout dan korelasi `bundle_checkout_id` dengan seluruh N independent member acquisitions. Shared Metadata, apabila digunakan, hanya merupakan proyeksi atau indeks turunan; metadata tersebut tidak memiliki otoritas untuk mengubah, melengkapi secara otoritatif, atau mendefinisikan ulang keanggotaan checkout.
 
+**Batas terminologi wajib:** Immutable Checkout Manifest pada NC-08 adalah artefak **Commercial Intent / checkout correlation**. Ia berbeda dari Album Membership Manifest pada NC-01/NC-02/NC-04 yang mendeklarasikan relasi member-to-Album dan ditandatangani Album Signer. Keduanya bukan satu dokumen, bukan satu namespace identitas, bukan satu signature/trust domain, dan tidak saling menggantikan. Bukti atau status salah satunya tidak membuktikan keabsahan yang lain.
+
 **A. Pemisahan Commercial Intent dan Execution Reality**
 
 1. **Commercial Intent — Immutable Checkout Manifest:**
