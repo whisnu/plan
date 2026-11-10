@@ -2089,7 +2089,13 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 | 4. B-05 — child hash contract | PSV B-05 telah diselesaikan; tetapkan byte-domain per-member `.nx`, producer/consumer, dan kontrak child mapping tanpa mengubah Zero-DDL |
 | 5. B-06 — filesystem / POSIX TOCTOU | PSV source review lintas platform telah diselesaikan; tetapkan mitigasi desain, threat model, residual-risk statement, serta adversarial test plan/expected results sebelum Gate B PASS; eksekusi adversarial/runtime tests dilakukan setelah otorisasi dan implementasi |
 | 6. B-09 — signer/membership | PSV signer/membership telah diselesaikan; kebijakan fail-closed telah disahkan PO; tetapkan identity binding, authority, trust lifecycle, verifier contract, dan test design tanpa mengulang PSV yang sama. Implementasi dan test execution dilakukan setelah otorisasi |
-| 7. Otorisasi resmi pelaksanaan implementasi        | TIDAK DIBERIKAN (NOT AUTHORIZED)             |
+| 7. B-07 / NC-07 — ZIP quota & extraction security | Tetapkan hard limits, threat model, benchmark basis, per-entry/cumulative enforcement, dan expected adversarial cases sebelum Gate B PASS; PSV-R07 telah ditutup. ZIP extractor implementation/test execution dilakukan setelah otorisasi |
+| 8. NC-01 / AC-01 — universal manifest schema | Unknown-field rejection telah disahkan PO; schema universal multi-payload, version/required-field contract, dan field/path yang belum normatif harus ditetapkan sebelum Gate B PASS. Parser implementation dilakukan setelah otorisasi |
+| 9. NC-05 / AC-09/10 — audio hash & Genesis taxonomy | Tetapkan satu identitas field/byte-domain audio hash dan taxonomy Genesis yang terukur; 3-Way Identity Binding AUDIT-NEW-10 telah diselesaikan, bukan blocker PO yang dibuka kembali |
+| 10. NC-06 / AC-28/29 — Album identity/persistence/reload | Tetapkan Album ID, member relation, persistence, reload/reconstruction, integrity, dan recovery tanpa DDL sebelum Gate B PASS |
+| 11. NC-13 / AC-22/32 — JIT Stage 8a & Auto-Next | Tetapkan prasyarat Stage 8a terhadap Genesis/active license, batas diagnostik/background yang belum disahkan, current-member authorization, serta lifecycle completion Auto-Next lintas payload sebelum Gate B PASS; jangan mengklaim background pre-verification ALLOWED tanpa dasar |
+| 12. NC-15 / AC-26 — error taxonomy | Tetapkan trigger, layer, retryability, user disposition, stable reason codes, dan expected negative tests sebelum Gate B PASS; tidak memerlukan PSV ulang untuk keputusan produk yang sudah disahkan |
+| 13. Otorisasi resmi pelaksanaan implementasi        | TIDAK DIBERIKAN (NOT AUTHORIZED)             |
 +----------------------------------------------------+----------------------------------------------+
 | STATUS AKHIR GATE B                                | BLOCKED                                      |
 +----------------------------------------------------+----------------------------------------------+
