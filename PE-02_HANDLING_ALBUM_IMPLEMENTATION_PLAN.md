@@ -190,14 +190,14 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 +--------------------------------------------------------------------+-----------------------------------------------+
 | 1. [TEST-PLANNED — SPECIFICATION READY] (11 AC)                    | AC-04, AC-11, AC-12, AC-17, AC-18,     |
 |    Skenario uji dan kriteria penerimaan fail-closed terdefinisi     | AC-19, AC-23, AC-24, AC-25, AC-30, AC-31 |
-|    lengkap pada tingkat spesifikasi teknis rencana dokumen tanpa   | AC-30, AC-31                                  |
+|    lengkap pada tingkat spesifikasi teknis rencana dokumen tanpa   |                                                |
 |    terhambat dependensi spesifikasi usulan atau celah arsitektur.  | *Catatan Verifikasi & Keputusan PO:*          |
 |                                                                    | - AC-17: Kepatuhan skema statis DDL dipatuhi; |
 |                                                                    |   runtime live DB berstatus NOT VERIFIED.     |
 |                                                                    | - AC-25: Keputusan PO CONF-02 (Pilihan B      |
 |                                                                    |   APPROVED: Tanpa Status Agregat di Verify).  |
-|                                                                    | - AC-17: Kepatuhan skema statis DDL dilaporkan; |
-|                                                                    |   runtime live DB berstatus NOT VERIFIED.     |
+|                                                                    |                                                |
+|                                                                    |                                                |
 |                                                                    | - AC-30..31: Larangan Campuran & Failure      |
 |                                                                    |   Handling Ulangi/Lewati Disahkan.            |
 |                                                                    | - AC-33..34: Keputusan PO Manual Next Desktop |
@@ -209,10 +209,10 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 |    oleh modul implementasi internal yang belum dikoding, usulan    |   - AC-06 (B-02: RFC 8785 JCS Serializer)     |
 |                                                                    | Sub-Kategori 2b: [BLOCKED BY ARCH / SPEC] (21)|
 |                                                                    |   - AC-01 (NC-01: Strict Unknown Fields; universal schema pending) |
-|    |   - AC-02 (NC-01: Universal Manifest / Member Path) |
-|    |   - AC-03 (B-08: Exact Signed-Content / Verifier) |
+|                                                                    |   - AC-02 (NC-01: Universal Manifest / Member Path) |
+|                                                                    |   - AC-03 (B-08: Exact Signed-Content / Verifier) |
 |                                                                    |   - AC-07 (NC-04/B-09: Membership policy approved; signer lifecycle pending) |
-|    |   - AC-08 (NC-04/B-09: Signer Revocation / Freshness) |
+|                                                                    |   - AC-08 (NC-04/B-09: Signer Revocation / Freshness) |
 |    gap pemuatan kembali Album, prasyarat normatif JIT &            |   - AC-09 (NC-05/NEW-01: Field Hash Unres)    |
 |    implementasi autentisitas membership dan lifecycle signer belum tersedia, blocker arsitektur aktif,     |   - AC-10 (NC-05/A-05: Taksonomi Error Gen)   |
 |    atau spesifikasi lifecycle non-audio yang belum terdefinisi.    |   - AC-13 (B-07/NC-07: Usulan Kuota ZIP)      |
@@ -222,6 +222,7 @@ Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kat
 |                                                                    |   - AC-20 (B-06/NC-12: Safe-Open TOCTOU)      |
 |                                                                    |   - AC-21 (B-06/NC-12: Post-Open Descr)       |
 |                                                                    |   - AC-22 (NC-13/CONF-01: JIT Prereq / Sig)   |
+|                                                                    |   - AC-26 (NC-15: Formalisasi Taksonomi Error) |
 |                                                                    |   - AC-27 (NC-16: Child ID Formula / DDL Evidence) |
 |                                                                    |   - AC-28 (NC-01/06: Gap Identitas Album)     |
 |                                                                    |   - AC-29 (NC-06: Gap Reload Kolektif Album)  |
