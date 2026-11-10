@@ -10,7 +10,7 @@
 > - **PE-01 Baseline:** 🔒 **`CLOSED / FROZEN`** (Tidak Boleh Diubah)
 > - **Sprint 17 Milestone:** ⏸️ **`NOT STARTED`** (Belum Dimulai)
 > - **Blocker Struktural & Ketidakpastian Kriptografi Kritis (status setelah integrasi PSV yang dilaporkan Programmer; independensi bukti sumber masih harus diperiksa):**
->   - **B-04 / NC-08 / CONF-03:** **`OPEN / BLOCKED — MODEL B & SSP ALLOCATION APPROVED; TRANSACTION / SETTLEMENT CONTRACT STILL OPEN`** (Fakta transaksi lokal dan panggilan eksternal dilaporkan; pola parent delivery/polling idempoten tetap proposal, bukan keputusan).
+>   - **B-04 / NC-08 / CONF-03:** **`OPEN / BLOCKED — MODEL B & SSP ALLOCATION APPROVED; TRANSACTION / SETTLEMENT CONTRACT STILL OPEN`** (Fakta transaksi lokal dan panggilan eksternal dilaporkan; Model B dan SSP/Largest Remainder telah disahkan; kontrak korelasi checkout/bundle-child, idempotency, settlement, dan reconciliation tetap terbuka dan tidak boleh diasumsikan).
 >   - **B-05 / NC-09:** **`STATIC DDL REPORTED VERIFIED; EXISTING HASH IS WRAPPER-ZIP DOMAIN; PER-MEMBER CHILD HASH CONTRACT NOT CLOSED`** (Makna field yang ada dilaporkan terpetakan; child mapping dan implikasi kontrak tetap harus dinilai terpisah).
 >   - **B-06 / NC-12:** **`OPEN / BLOCKED — PLATFORM PSV INCOMPLETE`** (Belum ada matriks bukti dan adversarial tests per platform; opsi mitigasi tidak disahkan).
 >   - **B-07 / NC-07:** **`OPEN / BLOCKED — TECHNICAL PARAMETERS UNRESOLVED`** (Ketiadaan extractor dilaporkan; kuota/rasio harus ditetapkan Architecture Authority berdasarkan threat model, benchmark, dan PSV).
@@ -1537,12 +1537,12 @@ Untuk memastikan kepatuhan mutlak atas mandat AUDIT-NEW-08 dan mencegah pemetaan
 > 4. *Status Provenance Taksonomi*: Taksonomi 20 kode error kanonikal di atas berstatus **Proposed Specification (NC-15)** yang belum dibekukan dalam White Paper v5.6, dan kode diskrit kegagalan tanda tangan Genesis berstatus **Unresolved Taxonomy** (dengan perilaku fail-closed `canPlay: false` pasti).
 
 #### 6.16 Rincian NC-16: Derivasi Matematis Identifier Deterministik (Spesifikasi Tambahan 5)
-Derivasi identifier transaksi album mengusulkan penggunaan format SHA-256 terpotong (*truncated SHA-256*) sepanjang 32 karakter heksadesimal (`[PROPOSED SPECIFICATION]`):
+Derivasi identifier child acquisition/entitlement untuk Model B mengusulkan penggunaan format SHA-256 terpotong (*truncated SHA-256*) sepanjang 32 karakter heksadesimal (`[PROPOSED SPECIFICATION — NOT YET CLOSED UNDER B-04]`). Input `bundle_checkout_id` adalah identitas korelasi checkout logis (bukan parent acquisition row atau kolom DDL baru); `member_asset_id` mengidentifikasi member `.nx` secara stabil. Formula ini tetap proposal sampai encoding, domain separation/versioning, uniqueness handling, dan integrasi idempotency ditetapkan dalam kontrak B-04:
 1. **Child Acquisition ID**:
-   $$\text{child\_acq\_id} = \text{"acq\_" } || \text{SHA256}(\text{parent\_acq\_id } || \text{ ":" } || \text{track\_id})[0..31]$$
+   $\text{child\_acq\_id} = \text{"acq\_" } || \text{SHA256}(\text{bundle\_checkout\_id } || \text{ ":" } || \text{member\_asset\_id})[0..31]$
    - Panjang string: $4 + 32 = 36$ karakter. Kapasitas kolom DDL aktif: `VARCHAR(128)`. Margin aman: $128 - 36 = 92$ karakter.
 2. **Child Entitlement ID**:
-   $$\text{child\_ent\_id} = \text{"ent\_" } || \text{SHA256}(\text{parent\_acq\_id } || \text{ ":" } || \text{track\_id } || \text{ ":ent"})[0..31]$$
+   $\text{child\_ent\_id} = \text{"ent\_" } || \text{SHA256}(\text{bundle\_checkout\_id } || \text{ ":" } || \text{member\_asset\_id } || \text{ ":ent"})[0..31]$
    - Panjang string: $4 + 32 = 36$ karakter. Kapasitas kolom DDL aktif: `VARCHAR(128)`. Margin aman: $128 - 36 = 92$ karakter.
 3. **Provider Identifier**:
    $$\text{provider\_id} = \text{"prv\_" } || \text{SHA256}(\text{album\_signer\_pubkey})[0..31]$$
