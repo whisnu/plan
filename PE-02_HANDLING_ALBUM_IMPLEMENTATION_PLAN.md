@@ -297,7 +297,7 @@ Sesuai Bagian 2.4 mandat audit, dokumen ini menerapkan 18 kontrol operasional mu
 | 13 | Batasan skema Zero-DDL diabaikan untuk membuat rancangan transaksi terlihat atomik. | Wajib patuhi skema DDL beku aktif 100%; dilarang mengarang kolom FK atau tabel outbox terdistribusi. | `G`, `NC-10` |
 | 14 | Acceptance Criteria ditulis dengan ruang lingkup yang lebih luas daripada bukti yang diperlukan. | Batasi cakupan AC tepat pada expected result terukur yang dapat diverifikasi empiris. | `PR`, `AC` |
 | 15 | Pernyataan root-clean, zero-mutation, atau tidak ada perubahan DB dibuat tanpa bukti terminal. | Wajib cantumkan output inspeksi git riil (`git diff`, `git status`) dan batasi klaim pada root level. | `V`, `R` |
-| 16 | Status Gate dihitung dari jumlah checklist centang, bukan konflik material yang terbuka. | Gate A wajib `NOT PASSED` selama konflik material belum terselesaikan (CONF-01 dan CONF-03; sedangkan CONF-02 telah disahkan PO via Pilihan B); Gate B `BLOCKED` selama B-01..B-09 terbuka. | `G`, `Gate A/B` |
+| 16 | Status Gate dihitung dari jumlah checklist centang, bukan konflik material yang terbuka. | Gate A wajib `NOT PASSED` selama masih ada blocker material/kontradiksi plan yang belum ditutup; kebijakan CONF-01 dan CONF-02 telah disahkan PO, sedangkan CONF-03 adalah kontrak teknis B-04 yang tetap terbuka; Gate B `BLOCKED` selama B-01..B-09 terbuka. | `G`, `Gate A/B` |
 | 17 | Temuan lama dihapus atau diganti istilah baru tanpa pemetaan yang dapat diaudit. | Pertahankan seluruh register historis (A-01..A-30, B-01..B-09, F-01..F-15) dengan namespace stabil. | `PR`, `Register` |
 | 18 | Solusi tambahan, tahapan audit, dokumen, dan evidence loop dibuat tanpa kebutuhan keputusan. | Patuhi batas tata kelola anti-overprocessing: satu berkas kanonikal, tanpa artefak duplikat. | `PR`, `Rule C` |
 
@@ -320,15 +320,15 @@ Dokumen ini mengonsolidasikan 7 akomodasi positif dari V5-REV1 dan secara jujur 
 #### B. Rekonsiliasi Sebelas Area Defect V6.9.4-REV4
 | Area Gap V6.9.4-REV4 | Kekurangan yang Harus Dituntaskan | Kriteria Koreksi Substantif REV6 |
 |---|---|---|
-| **Gate A** | Masih `NOT PASSED` karena konflik material belum selesai. | Menunjukkan konflik spesifik yang belum terselesaikan (CONF-01 dan CONF-03; sedangkan CONF-02 telah disahkan PO via Pilihan B) dan dependensinya; tidak meluluskan semu. |
+| **Gate A** | Masih `NOT PASSED` karena konflik material belum selesai. | Menunjukkan blocker teknis dan gap konsistensi yang benar-benar masih terbuka; CONF-01/CONF-02 policy telah disahkan, CONF-03 direklasifikasi menjadi kontrak teknis B-04. |
 | **Gate B** | Masih `BLOCKED`. | Mempertahankan status `BLOCKED` selama dependensi teknis dan PO belum selesai. |
 | **B-04 / NC-08 / CONF-03** | Gap transaksi Marketplace, Zero-DDL, dan daemon eksternal. | Tetap `BLOCKED`; Model B, SSP/Largest Remainder, identitas checkout, dan Manifest sebagai sumber kebenaran normatif telah disahkan. Kontrak atomisitas/pemenuhan multi-item, storage/persistensi, pemetaan acquisition, idempotency, recovery, settlement, dan side effect eksternal masih harus dirancang. |
 | **B-05 / NC-09** | Semantik `acquired_package_sha256` untuk child acquisition. | Tetap `BLOCKED`; melarang tebakan semantik kolom hash database. |
 | **B-06 / NC-12** | Batas keamanan filesystem safe-open dan race condition. | Membedakan symlink, descriptor, containment, dan batas concurrent ancestor rename. |
 | **B-08** | Circular dependency signing manifest JCS. | Tetap `BLOCKED — REQUIRES CLARIFICATION` sampai payload kanonikal diputuskan resmi. |
-| **B-09 / NC-04 / CONF-01** | Keputusan PO tentang autentisitas provenance membership manifest saat signer `UNKNOWN` dan dasar identitas/lifecycle signer; bukan kebijakan playback global. | Tetap `PO DECISION REQUIRED`; melarang pemilihan opsi A/B/C secara sepihak. |
-| **CONF-02** | Hierarki status agregat NX Verify. | **SELESAI / PO DECISION APPROVED (OPTION B)**: PO mengesahkan Pilihan B (tanpa status agregat Album di NX Verify; verifikasi individual member primer); AC-25 SPEC READY. AC-33/AC-34 tetap EXECUTION BLOCKED sampai autentisitas membership diputuskan melalui CONF-01/B-09. |
-| **Acceptance Criteria** | Status AC tidak seragam jika dependensi berbeda. | Setiap AC mewarisi status dependensi riil (34 AC aktif: 12 Spec Ready + 20 Execution Blocked [termasuk AC-22 gap prasyarat JIT dan provenance membership manifest CONF-01, AC-28 gap identitas Album, AC-29 gap reload Album, dan AC-32 gap kontrak lifecycle Auto-Next multi-payload] + 2 PO Decision Required (AC-01 [Unknown Fields], AC-07 [autentisitas provenance membership manifest saat signer UNKNOWN; B-09 / CONF-01]) = 34 AC; direkonsiliasi dari snapshot historis 27 AC). |
+| **B-09 / NC-04 / CONF-01** | Kebijakan membership fail-closed telah disahkan PO; identity binding, authority, trust store, dan lifecycle signer tetap merupakan gap teknis B-09. | Policy resolved; implementasi identity/lifecycle signer tetap OPEN/BLOCKED. |
+| **CONF-02** | Hierarki status agregat NX Verify. | **SELESAI / PO DECISION APPROVED (OPTION B)**: PO mengesahkan Pilihan B (tanpa status agregat Album di NX Verify; verifikasi individual member primer); AC-25 SPEC READY. AC-33/AC-34 tetap EXECUTION BLOCKED sampai implementasi/verifikasi membership dan signer lifecycle B-09 tersedia; kebijakan fail-closed telah diputuskan PO. |
+| **Acceptance Criteria** | Status AC tidak seragam jika dependensi berbeda. | Setiap AC mewarisi status dependensi riil (34 AC aktif: 12 Spec Ready + 22 Execution Blocked (termasuk AC-01 [strict unknown-field policy disahkan; universal schema/parser pending], AC-07 [membership policy fail-closed disahkan; signer lifecycle B-09 pending], AC-22, AC-28, AC-29, dan AC-32) + 0 PO Decision Required = 34 AC; direkonsiliasi dari snapshot historis 27 AC). |
 | **Evidence Ledger** | Klaim bukti harus sesuai ruang lingkup inspeksi riil. | Membatasi bukti pada kode statis Linux server; menandai mobile & live DB `NOT VERIFIED`. |
 | **Traceability Matrix** | Keterlacakan dua arah harus konsisten. | Seluruh NC, AC, B, F, E, G, dan CONF terpetakan dua arah tanpa tebakan. |
 
@@ -1771,7 +1771,7 @@ Keputusan normatif mengenai eksistensi/otoritas Album Signer dan penggunaan dekl
    - Keputusan yang masih diperlukan terbatas pada apakah deklarasi manifest yang signer-nya `UNKNOWN` dapat digunakan untuk mengautentikasi identitas/membership Album, dan bukti apa yang sah untuk menetapkan identitas serta lifecycle signer.
    - Otorisasi playback tetap dilakukan secara JIT dan independen untuk setiap member berdasarkan kontrak PE-01, Creator signature, Genesis ownership, Registry evidence, dan active license yang berlaku.
    - Programmer **DILARANG** memilih opsi yang memblokir atau mengizinkan seluruh playback Album atas dasar status Album Signer.
-   - Sampai CONF-01 diselesaikan, membership dari manifest dengan signer `UNKNOWN` tidak boleh dianggap autentik. Namun status tersebut juga **TIDAK BOLEH** otomatis mengubah status member menjadi `INVALID` atau membatalkan trust member.
+   - Sesuai keputusan PO CONF-01, membership dari manifest dengan signer `UNKNOWN` tidak boleh dianggap autentik; kebijakan fail-closed telah diputuskan, sedangkan implementasi identity/lifecycle signer tetap terbuka. Namun status tersebut juga **TIDAK BOLEH** otomatis mengubah status member menjadi `INVALID` atau membatalkan trust member.
 
 3. **Preservasi Prinsip White Paper v5.6**:
    - Status `UNKNOWN / INCOMPLETE` **BUKAN `INVALID`**.
