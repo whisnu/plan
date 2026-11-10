@@ -2101,7 +2101,7 @@ Evaluasi 7 dimensi Preservation Gate disajikan secara objektif dengan membedakan
 ---
 
 ### 12.2 Evaluasi Pre-Handoff Gates (G-01 sampai G-10)
-- **G-01 (Fact-Based Plan Verification)**: `CONDITIONALLY MET — DOCUMENT REVIEW ONLY` (Plan memuat laporan Programmer tentang inspeksi lokal pada Evidence Ledger; Auditor belum memverifikasi repositori/bukti primer secara independen. Status ini bukan konfirmasi inspeksi kode oleh Auditor).
+- **G-01 (Fact-Based Plan Verification)**: `CONDITIONALLY MET — DOCUMENT REVIEW ONLY` (Plan memuat laporan Programmer tentang inspeksi lokal pada Evidence Ledger; Auditor belum memverifikasi repositori/bukti primer secara independen. Status ini bukan klaim inspeksi source oleh AA).
 - **G-02 (Empirical Evidence Verification)**: `CONDITIONALLY MET — BASED ON PROGRAMMER-REPORTED STATIC INSPECTION ONLY` (Klaim inspeksi kode statis merupakan evidence yang diserahkan Programmer; AA menilai konsistensi dan batas buktinya tanpa mengakses source; pengujian fisik mobile tetap `NOT VERIFIED`).
 - **G-03 (Repository Evidence Ledger Provenance)**: `CONDITIONALLY MET — EVIDENCE PROVENANCE NOT INDEPENDENTLY VERIFIED` (Evidence Ledger §4.4 memuat path, baris, dan raw snippets yang dilaporkan berasal dari kode lokal; AA tidak mengakses repository source `whisnu/nexa` dan tidak mengklaim verifikasi source independen. E-07, database live, dan runtime mobile tetap tunduk pada batas bukti masing-masing).
 - **G-04 (Preservation Gate Synchronization)**: `CONDITIONALLY MET` (Diselaraskan dengan evaluasi konservatif D-01 s.d. D-07 pada §12.1; kesimpulan preservasi berstatus PARTIAL; pengujian runtime fisik berstatus NOT VERIFIED).
@@ -2161,7 +2161,7 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 
 ### 13.1 Evaluasi Kesiapan (Readiness Conclusion)
 Berdasarkan isi dokumen, laporan Programmer, dan batas bukti yang tersedia bagi Auditor, kesiapan sistem dirinci ke dalam 8 kategori kesiapan. Klasifikasi di bawah ini adalah status readiness, bukan pengganti urutan PSV: seluruh fakta implementasi yang menjadi dependency blocker source-dependent tetap harus diperiksa Programmer terlebih dahulu sesuai §7.1 dan §15.3.
-1. **Laporan inspeksi repositori Programmer (`REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`):** Programmer telah menyerahkan `PE-02_SOURCE_EVIDENCE_AND_GAP_IDENTIFICATION_REPORT.md` untuk `whisnu/nexa:main` commit `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`; laporan tersebut kini terintegrasi pada §16.18. Klaim source tetap berstatus Programmer-reported sampai Auditor memvalidasi evidence yang diserahkan. Ini bukan alasan meminta Programmer mengulang PSV terhadap commit dan scope yang sama; audit independen harus fokus pada konsistensi evidence dan PLAN.
+1. **Laporan inspeksi repositori Programmer (`REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`):** Programmer telah menyerahkan `PE-02_SOURCE_EVIDENCE_AND_GAP_IDENTIFICATION_REPORT.md` untuk `whisnu/nexa:main` commit `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`; laporan tersebut kini terintegrasi pada §16.18. Klaim source tetap berstatus Programmer-reported; AA memeriksa konsistensi evidence dan PLAN tanpa mengakses source. Ini bukan alasan meminta Programmer mengulang PSV terhadap commit dan scope yang sama.
 2. **Hal yang Berstatus Spesifikasi Konseptual (`SPECIFIED — PENDING IMPL`):** Schema universal kini memiliki canonical manifest envelope, ordered members, payload_type discriminator, dan audio digest field/path pada §16.2/§16.12; schema file envelope/name/location, complete JSON Schema/version constraints, signer evidence schema placement, serta persistence mapping masih perlu rekonsiliasi. Batas 199 track tetap non-normative. JCS engine, Safe-Open implementation, error registry cross-layer, dan existing ID/receipt integration tetap pending.
 3. **Inventaris dan Klasifikasi Kesiapan Seluruh Acceptance Criteria (Total Tepat 34 AC) (DEFECT-01):**
    Seluruh 34 AC terpetakan secara lengkap dan eksklusif berdasarkan register otoritatif §8 (setiap AC berada tepat di satu kelompok utama tanpa penghitungan ganda):
@@ -3828,13 +3828,13 @@ Berdasarkan hasil pembuktian sumber primer lanjutan di atas, status aktual Block
    - **Sprint 16 & PE-01:** `CLOSED / FINAL ACCEPTED / FROZEN`.
    - **Sprint 17:** `NOT STARTED`.
 
-### 15.11 Review Auditor atas Hasil Eksekusi Programmer — Disposisi PSV dan DGR
+### 15.11 Review Architecture Authority atas Hasil Eksekusi Programmer — Disposisi PSV dan DGR
 
 #### 15.11.1 Batas pemeriksaan dan provenance
-1. Auditor memeriksa PLAN kanonikal, struktur bukti, konsistensi internal, ketepatan klasifikasi, keterlacakan klaim, dan kecukupan bukti yang diserahkan Programmer.
-2. Akses ke repository sumber `whisnu/nexa` merupakan kewenangan dan lingkungan kerja **Programmer-only**. Auditor tidak diwajibkan memiliki akses langsung ke repository tersebut. Ketiadaan akses langsung Auditor bukan defect, bukan blocker proyek, bukan kekurangan bukti Programmer, dan tidak boleh dijadikan item PSV atau handoff.
+1. AA memeriksa PLAN kanonikal, struktur bukti yang diserahkan Programmer, konsistensi internal, ketepatan klasifikasi, keterlacakan klaim, dan kecukupan evidence terhadap kontrak. AA tidak mengakses repository source.
+2. Akses ke repository sumber `whisnu/nexa` merupakan kewenangan dan lingkungan kerja **Programmer-only**. AA tidak memiliki akses dan tidak akan mengakses repository source. Keterbatasan tersebut bukan defect, bukan blocker proyek, bukan kekurangan bukti Programmer, dan tidak boleh dijadikan item PSV atau handoff.
 3. Karena bukti repository berasal dari hasil inspeksi Programmer, setiap klaim source/schema/test/runtime harus dinilai berdasarkan materi primer yang disertakan Programmer (path, commit, line range, raw snippet, command, exit code, output, dan runtime evidence yang relevan). Status `VERIFIED` pada §15.9 berarti subklaim tersebut diverifikasi dalam pemeriksaan Programmer sesuai bukti yang dicantumkan; status itu tidak boleh diperluas melampaui ruang lingkup bukti atau dianggap sebagai verifikasi runtime jika hanya ada inspeksi statis.
-4. Auditor tidak boleh menurunkan status bukti hanya karena tidak dapat membuka repository sumber secara langsung. Sebaliknya, Auditor tetap wajib mengidentifikasi kontradiksi internal, klaim yang melampaui bukti yang diserahkan, test yang gagal/tidak dijalankan, serta runtime/platform yang belum dibuktikan.
+4. AA tidak boleh menurunkan status bukti hanya karena tidak mengakses repository source. AA tetap wajib mengidentifikasi kontradiksi internal, klaim yang melampaui bukti yang diserahkan, test yang gagal/tidak dijalankan, serta runtime/platform yang belum dibuktikan.
 5. Tidak ada perubahan source code, schema, database, konfigurasi runtime, atau Product Truth. Tidak ada Gate yang dinaikkan dan tidak ada otorisasi implementasi yang diberikan.
 
 #### 15.11.2 Koreksi DGR yang dilakukan langsung pada PLAN kanonikal
