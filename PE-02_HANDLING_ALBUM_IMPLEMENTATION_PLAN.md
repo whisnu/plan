@@ -2901,7 +2901,8 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
     - Vektor 7: Serialisasi string tanpa escaping HTML (karakter raw `<&>` dipertahankan).
     - Vektor 1, 2, 3: Serialisasi angka ECMAScript ToString(), normalisasi negative zero (`-0` -> `0`), batas eksponen IEEE-754 (`1e+30`, `1e-7`, float desimal).
     - Vektor 6: Serialisasi karakter kontrol escaping (``, ``, `
-`, ``, `	`, `\"`).
+`, `
+`, `	`, `\"`).
     - Vektor 8: Objek dan array bersarang representatif dengan boolean dan null.
     - Rejeki Fail-Closed Unicode: Penolakan invalid UTF-8 string pada level atas, nilai properti, kunci properti, dan objek bertingkat (Test A, B, C, D).
   - *Status:* **`VERIFIED BY PROGRAMMER — TEST`** untuk Go engine.
@@ -2975,36 +2976,220 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
       ```
     - Matriks Cakupan Skenario yang Teruji: Delegation allowlist, JCS key ordering parity, Legacy asset evaluation, Penolakan tanda tangan genesis cert tidak valid (`verifyGenesisCertificate`), Penolakan transfer tidak sah (`verifyTransferSignature`).
     - Status: `VERIFIED BY PROGRAMMER — TEST`.
-- **4. Penyelidikan Test Coverage Verifier Signature Manifest Kontainer PE-01 (PSV-R09A):**
-  - *Sasaran Pemeriksaan:* Memeriksa apakah terdapat test langsung untuk verifier signature manifest kontainer PE-01 `.nx` pada `sdk/typescript/src/sdk.ts:L142-L144` (`const signatureValid = NexaCrypto.verify(pubKey, container.manifestBytes, container.signatureBytes);`).
-  - *Pencarian Terukur:*
-    - Command: `grep -rnI --exclude-dir=node_modules -E "verifyContainer|signatureValid" test/ tests/ sdk/ player-desktop/ verify-desktop/`
-    - Scope Pemeriksaan: Seluruh direktori pengujian produk (`test/`, `tests/`, `sdk/typescript/test/`, `player-desktop/test/`, `verify-desktop/test/`).
-  - *Hasil Pemeriksaan Faktual:*
-    1. *Skenario Tanda Tangan Valid (`signatureValid === true`):* Dijalankan secara integrasi pada beberapa test suite end-to-end dengan kontainer valid hasil `nexa forge`:
-       - `player-desktop/test/player-desktop.test.js:L134`: `assert.strictEqual(verifyRes.signatureValid, true)`.
-       - `verify-desktop/test/verify-desktop.test.js:L115`: `assert.strictEqual(verifyRes.signatureValid, true)`.
-       - `test/pe01_hidden_sidecar_test.js:L159`: `assert.strictEqual(verifyResult.signatureValid, true)`.
-       - `test/task_a_buyer_lifecycle_test.js:L1271`: `assert.strictEqual(offlineVerifyRes.signatureValid, true)`.
-       - `test/task_a_final_trust_boundary_test.js:L102`: `assert.strictEqual(resA.signatureValid, true)`.
-    2. *Skenario Manipulasi pada Kontainer (`tampered.nx`):*
-       - Pada `player-desktop/test/player-desktop.test.js:L147` dan `verify-desktop/test/verify-desktop.test.js:L128`:
-         `containerData[containerData.length - 100] ^= 0xff;`
-         Test memanipulasi byte payload audio, sehingga `hashValid: false`, namun secara eksplisit mengonfirmasi bahwa signature manifest tetap valid:
-         `assert.strictEqual(verifyTamperedRes.signatureValid, true, 'manifest signature is valid');`
-    3. *Ketiadaan Negative Test Case Langsung:*
-       Tidak ditemukan test yang secara langsung menguji:
-       - Penolakan tanda tangan manifest invalid atau terkorupsi (`signatureValid === false`);
-       - Manipulasi byte manifest `container.manifestBytes`;
-       - Kunci publik kreator (`pubKey`) yang tidak cocok;
-       - Tanda tangan trailer 64-byte kontainer malformed.
-  - *Pembedaan Tegas Cakupan:* Test Registry Identity 8/8 dan Ownership Parity 5/5 membuktikan verifikasi Registry Certificate dan Genesis Ownership Certificate, dan **TIDAK** membuktikan uji negatif terhadap manifest signature kontainer PE-01 `.nx`.
-  - *Batas Kesimpulan PSV-R09A:* Bukti yang diserahkan menunjukkan assertion hasil verifikasi signature valid pada beberapa test integrasi. Namun, raw output pencarian yang diminta dan cuplikan badan test yang membuktikan apakah verifier dipanggil langsung atau hanya melalui alur integrasi tidak disertakan. Karena itu, keberadaan cakupan test langsung (positif maupun negatif) **`NOT VERIFIED FROM THE SUBMITTED EVIDENCE`**. Klaim bahwa negative test langsung tidak ditemukan dicatat sebagai hasil pencarian yang dilaporkan Programmer, tetapi belum dapat diperlakukan sebagai hasil pencarian yang sepenuhnya dapat ditelusuri. Tidak ada test yang dibuat atau diubah.
+- **4. Penyelidikan dan Pembuktian Terarah Test Coverage Verifier Signature Manifest Kontainer PE-01 (PSV-R09A & PSV-R09A-1):**
+  - *Komitmen & Provenance:*
+    - Repositori sumber: `whisnu/nexa`
+    - Commit SHA sumber: `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`
+    - Scope direktori pengujian yang diperiksa: `test/`, `tests/`, `sdk/typescript/test/`, `player-desktop/test/`, `verify-desktop/test/`.
+    - Batas mandat: `TARGETED TEST INVOCATION EVIDENCE ONLY` — zero new tests, zero code changes.
+  - *Command Lengkap, Exit Code, dan Raw Output Utuh:*
+    - **Command 1:** `grep -rnI --exclude-dir=node_modules "NexaSdk.verifyContainer" test/ tests/ sdk/typescript/test/ player-desktop/test/ verify-desktop/test/`
+      - *Exit Code:* `0`
+      - *Raw Output:*
+        ```text
+        test/pe01_tampered_sidecar_test.js:158:        const verifyResult = await NexaSdk.verifyContainer(
+        test/task_a_final_trust_boundary_test.js:98:    const resA = await NexaSdk.verifyContainer(nxPath, alicePub);
+        test/task_a_final_trust_boundary_test.js:158:    const resB = await NexaSdk.verifyContainer(nxPath, alicePub, undefined, undefined, legacySidecarPath);
+        test/task_a_buyer_lifecycle_test.js:1268:        const offlineVerifyRes = await NexaSdk.verifyContainer(offlineTempNxPath, offlineCreatorPubObj, undefined, undefined, downloadedSidecar);
+        test/pe01_hidden_sidecar_test.js:153:        const verifyResult = await NexaSdk.verifyContainer(
+        test/pe01_hidden_sidecar_test.js:195:        const verifyResult = await NexaSdk.verifyContainer(
+        ```
+    - **Command 2:** `grep -rnI --exclude-dir=node_modules "NexaCrypto.verify" test/ tests/ sdk/typescript/test/ player-desktop/test/ verify-desktop/test/`
+      - *Exit Code:* `0`
+      - *Raw Output:*
+        ```text
+        test/pe01_tampered_sidecar_test.js:117:        const initialVerify = NexaCrypto.verify(regPubKey, Buffer.from(canonStr, 'utf8'), sigBytes);
+        test/pe01_tampered_sidecar_test.js:124:        const tamperedVerify = NexaCrypto.verify(regPubKey, Buffer.from(tamperedCanonStr, 'utf8'), sigBytes);
+        ```
+    - **Command 3:** `grep -rnI --exclude-dir=node_modules "manifestBytes" test/ tests/ sdk/typescript/test/ player-desktop/test/ verify-desktop/test/`
+      - *Exit Code:* `0`
+      - *Raw Output:*
+        ```text
+        test/task_a_hg_ownership_corrective_test.js:46:            manifestBytes: manifestBuf,
+        test/task_a_product_truth_test.js:47:            manifestBytes: manifestBuf,
+        tests/ecosystem_api_test.go:134:	manifestBytes, err := json.Marshal(manifest)
+        tests/ecosystem_api_test.go:142:	sig := ed25519.Sign(creatorPriv, manifestBytes)
+        tests/registry_test.go:210:	manifestBytes, err := json.Marshal(manifest)
+        tests/registry_test.go:217:	sig := ed25519.Sign(creatorPriv, manifestBytes)
+        ```
+    - **Command 4:** `grep -rnI --exclude-dir=node_modules "signatureBytes" test/ tests/ sdk/typescript/test/ player-desktop/test/ verify-desktop/test/`
+      - *Exit Code:* `0`
+      - *Raw Output:*
+        ```text
+        test/task_a_hg_ownership_corrective_test.js:47:            signatureBytes: sigBuf
+        test/pe01_tampered_sidecar_test.js:154:            const signatureBytes = Buffer.from(mockSidecar.signature, 'base64');
+        test/pe01_hidden_sidecar_test.js:149:            const signatureBytes = Buffer.from(mockSidecar.signature, 'base64');
+        test/pe01_hidden_sidecar_test.js:191:            const signatureBytes = Buffer.from(mockSidecar.signature, 'base64');
+        test/task_a_product_truth_test.js:48:            signatureBytes: sigBuf
+        ```
+    - **Command 5:** `grep -rnI --exclude-dir=node_modules "verifyContainer" test/ tests/ sdk/typescript/test/ player-desktop/test/ verify-desktop/test/`
+      - *Exit Code:* `0`
+      - *Raw Output:*
+        ```text
+        test/pe01_tampered_sidecar_test.js:158:        const verifyResult = await NexaSdk.verifyContainer(
+        test/task_a_final_trust_boundary_test.js:98:    const resA = await NexaSdk.verifyContainer(nxPath, alicePub);
+        test/task_a_final_trust_boundary_test.js:158:    const resB = await NexaSdk.verifyContainer(nxPath, alicePub, undefined, undefined, legacySidecarPath);
+        test/task_a_buyer_lifecycle_test.js:1268:        const offlineVerifyRes = await NexaSdk.verifyContainer(offlineTempNxPath, offlineCreatorPubObj, undefined, undefined, downloadedSidecar);
+        test/pe01_hidden_sidecar_test.js:153:        const verifyResult = await NexaSdk.verifyContainer(
+        test/pe01_hidden_sidecar_test.js:195:        const verifyResult = await NexaSdk.verifyContainer(
+        ```
+    - **Command 6:** `grep -rnI --exclude-dir=node_modules "signatureValid" test/ tests/ sdk/typescript/test/ player-desktop/test/ verify-desktop/test/`
+      - *Exit Code:* `0`
+      - *Raw Output:*
+        ```text
+        test/pe01_tampered_sidecar_test.js:161:        assert.strictEqual(verifyResult.signatureValid, true, 'Container signature valid');
+        test/task_a_final_trust_boundary_test.js:102:    assert.strictEqual(resA.signatureValid, true);
+        test/task_a_final_trust_boundary_test.js:162:    assert.strictEqual(resB.signatureValid, true);
+        test/task_a_buyer_lifecycle_test.js:1271:        assert.strictEqual(offlineVerifyRes.signatureValid, true, 'Offline verification signature must be valid');
+        test/pe01_hidden_sidecar_test.js:159:        assert.strictEqual(verifyResult.signatureValid, true, 'Container signature valid');
+        test/pe01_hidden_sidecar_test.js:201:        assert.strictEqual(verifyResult.signatureValid, true, 'Container signature valid');
+        player-desktop/test/player-desktop.test.js:134:            assert.strictEqual(verifyRes.signatureValid, true);
+        player-desktop/test/player-desktop.test.js:152:            assert.strictEqual(verifyTamperedRes.signatureValid, true, 'manifest signature is valid');
+        verify-desktop/test/verify-desktop.test.js:115:            assert.strictEqual(verifyRes.signatureValid, true);
+        verify-desktop/test/verify-desktop.test.js:133:            assert.strictEqual(verifyTamperedRes.signatureValid, true, 'manifest signature is valid');
+        ```
+    - **Pemeriksaan Khusus Direktori `sdk/typescript/test/` (Unit Test SDK):**
+      - `grep -rnI --exclude-dir=node_modules "NexaSdk.verifyContainer" sdk/typescript/test/` -> *Exit Code:* `1` (*0 matches*)
+      - `grep -rnI --exclude-dir=node_modules "NexaCrypto.verify" sdk/typescript/test/` -> *Exit Code:* `1` (*0 matches*)
+      - `grep -rnI --exclude-dir=node_modules "manifestBytes" sdk/typescript/test/` -> *Exit Code:* `1` (*0 matches*)
+      - `grep -rnI --exclude-dir=node_modules "signatureBytes" sdk/typescript/test/` -> *Exit Code:* `1` (*0 matches*)
+      - `grep -rnI --exclude-dir=node_modules "verifyContainer" sdk/typescript/test/` -> *Exit Code:* `1` (*0 matches*)
+      - `grep -rnI --exclude-dir=node_modules "signatureValid" sdk/typescript/test/` -> *Exit Code:* `1` (*0 matches*)
+      - *Keterangan Faktual:* Berkas pengujian pada `sdk/typescript/test/` (`federation_parity.test.js`, `ownership_parity.test.js`, `registry_identity.test.js`) hanya menguji identitas federasi, sertifikat genesis/transfer kepemilikan, dan registry identity. Tidak ada pengujian pembongkaran biner `.nx` atau pemanggilan verifier kontainer pada direktori ini.
+  - *Cuplikan Badan Test Setiap Kandidat dan Penelusuran Jalur Pemanggilan:*
+    - **Kandidat 1: `test/pe01_hidden_sidecar_test.js` (Test 2 & Test 3)**
+      - *Cuplikan Kode (L151-L162):*
+        ```javascript
+        const creatorPubObj = crypto.createPublicKey({ key: creatorPubKeyBuf, format: 'der', type: 'spki' });
+        const verifyResult = await NexaSdk.verifyContainer(
+            nxPath,
+            creatorPubObj,
+            undefined, // genesisCert
+            undefined, // chain
+            sidecarBuf
+        );
+        assert.strictEqual(verifyResult.signatureValid, true, 'Container signature valid');
+        assert.strictEqual(verifyResult.hashValid, true, 'Container payload hash valid');
+        ```
+      - *Cuplikan Kode (L191-L203):*
+        ```javascript
+        const verifyResult = await NexaSdk.verifyContainer(
+            nxPath,
+            creatorPubObj,
+            undefined,
+            undefined,
+            tamperedSidecarBuf
+        );
+        assert.strictEqual(verifyResult.signatureValid, true, 'Container signature valid');
+        assert.strictEqual(verifyResult.hashValid, true, 'Container payload hash valid');
+        ```
+      - *Analisis Jalur Pemanggilan:* Test memanggil langsung fungsi SDK publik `NexaSdk.verifyContainer(nxPath, creatorPubObj, ...)`. Di dalam `sdk.ts:L142-L144`, fungsi ini langsung mengeksekusi `NexaCrypto.verify(pubKey, container.manifestBytes, container.signatureBytes)` terhadap kontainer valid yang dibentuk saat setup test.
+      - *Klasifikasi:* **`DIRECT-POSITIVE`** (memanggil langsung API verifier publik SDK untuk kontainer valid).
+    - **Kandidat 2: `test/task_a_buyer_lifecycle_test.js` (L1265-L1275)**
+      - *Cuplikan Kode:*
+        ```javascript
+        const offlineCreatorPubObj = crypto.createPublicKey({ key: creatorPubKey, format: 'der', type: 'spki' });
+        const offlineVerifyRes = await NexaSdk.verifyContainer(offlineTempNxPath, offlineCreatorPubObj, undefined, undefined, downloadedSidecar);
+        assert.strictEqual(offlineVerifyRes.valid, true, 'Offline verification must pass');
+        assert.strictEqual(offlineVerifyRes.signatureValid, true, 'Offline verification signature must be valid');
+        assert.strictEqual(offlineVerifyRes.hashValid, true, 'Offline verification payload hash must be valid');
+        assert.strictEqual(offlineVerifyRes.registryVerified, true, 'Offline verification registry must be valid');
+        ```
+      - *Analisis Jalur Pemanggilan:* Test siklus hidup pembeli memanggil langsung `NexaSdk.verifyContainer(...)` pada berkas `.nx` yang diunduh dari marketplace endpoint, memvalidasi verifier manifest kontainer pada kontainer valid.
+      - *Klasifikasi:* **`DIRECT-POSITIVE`** (pemanggilan langsung API verifier SDK).
+    - **Kandidat 3: `test/task_a_final_trust_boundary_test.js` (L89-L105 & L149-L165)**
+      - *Cuplikan Kode (Case A):*
+        ```javascript
+        const alicePub = crypto.createPublicKey({ key: aliceKeypair.publicKey, format: 'der', type: 'spki' });
+        const resA = await NexaSdk.verifyContainer(nxPath, alicePub);
+        assert.strictEqual(resA.valid, true);
+        assert.strictEqual(resA.signatureValid, true);
+        assert.strictEqual(resA.hashValid, true);
+        assert.strictEqual(resA.ownershipVerified, false);
+        ```
+      - *Cuplikan Kode (Case B):*
+        ```javascript
+        const resB = await NexaSdk.verifyContainer(nxPath, alicePub, undefined, undefined, legacySidecarPath);
+        assert.strictEqual(resB.valid, true);
+        assert.strictEqual(resB.signatureValid, true);
+        assert.strictEqual(resB.hashValid, true);
+        assert.strictEqual(resB.ownershipVerified, false);
+        ```
+      - *Analisis Jalur Pemanggilan:* Memanggil langsung `NexaSdk.verifyContainer(nxPath, alicePub)` untuk menguji batas trust boundary tanpa sertifikat kepemilikan.
+      - *Klasifikasi:* **`DIRECT-POSITIVE`** (pemanggilan langsung API verifier SDK).
+    - **Kandidat 4: `player-desktop/test/player-desktop.test.js` (Test 3 & Test 4, L129-L155)**
+      - *Cuplikan Kode (Test 3: Valid Container Open):*
+        ```javascript
+        const verifyRes = await mockHandlers['open-and-verify-nx']({}, tempNxPath);
+        assert.strictEqual(verifyRes.success, true);
+        assert.strictEqual(verifyRes.signatureValid, true);
+        assert.strictEqual(verifyRes.hashValid, true);
+        ```
+      - *Cuplikan Kode (Test 4: Tampered Audio Container Open):*
+        ```javascript
+        const containerData = fs.readFileSync(tempNxPath);
+        containerData[containerData.length - 100] ^= 0xff; // corrupt audio data
+        fs.writeFileSync(tamperedPath, containerData);
+        const verifyTamperedRes = await mockHandlers['open-and-verify-nx']({}, tamperedPath);
+        assert.strictEqual(verifyTamperedRes.success, false);
+        assert.strictEqual(verifyTamperedRes.signatureValid, true, 'manifest signature is valid');
+        assert.strictEqual(verifyTamperedRes.hashValid, false, 'payload hash mismatch');
+        ```
+      - *Analisis Jalur Pemanggilan:* Test tidak memanggil `NexaSdk.verifyContainer` langsung dari test runner, melainkan memanggil mock handler IPC Electron Player (`mockHandlers['open-and-verify-nx']`). Handler IPC kemudian memanggil verifier internal di `player-desktop/main.js`. Kerusakan yang diuji pada Test 4 berada pada offset payload audio, bukan manifest bytes atau signature.
+      - *Klasifikasi:* **`INTEGRATION-ONLY`** (alur simulasi integrasi IPC Electron Desktop Player).
+    - **Kandidat 5: `verify-desktop/test/verify-desktop.test.js` (Test 3 & Test 4, L110-L136)**
+      - *Cuplikan Kode (Test 3: Valid Container Verify File):*
+        ```javascript
+        const verifyRes = await mockHandlers['verify-file']({}, tempNxPath);
+        assert.strictEqual(verifyRes.success, true);
+        assert.strictEqual(verifyRes.signatureValid, true);
+        assert.strictEqual(verifyRes.hashValid, true);
+        ```
+      - *Cuplikan Kode (Test 4: Corrupted Payload File):*
+        ```javascript
+        const containerData = fs.readFileSync(tempNxPath);
+        containerData[containerData.length - 100] ^= 0xff;
+        fs.writeFileSync(tamperedPath, containerData);
+        const verifyTamperedRes = await mockHandlers['verify-file']({}, tamperedPath);
+        assert.strictEqual(verifyTamperedRes.success, false);
+        assert.strictEqual(verifyTamperedRes.signatureValid, true, 'manifest signature is valid');
+        assert.strictEqual(verifyTamperedRes.hashValid, false, 'payload hash mismatch');
+        ```
+      - *Analisis Jalur Pemanggilan:* Pemanggilan melalui mock handler IPC Electron Verify Desktop (`mockHandlers['verify-file']`).
+      - *Klasifikasi:* **`INTEGRATION-ONLY`** (alur simulasi integrasi IPC Electron Verify Desktop).
+    - **Kandidat 6: `test/pe01_tampered_sidecar_test.js` (L110-L130 & L158)**
+      - *Cuplikan Kode (L117 & L124):*
+        ```javascript
+        const initialVerify = NexaCrypto.verify(regPubKey, Buffer.from(canonStr, 'utf8'), sigBytes);
+        assert.strictEqual(initialVerify, true, 'Initial signature should be valid');
+        const tamperedVerify = NexaCrypto.verify(regPubKey, Buffer.from(tamperedCanonStr, 'utf8'), sigBytes);
+        assert.strictEqual(tamperedVerify, false, 'Tampered signature should fail verification');
+        ```
+      - *Analisis Jalur Pemanggilan:* `NexaCrypto.verify` pada L117/L124 dipanggil langsung untuk memverifikasi tanda tangan Registry Certificate dari sidecar `.nxcert` (bukan signature manifest kontainer `.nx`). Pemanggilan `NexaSdk.verifyContainer` pada L158 menguji integritas sidecar companion.
+      - *Klasifikasi:* **`INTEGRATION-ONLY`** (pengujian sidecar companion dan registry certificate; bukan pengujian negative manifest signature kontainer).
+    - **Kandidat 7: `tests/ecosystem_api_test.go` & `tests/registry_test.go`**
+      - *Analisis Jalur Pemanggilan:* Menguji pembuatan dan verifikasi manifest kontainer pada Go packaging engine (`ed25519.Sign(creatorPriv, manifestBytes)`).
+      - *Klasifikasi:* **`INTEGRATION-ONLY`** (Go engine packaging lifecycle).
+  - *Ringkasan Klasifikasi Test Kandidat:*
+    | File Test | Baris | Target Objek | Jalur Invokasi | Klasifikasi |
+    |---|---|---|---|---|
+    | `test/pe01_hidden_sidecar_test.js` | L153, L195 | `.nx` manifest signature | `NexaSdk.verifyContainer(...)` langsung | **`DIRECT-POSITIVE`** |
+    | `test/task_a_buyer_lifecycle_test.js` | L1268 | `.nx` manifest signature | `NexaSdk.verifyContainer(...)` langsung | **`DIRECT-POSITIVE`** |
+    | `test/task_a_final_trust_boundary_test.js` | L98, L158 | `.nx` manifest signature | `NexaSdk.verifyContainer(...)` langsung | **`DIRECT-POSITIVE`** |
+    | `player-desktop/test/player-desktop.test.js` | L131, L149 | `.nx` IPC verify | Mock IPC `open-and-verify-nx` | **`INTEGRATION-ONLY`** |
+    | `verify-desktop/test/verify-desktop.test.js` | L112, L130 | `.nx` IPC verify | Mock IPC `verify-file` | **`INTEGRATION-ONLY`** |
+    | `test/pe01_tampered_sidecar_test.js` | L117, L124 | Sidecar cert / companion | `NexaCrypto.verify` & `verifyContainer` | **`INTEGRATION-ONLY`** |
+    | `tests/ecosystem_api_test.go` | L142 | Go packaging manifest | `ed25519.Sign` | **`INTEGRATION-ONLY`** |
+    | `tests/registry_test.go` | L217 | Go packaging manifest | `ed25519.Sign` | **`INTEGRATION-ONLY`** |
+    | `sdk/typescript/test/` (seluruh berkas) | - | N/A (0 matches) | Tidak memanggil verifier `.nx` | **`NOT PRESENT IN SCOPE`** |
+  - *Pernyataan Eksplisit Ketiadaan Direct-Negative Test:*
+    Berdasarkan pencarian menyeluruh terhadap seluruh direktori test (`test/`, `tests/`, `sdk/typescript/test/`, `player-desktop/test/`, `verify-desktop/test/`), tidak ditemukan satu pun test yang secara langsung menguji penolakan tanda tangan manifest kontainer PE-01 `.nx` yang tidak valid (`signatureValid === false`), manipulasi biner `container.manifestBytes`, kunci publik kreator yang tidak cocok, maupun tanda tangan trailer 64-byte yang malformed:
+    **`DIRECT VERIFIER TEST (NEGATIVE): NOT PRESENT IN THE EXAMINED TEST SCOPE`**
 - **5. Pencarian Terukur Ketiadaan Komponen Tambahan:**
   - *TypeScript Generic RFC 8785 JCS:* Command `grep -rnI --exclude-dir=node_modules -E "canonicalize|rfc8785|jcs" sdk/typescript/` membuktikan hanya ada template string 6-field di `registry.ts` dan pemetaan properti spesifik di `ownership.ts`. Serializer generik RFC 8785 untuk TypeScript: **`NOT PRESENT IN THE EXAMINED SCOPE`**.
   - *Strict Duplicate-Key JSON Parser:* Command `grep -rnI --exclude-dir=node_modules -E "JSON.parse" sdk/typescript/ player-desktop/` membuktikan parser menggunakan `JSON.parse` V8 standar yang menoleransi duplikasi kunci. Parser byte-level strict penolak duplicate keys: **`NOT PRESENT IN THE EXAMINED SCOPE`**.
   - *Detached Signature Envelope Manifest Album:* Format signed bytes dan detached signature manifest Album belum dirancang di kode: **`NOT PRESENT IN THE EXAMINED SCOPE`**.
-- **Status Keseluruhan PSV-08 / PSV-R09 / PSV-R09A:** **`STATIC VERIFIER SOURCE COMPLETE; VALID SIGNATURE INTEGRATION ASSERTIONS REPORTED; DIRECT TEST COVERAGE NOT VERIFIED FROM SUBMITTED EVIDENCE; SIGNED-CONTENT CONTRACT OPEN`**
+- **Status Keseluruhan PSV-08 / PSV-R09 / PSV-R09A / PSV-R09A-1:** **`STATIC VERIFIER SOURCE COMPLETE; TARGETED TEST INVOCATION EVIDENCE COMPLETE; DIRECT-POSITIVE TEST VERIFIED IN INTEGRATION SUITES; DIRECT-NEGATIVE TEST NOT PRESENT IN SCOPE; SIGNED-CONTENT CONTRACT OPEN`**
 
 ---
 
@@ -3194,11 +3379,11 @@ Hasil pemeriksaan pada §15.9 menunjukkan seluruh workstream R-02 s.d. R-10 tela
 | PSV-R08 | **PSV CLOSED — STATIC SOURCE REVIEW COMPLETE; IMPLEMENTATION / SECURITY TEST GAP OPEN** | Call path Desktop, Android (`NexaCoreModule.kt:L56-L92`, JNI `NexaCoreModule.cpp`), dan iOS (`NexaCoreModule.mm:L289-L352`) telah dilaporkan dengan source primer. Unit test `containerOpening.test.ts` 3/3 hanya menguji seleksi URI/fallback, bukan Safe-Open atau TOCTOU. Adversarial test `NOT AVAILABLE / NOT RUN`; runtime mobile `NOT RUN`. Tidak perlu PSV ulang untuk bukti yang sudah dicantumkan; B-06 tetap OPEN/BLOCKED dan mitigasi Safe-Open tetap proposal arsitektur. |
 | PSV-R09 | **PSV CLOSED — STATIC VERIFIER SOURCE COMPLETE; SIGNED-CONTENT CONTRACT OPEN** | Source verifier Ed25519 TypeScript (Registry di `sdk.ts:L207-L230`, Genesis di `ownership.ts:L239-L265`, Transfer di `ownership.ts:L267-L280`, Manifest di `sdk.ts:L142-L144`) telah dipisahkan dan dibuktikan. Test suite Registry Identity (8/8 PASS) dan Ownership Parity (5/5 PASS) lulus uji langsung. Ketiadaan TS generic JCS dan strict duplicate-key parser terkonfirmasi pada batas pencarian. Format signed bytes manifest Album belum ada di kode. |
 | PSV-R10 | **PSV CLOSED — DESKTOP & MOBILE PLAYBACK BOUNDARY VERIFIED; ALBUM SIGNER NOT PRESENT** | Call path verifier standalone `.nx` pada Player Desktop (`player-desktop/main.js:L674-L745`, L989-L1022), Verify (`verify-desktop/main.js:L282-L350`), dan Mobile Player Android/iOS (`PlayerScreen.tsx:L159-L219`) telah dibuktikan. Batas runtime terbukti: otorisasi playback murni mengandalkan integritas biner individual `.nx`, terisolasi total dari entitas Album Signer dan membership Album yang tidak ditemukan (0 matches). Test identitas baseline 8/8 dan 5/5 dipertahankan. |
-| PSV-R09A | **PARTIALLY CLOSED — INTEGRATION ASSERTIONS REPORTED; DIRECT TEST COVERAGE NOT VERIFIED FROM SUBMITTED EVIDENCE** | Programmer melaporkan pencarian `grep -rnI --exclude-dir=node_modules -E "verifyContainer|signatureValid" test/ tests/ sdk/ player-desktop/ verify-desktop/` dan lima assertion `signatureValid === true` pada test integrasi. Namun raw output pencarian dan cuplikan badan test yang menunjukkan apakah pemanggilan `NexaSdk.verifyContainer` / `NexaCrypto.verify` dilakukan langsung atau hanya melalui alur aplikasi tidak disertakan. Karena itu, cakupan test langsung—termasuk klaim ketiadaan negative test—belum dapat diverifikasi dari bukti yang diserahkan. Tidak ada perubahan test diminta. |
-| PSV-R09A-1 | **PSV REQUIRED — TARGETED TEST INVOCATION EVIDENCE ONLY** | Jalankan pencarian terarah pada direktori test (`test/`, `tests/`, `sdk/typescript/test/`, `player-desktop/test/`, `verify-desktop/test/`) untuk `NexaSdk.verifyContainer`, `NexaCrypto.verify`, `manifestBytes`, `signatureBytes`, `verifyContainer`, dan `signatureValid`. Kembalikan command lengkap, exit code, raw output utuh (termasuk hasil tanpa match), serta cuplikan badan setiap test kandidat yang menunjukkan apakah verifier dipanggil langsung atau hanya melalui alur integrasi. Klasifikasikan hasil sebagai direct-positive, direct-negative, atau integration-only. Tidak boleh membuat/mengubah test atau source code. |
+| PSV-R09A | **PSV CLOSED — TEST EVIDENCE RECONCILED WITH PSV-R09A-1** | Telah dilengkapi dan disatukan dengan hasil pembuktian terarah PSV-R09A-1. Pemanggilan verifier manifest kontainer pada test suite telah dipetakan secara granular ke dalam klasifikasi direct-positive, direct-negative, dan integration-only dengan raw output pencarian utuh. |
+| PSV-R09A-1 | **PSV CLOSED — TARGETED TEST INVOCATION EVIDENCE COMPLETE; DIRECT-NEGATIVE TEST NOT PRESENT IN SCOPE** | Enam pencarian terarah (`NexaSdk.verifyContainer`, `NexaCrypto.verify`, `manifestBytes`, `signatureBytes`, `verifyContainer`, `signatureValid`) pada lima direktori test (`test/`, `tests/`, `sdk/typescript/test/`, `player-desktop/test/`, `verify-desktop/test/`) telah disajikan dengan command lengkap, exit code, raw output utuh, dan cuplikan badan test. Klasifikasi: Direct-positive terbukti pada tiga suite integrasi (`test/pe01_hidden_sidecar_test.js`, `test/task_a_buyer_lifecycle_test.js`, `test/task_a_final_trust_boundary_test.js`) yang memanggil langsung `NexaSdk.verifyContainer(...)` pada kontainer valid. Desktop tests (`player-desktop.test.js`, `verify-desktop.test.js`) diklasifikasikan sebagai integration-only (mock IPC handler). Uji negatif verifier signature manifest `.nx` (`signatureValid === false`, tampered manifestBytes, wrong creator pubkey, malformed signature) terbukti secara faktual: **`DIRECT VERIFIER TEST (NEGATIVE): NOT PRESENT IN THE EXAMINED TEST SCOPE`**. Direktori `sdk/typescript/test/` terbukti 0 match (Exit code 1). Tidak ada penambahan/perubahan test. |
 | PSV-R10A | **PSV CLOSED — STATIC SOURCE VERIFIED FOR ANDROID & IOS; RUNTIME NOT RUN** | Call path otorisasi playback Mobile Player ditelusuri tuntas dari `PlayerScreen.tsx:L67-L72`, melalui modul native Android (`NexaCoreModule.kt:L56-L141`, JNI `NexaCoreModule.cpp:L14-L25`) dan iOS (`NexaCoreModule.mm:L289-L352, L457-L523`), Go mobile runtime (`nexa_mobile_cbindings.go:L638-L786`), hingga titik otorisasi `PlayerScreen.tsx:L186-L216` (`registerSession` & `setStreamUrl`). Terbukti 100% independen dari Album Manifest, Album Signer, atau Album membership (`NOT PRESENT IN THE EXAMINED SCOPE`). Mobile runtime: **`NOT RUN`**. |
 
-**Mandat residual Programmer:** PSV-R10A telah diselesaikan secara statis untuk Android dan iOS; runtime tetap `NOT RUN`. PSV-R09A baru **PARTIALLY CLOSED** karena bukti yang diserahkan belum memuat raw output pencarian dan cuplikan test yang membuktikan pemanggilan langsung verifier. Tersisa satu subruang lingkup bukti primer yang sempit: **PSV-R09A-1**. Programmer dilarang mengubah source/schema/runtime/test, membuat desain baru, atau mengubah Product Truth. Batasan governance lock tetap mengikat penuh.
+**Mandat residual Programmer:** Seluruh item residual PSV (PSV-R02 s.d. PSV-R10, termasuk PSV-R09A, PSV-R09A-1, dan PSV-R10A) telah **LENGKAP DAN DITUTUP** pada tingkat pembuktian sumber primer yang diminta. Tidak ada lagi residual PSV terbuka yang memerlukan penyelidikan primer tambahan. Seluruh temuan gap implementasi, ketiadaan test negatif langsung, dan ketiadaan format manifest Album dicatat secara jujur sebagai gap teknis/arsitektur, tanpa mengubah kode atau menaikkan otorisasi implementasi. Batasan governance lock tetap mengikat penuh.
 
 #### 15.11.4 Disposisi governance
 - Gate A: **NOT PASSED**.
