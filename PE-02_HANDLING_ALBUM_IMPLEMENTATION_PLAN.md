@@ -1732,7 +1732,7 @@ Rancangan target dan gap implementasi ditetapkan pada §13.12.11. Satu pertanyaa
 
 Lifecycle revocation, freshness, dan offline disposition mengikuti kontrak teknis §13.12.11. Bila aspek tersebut memerlukan pilihan perilaku produk tambahan, pilihan itu diajukan terpisah setelah pertanyaan otoritas delegation diselesaikan.
 
-**Disposisi AUDIT-NEW-10:** target architecture tercantum normatif dalam PLAN; dokumentasi AUDIT-NEW-10 dapat ditutup setelah konsistensi silang bagian aktif diverifikasi. Implementasi dan runtime test belum diklaim selesai; PE-02 Implementation tetap NOT AUTHORIZED.
+**Disposisi AUDIT-NEW-10:** target architecture telah tercantum normatif dalam PLAN dan konsistensi silang atas klaim lama 3-way binding telah diperiksa; **AUDIT-NEW-10 CLOSED pada tingkat rekonsiliasi keputusan produk dan dokumentasi arsitektur**. Implementasi dan runtime test belum diklaim selesai; PE-02 Implementation tetap NOT AUTHORIZED.
 ---
 
 ## 11. KONFLIK MATERIAL DAN STOP-AND-CLARIFY
