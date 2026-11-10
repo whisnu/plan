@@ -2292,6 +2292,20 @@ Setiap klaim harus ditautkan ke path dan line range pada commit yang diperiksa. 
 
 Invariant: ketiga identitas adalah peran semantik berbeda dan tidak diwajibkan identik; ownCertPubKey berbeda dari genesisPubKey hanya dengan ownership/transfer chain sah; containerSigKey == genesisPubKey adalah self-packaging tanpa delegation tambahan; containerSigKey != genesisPubKey adalah third-party packaging dan wajib delegation valid untuk asset/scope. Container signature membuktikan integritas byte-domain, bukan copyright/ownership/authority. Kegagalan packaging authorization tidak boleh otomatis dilaporkan sebagai Genesis Certificate invalid atau ownership invalid. Album Signer, Registry Authority, Licensing Authority, Genesis Creator, Container Packager dan current holder tetap trust domain terpisah.
 
+
+#### A.1 Root authority untuk CONTAINER_PACKAGING — keputusan PO/Architecture Authority
+
+**Keputusan normatif: APPROVED / RESOLVED.** Kewenangan awal (root / initial authority) untuk menerbitkan delegation dengan scope CONTAINER_PACKAGING berada secara eksklusif pada **Genesis Creator**, yaitu identitas genesisPubKey yang berakar pada Genesis Ownership Certificate. Tidak ada Designated Packaging Authority, Label/Studio, atau Current Owner yang memperoleh kewenangan awal secara mandiri (ex-nihilo).
+
+- **Genesis Creator — ROOT / INITIAL AUTHORITY:** dapat melakukan self-packaging (containerSigKey == genesisPubKey) tanpa delegation tambahan, atau menerbitkan OwnershipDelegation dengan scope CONTAINER_PACKAGING kepada pihak pengemas yang ditunjuk.
+- **Designated Packaging Authority — DERIVED AUTHORITY:** Label, Studio, atau pihak pengemas lain hanya sah berdasarkan rantai delegation yang valid, dapat diverifikasi, terikat pada asset/Genesis yang tepat, dan berakar pada Genesis Creator. Penerima delegation tidak otomatis memperoleh kewenangan untuk mendelegasikan kembali.
+- **Sub-delegation:** Genesis Creator dapat secara eksplisit mengizinkan penerima delegation melakukan sub-delegation, direpresentasikan oleh sub_delegation_allowed = true. Jika izin tersebut tidak diberikan atau tidak dapat diverifikasi, sub-delegation tidak sah. Setiap sub-delegation harus tetap dapat ditelusuri ke delegation root Genesis Creator dan tidak boleh memperluas scope atau masa berlaku dari mandat induknya. Batas kedalaman/rekursi sub-delegation merupakan kontrak teknis yang masih harus ditetapkan sebelum implementation readiness.
+- **Current Owner / Rights Holder — RESTRICTED / GENERALLY EXCLUDED:** kepemilikan edisi, hak koleksi, atau consumption/playback license tidak dengan sendirinya memberikan hak untuk menerbitkan kontainer .nx baru atau mendelegasikan CONTAINER_PACKAGING. Pengecualian hanya berlaku bila bukti transfer secara eksplisit mengalihkan seluruh hak master/IP yang relevan, termasuk hak penerbitan/pengemasan master, dari Genesis Creator kepada penerima. Ownership transfer biasa tidak cukup.
+- **Authority derivation:** seluruh jalur pihak ketiga harus membuktikan rantai otorisasi dari Genesis Creator. Validitas matematis tanda tangan containerSigKey hanya membuktikan integritas kontainer; hal itu tidak menggantikan pembuktian kewenangan pengemasan.
+- **Failure taxonomy:** delegation hilang, tidak valid, tidak berakar pada Genesis Creator, scope/asset tidak cocok, kedaluwarsa, dicabut, atau sub-delegation tidak diizinkan harus menghasilkan kegagalan packaging_authorization (mis. UNTRUSTED / UNAUTHORIZED PACKAGING). Kegagalan ini tidak otomatis mengubah hasil genesis_certificate atau ownership_chain menjadi invalid.
+- **Batas klaim produk:** aturan ini adalah kontrak kewenangan produk dan keamanan NEXA. Penetapan siapa pemegang hak cipta/hak ekonomi menurut hukum positif tetap bergantung pada fakta kontrak dan yurisdiksi; sistem harus memverifikasi bukti pengalihan hak yang relevan, bukan mengasumsikannya hanya dari status Current Owner.
+
+
 #### B. Target verification flow
 1. Parse schema/version sertifikat dan referensi identity/delegation.
 2. Verifikasi Container Packaging Signature terhadap containerSigKey; jangan otomatis memakai genesisPubKey sebagai substitusi.
