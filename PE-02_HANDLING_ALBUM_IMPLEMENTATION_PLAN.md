@@ -1911,16 +1911,16 @@ Matriks berikut mendokumentasikan keterlacakan dua arah (*Forward & Reverse Trac
 
 ## 10. STATUS KEPUTUSAN PRODUCT OWNER DAN RESIDUAL AUTHORITY
 
-### 10.1 Kebijakan Album Signer `UNKNOWN`, Kebutuhan Entitas Signer & Lifecycle Key (NC-04, B-09, CONF-01, AUDIT-TRUTH-02)
+### 10.1 CONF-01 Disahkan — Identitas dan Lifecycle Album Signer sebagai Gap Teknis (NC-04, B-09, AUDIT-TRUTH-02)
 Kebijakan produk CONF-01 telah disahkan PO: manifest dengan signer `UNKNOWN` atau signature invalid tidak mengautentikasi membership Album. Tidak ada PO decision blocker yang tersisa untuk kebijakan ini. Desain identity binding, authority, trust store, lifecycle, rotation, revocation, freshness, dan verifier merupakan pekerjaan teknis B-09/NC-04; PSV-R10/R10A telah ditutup pada tingkat bukti yang dilaporkan di §15.11.3. **CONF-01 bukan pilihan kebijakan playback global.**
 
 1. **Evaluasi Kebutuhan Entitas Album Signer**:
-   - Jika dipertahankan melalui keputusan PO/Arsitektur, fungsinya dibatasi murni pada autentisitas deklarasi manifest dan daftar anggota.
+    - Album Signer hanya mengautentikasi deklarasi manifest dan daftar anggota; identitas/lifecycle signer serta mekanisme Registry yang sah tetap merupakan kontrak teknis B-09/NC-04, bukan keputusan PO yang masih tertunda.
    - Album Signer **DILARANG** menggantikan Creator signature, Genesis proof, Registry trust, asset trust, active license, atau otorisasi playback masing-masing member `.nx`.
     - Dasar identitas, private-key custody, pendaftaran public key ke Registry, identity binding, key rotation, revocation, dan freshness belum ditetapkan sebagai kontrak teknis (**`OPEN — ARCHITECTURE / IMPLEMENTATION GAP B-09`**); jangan menciptakan endpoint/record/field baru tanpa dasar dan otorisasi.
 
 2. **Batas Keputusan CONF-01 untuk Signer `UNKNOWN`**:
-   - Keputusan yang masih diperlukan terbatas pada apakah deklarasi manifest yang signer-nya `UNKNOWN` dapat digunakan untuk mengautentikasi identitas/membership Album, dan bukti apa yang sah untuk menetapkan identitas serta lifecycle signer.
+    - Kebijakan CONF-01 telah diputuskan: manifest signer `UNKNOWN` tidak dapat mengautentikasi membership Album. Tidak ada keputusan PO yang masih diperlukan untuk pilihan tersebut; desain identity/lifecycle signer tetap terbuka sebagai pekerjaan teknis B-09/NC-04.
    - Otorisasi playback tetap dilakukan secara JIT dan independen untuk setiap member berdasarkan kontrak PE-01, Creator signature, Genesis ownership, Registry evidence, dan active license yang berlaku.
    - Programmer **DILARANG** memilih opsi yang memblokir atau mengizinkan seluruh playback Album atas dasar status Album Signer.
    - Sesuai keputusan PO CONF-01, membership dari manifest dengan signer `UNKNOWN` tidak boleh dianggap autentik; kebijakan fail-closed telah diputuskan, sedangkan implementasi identity/lifecycle signer tetap terbuka. Namun status tersebut juga **TIDAK BOLEH** otomatis mengubah status member menjadi `INVALID` atau membatalkan trust member.
@@ -2084,11 +2084,11 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 | Parameter Evaluasi Kesiapan Implementasi (Gate B)  | Hasil Evaluasi Substantif                    |
 +----------------------------------------------------+----------------------------------------------+
 | 1. Kelulusan formal Gate A                         | GAGAL (Gate A belum lulus)                   |
-| 2. B-08 — signed-content / signature construction | PSV source review telah diselesaikan (§15.9/§15.11); signed-content contract, canonical byte-domain, envelope, dan direct-negative test coverage tetap harus ditetapkan/dibangun sebelum Gate B PASS |
+| 2. B-08 — signed-content / signature construction | PSV-R09/R09A/R09A-1 telah ditutup (§15.11.3); signed-content contract, canonical byte-domain, envelope, direct-negative test specification, dan cross-language vectors harus ditetapkan sebelum Gate B PASS. Implementasi verifier dan eksekusi test dilakukan setelah otorisasi |
 | 3. B-04 — Marketplace / Zero-DDL | PSV B-04 telah diterima sebagai baseline (§15.11); selesaikan kontrak transaksi/pemenuhan, Manifest storage, member mapping, idempotency, partial failure, recovery, settlement, dan License Daemon side effects |
 | 4. B-05 — child hash contract | PSV B-05 telah diselesaikan; tetapkan byte-domain per-member `.nx`, producer/consumer, dan kontrak child mapping tanpa mengubah Zero-DDL |
-| 5. B-06 — filesystem / POSIX TOCTOU | PSV source review lintas platform telah diselesaikan; selesaikan mitigasi desain, adversarial tests, dan penerimaan residual risk berbasis bukti sebelum Gate B PASS |
-| 6. B-09 — signer/membership | PSV signer/membership telah diselesaikan; kebijakan fail-closed telah disahkan PO; selesaikan identity binding, authority, trust lifecycle, verifier, dan test tanpa mengulang PSV yang sama |
+| 5. B-06 — filesystem / POSIX TOCTOU | PSV source review lintas platform telah diselesaikan; tetapkan mitigasi desain, threat model, residual-risk statement, serta adversarial test plan/expected results sebelum Gate B PASS; eksekusi adversarial/runtime tests dilakukan setelah otorisasi dan implementasi |
+| 6. B-09 — signer/membership | PSV signer/membership telah diselesaikan; kebijakan fail-closed telah disahkan PO; tetapkan identity binding, authority, trust lifecycle, verifier contract, dan test design tanpa mengulang PSV yang sama. Implementasi dan test execution dilakukan setelah otorisasi |
 | 7. Otorisasi resmi pelaksanaan implementasi        | TIDAK DIBERIKAN (NOT AUTHORIZED)             |
 +----------------------------------------------------+----------------------------------------------+
 | STATUS AKHIR GATE B                                | BLOCKED                                      |
