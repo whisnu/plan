@@ -2900,7 +2900,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
     - Vektor 1 & 5: Pengurutan kode UTF-16, penanganan karakter non-BMP (`😀` emoji grinning), objek bersarang.
     - Vektor 7: Serialisasi string tanpa escaping HTML (karakter raw `<&>` dipertahankan).
     - Vektor 1, 2, 3: Serialisasi angka ECMAScript ToString(), normalisasi negative zero (`-0` -> `0`), batas eksponen IEEE-754 (`1e+30`, `1e-7`, float desimal).
-    - Vektor 6: Serialisasi karakter kontrol escaping (``, ``, `
+    - Vektor 6: Serialisasi karakter kontrol escaping (\b, \t, \n, \f, \r, \\, \").
 `, `
 `, `	`, `\"`).
     - Vektor 8: Objek dan array bersarang representatif dengan boolean dan null.
@@ -3183,7 +3183,7 @@ Sesuai mandat `HANDOFF PROGRAMMER — PE-02 RESIDUAL PRIMARY SOURCE VERIFICATION
     | `tests/registry_test.go` | L217 | Go packaging manifest | `ed25519.Sign` | **`INTEGRATION-ONLY`** |
     | `sdk/typescript/test/` (seluruh berkas) | - | N/A (0 matches) | Tidak memanggil verifier `.nx` | **`NOT PRESENT IN SCOPE`** |
   - *Pernyataan Eksplisit Ketiadaan Direct-Negative Test:*
-    Berdasarkan pencarian menyeluruh terhadap seluruh direktori test (`test/`, `tests/`, `sdk/typescript/test/`, `player-desktop/test/`, `verify-desktop/test/`), tidak ditemukan satu pun test yang secara langsung menguji penolakan tanda tangan manifest kontainer PE-01 `.nx` yang tidak valid (`signatureValid === false`), manipulasi biner `container.manifestBytes`, kunci publik kreator yang tidak cocok, maupun tanda tangan trailer 64-byte yang malformed:
+    Berdasarkan enam pencarian terarah dan raw output yang dicantumkan di atas pada direktori test (`test/`, `tests/`, `sdk/typescript/test/`, `player-desktop/test/`, `verify-desktop/test/`), tidak ditemukan test verifier langsung untuk penolakan signature manifest kontainer PE-01 `.nx` (`signatureValid === false`), manipulasi `container.manifestBytes`, creator public key yang tidak cocok, atau malformed 64-byte signature trailer dalam scope dan pola pemanggilan yang diperiksa. Kesimpulan ini dibatasi pada scope pencarian tersebut dan tidak menyatakan ketiadaan universal di luar pola yang dicari:
     **`DIRECT VERIFIER TEST (NEGATIVE): NOT PRESENT IN THE EXAMINED TEST SCOPE`**
 - **5. Pencarian Terukur Ketiadaan Komponen Tambahan:**
   - *TypeScript Generic RFC 8785 JCS:* Command `grep -rnI --exclude-dir=node_modules -E "canonicalize|rfc8785|jcs" sdk/typescript/` membuktikan hanya ada template string 6-field di `registry.ts` dan pemetaan properti spesifik di `ownership.ts`. Serializer generik RFC 8785 untuk TypeScript: **`NOT PRESENT IN THE EXAMINED SCOPE`**.
