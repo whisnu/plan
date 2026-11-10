@@ -4019,3 +4019,20 @@ Status: transaction/recovery contract SPECIFIED BY AA; existing Zero-DDL durable
 Keputusan dan kontrak AA di atas menggantikan status lama yang menyebut Stage 8a background diagnostic permission, Genesis/active-license prerequisite untuk digest computation, atau desain teknis B-03/B-04/B-05/B-06/B-08/B-09 masih menunggu keputusan PO. Snapshot audit historis dipertahankan sebagai histori, bukan status aktif.
 
 Gate A tetap memerlukan rekonsiliasi seluruh cross-register dan independent re-audit. Gate B menilai implementation readiness, bukan menunggu kode PE-02 atau post-authorization runtime tests selesai. Seluruh keputusan AA ini tidak memberikan otorisasi implementasi; otorisasi tetap keputusan PO terpisah setelah Gate A dan Gate B PASS.
+
+
+### 16.11 NC-13 / AC-32 — viewer lifecycle completion and Auto-Next
+
+PO product decision: Album playback/viewing proceeds member-by-member and advances automatically after the current viewer reports completion. This AA contract defines the completion signal without introducing an arbitrary timer or treating an unrelated UI event as completion.
+
+1. Every payload viewer must expose one normalized lifecycle event: VIEWER_COMPLETED(member_id, viewer_instance_id, completion_reason, evidence). The event is accepted only from the active viewer instance for the current member; stale, duplicate, background, or prior-instance events are ignored idempotently.
+2. Audio completion is the native playback engine's definitive end-of-stream event (not pause, stop, seek, buffer underrun, or component unmount).
+3. Video completion is the native video engine's definitive ended/end-of-stream event (not timeupdate, reaching a percentage threshold, pause, seek, or unmount).
+4. Document completion is emitted only when the document viewer reaches its terminal document position and the viewer explicitly completes its lifecycle through its defined completion action. Merely opening a document, rendering the first page, reaching an arbitrary dwell time, or backgrounding the app is not completion.
+5. Image completion has no intrinsic time-based event. It is emitted only by the image viewer's explicit completion/advance action. No dwell-time heuristic or automatic timeout may be invented.
+6. On VIEWER_COMPLETED, Player releases the current member's playback/viewer resources and authorization, then performs a fresh independent JIT authorization for the next member. The next member's Stage 8a diagnostic result may be reused only as a diagnostic cache if its identity, byte hash, and freshness still match; it never supplies Genesis/license/trust authorization.
+7. Auto-Next must not run if the current viewer reports failure, user cancellation, app backgrounding, resource interruption, or an ambiguous completion state. Those cases preserve the existing user-directed failure handling; they do not silently skip.
+8. There is at most one accepted completion event per viewer instance. A replayed or duplicated event cannot advance two members. Member index advances only after the next member is selected and its own JIT authorization succeeds; failure of the next member is handled per existing retry/skip policy and does not alter completed member evidence.
+9. Platform parity tests cover Audio/Video/Document/Image on Desktop and Mobile, including natural completion, manual stop, pause, seek, app background/resume, viewer recreation, duplicate/stale completion event, current-member authorization release, next-member authorization failure, and no timer-triggered advance.
+
+Status: product behavior approved; normalized completion event and platform-specific completion source specified by AA. If a target viewer cannot provide the required completion event, that platform/payload combination remains NOT READY; do not synthesize a timer or infer completion from UI visibility.
