@@ -15,7 +15,7 @@
 >   - **B-06 / NC-12:** **`SAFE-OPEN / TOCTOU DESIGN SPECIFIED BY AA; PLATFORM TEST EXECUTION POST-AUTHORIZATION`**.
 >   - **B-07 / NC-07:** **`AA BENCHMARK PROTOCOL SPECIFIED; NUMERIC RESOURCE LIMITS BLOCKED PENDING MEASURED CAPACITY EVIDENCE; PSV-R07 CLOSED`** (empat kelas payload, workload, metrik, boundary tests, dan format evidence ditetapkan pada §16.7 dan §16.14; tidak ada angka universal yang diasumsikan).
 >   - **B-08 / NC-02:** **`SIGNATURE-STRIPPED JCS / SIGNED FIELD SET / ENVELOPE / VERIFIER CONTRACT SPECIFIED BY AA; IMPLEMENTATION AND TESTS POST-AUTHORIZATION`**.
->   - **B-09 / NC-04 / CONF-01:** **`ALBUM-SPECIFIC CAPABILITY IS A NEW PE-02 PRODUCT/ARCHITECTURE EXTENSION; EXISTING IDENTITY FOUNDATIONS ARE REUSED; IMPLEMENTATION GAP CONFIRMED BY PROGRAMMER EVIDENCE REPORT`** (Organization Identity subject/key lifecycle foundations are established in Sprint 14; no Album Signer or `ALBUM_MEMBERSHIP_SIGNING` capability contract is defined in any inventoried WP/Roadmap version. Programmer must prove whether existing authority/scope machinery can express and verify it. Any missing capability, evidence carrier, issuer authorization, lifecycle binding, or verifier wiring is a mandatory PE-02 implementation requirement in §16.16; no new trust root or identity model.)
+>   - **B-09 / NC-04 / CONF-01:** **`ALBUM-SPECIFIC CAPABILITY IS A NEW PE-02 PRODUCT/ARCHITECTURE EXTENSION; EXISTING IDENTITY FOUNDATIONS ARE REUSED; IMPLEMENTATION GAP CONFIRMED BY PROGRAMMER EVIDENCE REPORT`** (Organization Identity subject/key lifecycle foundations are established in Sprint 14. Album Signer and ALBUM_MEMBERSHIP_SIGNING are new PE-02 capabilities, so their absence from historical WP/Roadmap is expected. Programmer evidence report §16.18 confirms the implementation gaps in its examined scope; those gaps are mandatory PE-02 implementation requirements. No new trust root or identity model is introduced.)
 >   - **NC-14 / CONF-02:** **`PO DECISION APPROVED (OPTION B)`** (Keputusan PO Disahkan: NX Verify Tidak Menampilkan Status Agregat Album; Hasil Verifikasi Individual Member Tetap Menjadi Hasil Utama).
 
 ---
@@ -2153,7 +2153,7 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 | 12. NC-15 / AC-26 — error taxonomy | Dimensi error, unknown-vs-invalid, stage/object/retryability mapping, evidence reference, dan user disposition ditetapkan AA §16.9. Final stable code registry wajib diselaraskan lintas seluruh AC/NC dan UI/API contract sebelum Gate A PASS |
 | 13. Otorisasi resmi pelaksanaan implementasi        | TIDAK DIBERIKAN (NOT AUTHORIZED)             |
 +----------------------------------------------------+----------------------------------------------+
-| STATUS AKHIR GATE B                                | BLOCKED                                      |
+| STATUS AKHIR GATE B                                | BLOCKED — READINESS / PRE-CODING CONTRACTS ONLY; NOT BLOCKED BY MISSING IMPLEMENTATION OR POST-AUTHORIZATION TESTS |
 +----------------------------------------------------+----------------------------------------------+
 ```
 
@@ -2163,7 +2163,7 @@ Dokumen ini memisahkan secara tegas antara evaluasi kualitas dokumen rencana (*G
 
 ### 13.1 Evaluasi Kesiapan (Readiness Conclusion)
 Berdasarkan isi dokumen, laporan Programmer, dan batas bukti yang tersedia bagi Auditor, kesiapan sistem dirinci ke dalam 8 kategori kesiapan. Klasifikasi di bawah ini adalah status readiness, bukan pengganti urutan PSV: seluruh fakta implementasi yang menjadi dependency blocker source-dependent tetap harus diperiksa Programmer terlebih dahulu sesuai §7.1 dan §15.3.
-1. **Laporan inspeksi repositori lokal Programmer (`REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`):** Programmer melaporkan inspeksi atas DDL `schema.postgres.sql`, engine packaging Go `container.go`, modul Ed25519 SDK `crypto.ts`, handler NX Player `main.js`, ketiadaan 2PC di Marketplace `server.js`, dan status git commit `fc08a5c...`. Auditor belum memeriksa repositori `whisnu/nexa` atau bukti primer tersebut; seluruh klaim inspeksi tetap `NOT VERIFIED — PRIMARY SOURCE EVIDENCE NOT AVAILABLE` bagi audit independen ini.
+1. **Laporan inspeksi repositori Programmer (`REPORTED BY PROGRAMMER — NOT INDEPENDENTLY VERIFIED`):** Programmer telah menyerahkan `PE-02_SOURCE_EVIDENCE_AND_GAP_IDENTIFICATION_REPORT.md` untuk `whisnu/nexa:main` commit `fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956`; laporan tersebut kini terintegrasi pada §16.18. Klaim source tetap berstatus Programmer-reported sampai Auditor memvalidasi evidence yang diserahkan. Ini bukan alasan meminta Programmer mengulang PSV terhadap commit dan scope yang sama; audit independen harus fokus pada konsistensi evidence dan PLAN.
 2. **Hal yang Berstatus Spesifikasi Konseptual (`SPECIFIED — PENDING IMPL`):** Schema universal kini memiliki canonical manifest envelope, ordered members, payload_type discriminator, dan audio digest field/path pada §16.2/§16.12; schema file envelope/name/location, complete JSON Schema/version constraints, signer evidence schema placement, serta persistence mapping masih perlu rekonsiliasi. Batas 199 track tetap non-normative. JCS engine, Safe-Open implementation, error registry cross-layer, dan existing ID/receipt integration tetap pending.
 3. **Inventaris dan Klasifikasi Kesiapan Seluruh Acceptance Criteria (Total Tepat 34 AC) (DEFECT-01):**
    Seluruh 34 AC terpetakan secara lengkap dan eksklusif berdasarkan register otoritatif §8 (setiap AC berada tepat di satu kelompok utama tanpa penghitungan ganda):
@@ -4118,7 +4118,7 @@ This finding does not require a new organization identity, a new trust root, a g
 
 #### 16.16.2 Mandatory source-evidence decision
 
-Programmer must inspect the existing implementation and prove, separately, each of these predicates:
+The Programmer has completed the bounded source inspection and submitted the commit-pinned evidence report integrated in §16.18. The predicates below are the evidence-review and implementation-acceptance checklist; they are not a request to repeat PSV. For each predicate, use the submitted report's PRESENT / PARTIAL / NOT FOUND disposition and the cited source/test evidence. Any genuinely material ambiguity must be isolated to the exact claim and must not trigger a repeat of the same search scope:
 
 1. Individual Creator subject resolution and exact key-to-subject binding.
 2. Organization Subject ID resolution from Genesis Root Public Key, Current Root lineage, and timestamp-correct Active Level-1 key.
@@ -4131,7 +4131,7 @@ Programmer must inspect the existing implementation and prove, separately, each 
 9. Actual caller-to-verifier production path from Album Manifest verification to authoritative identity/authority resolution. A library or helper that is not wired into the production verifier is insufficient.
 10. Negative and positive tests for both approved subject classes, including valid identity without Album capability, wrong scope, wrong subject/key, revoked/expired/rotated key, invalid recovery lineage, unknown/conflicting issuer, stale offline evidence, and a valid standalone PE-01 member when Album membership fails.
 
-For each predicate, evidence must include repository, branch, exact commit SHA, exact path and line range, raw source excerpt, caller/callee chain, relevant DDL or serialized evidence shape, exact test command, exit code, and raw test output. Tests must be tied to the source path under review. Search evidence must include exact search terms/commands and searched directories. "Not found" without search scope is not accepted.
+The submitted evidence is commit-pinned to repository whisnu/nexa, branch main, commit fc08a5c7ac6aa1b0e4bcf64dc264666f149e1956. Its evidence format includes source paths/line ranges, excerpts, caller paths, DDL where relevant, search commands/scopes, and two existing identity test runs with exit code 0. The report's evidence is Programmer-reported pending Auditor validation; a test result proves only the tested baseline and not untested Album behavior. A new targeted clarification is permissible only for a specific material inconsistency in the submitted evidence, not as repeated broad PSV.
 
 #### 16.16.3 Mandatory implementation work package when evidence is absent
 
