@@ -203,7 +203,7 @@ Tabel berikut membuktikan penelusuran individual per AC mencakup seluruh 34 AC t
 | **AC-05** | NC-03 | `TEST-PLANNED — EXECUTION BLOCKED` | White Paper v5.6 §Parsers; Nexa Parser Policy | B-01 (Modul Strict JSON Parser Engine belum diimplementasikan) | `BLOCKED (MODULE PENDING)` | Module Pending / Gate B | Konsisten; spesifikasi uji duplicate key siap, modul pending koding. |
 | **AC-06** | NC-03 | `TEST-PLANNED — EXECUTION BLOCKED` | IETF RFC 8785; Canonical JCS Test Vectors TV-01..TV-08 | B-02 (Modul RFC 8785 JCS Serializer Engine belum diimplementasikan) | `BLOCKED (MODULE PENDING)` | Module Pending / Gate B | Konsisten; vektor uji RFC 8785 siap, modul serializer pending koding. |
 | **AC-07** | NC-04 | White Paper Identity/Federated Trust; PO CONF-01; AA §16.5/§16.16.4A | Unknown signer, unbound key, missing/invalid per-Album authority carrier, album/signer/key/purpose mismatch, stale/conflicting federation evidence, or invalid manifest signature | Album Membership `UNAUTHENTICATED` / `INVALID` fail-closed; standalone PE-01 behavior remains independent | `[TEST-PLANNED — EXECUTION BLOCKED BY B-09 AUTHORITY CARRIER / VERIFIER IMPLEMENTATION]` | PO issuer-authority decision resolved; WP-04/WP-05 implementation and tests post-authorization |
-| **AC-08** | NC-04 | Roadmap v4.8 §5.5; White Paper v5.6 §19.6; AA §16.5/§16.15 | Signer key revoked/expired/rotated, invalid recovery lineage, stale/unavailable lifecycle evidence | Membership NOT AUTHENTICATED when required evidence is absent/invalid/unknown; standalone PE-01 remains independent | `[TEST-PLANNED — EXECUTION BLOCKED BY B-09 ISSUER DECISION / LIFECYCLE / VERIFIER INTEGRATION]` | PO issuer-authority decision pending; AA lifecycle contract specified; key history and revocation/freshness integration remain |
+| **AC-08** | NC-04 | Roadmap v4.8 §5.5; White Paper v5.6 §19.6; AA §16.5/§16.15/§16.16.4A/B | Signer key revoked/expired/rotated, invalid recovery lineage, stale/unavailable lifecycle evidence | Membership NOT AUTHENTICATED when required evidence is absent/invalid/unknown; standalone PE-01 remains independent | `[TEST-PLANNED — EXECUTION BLOCKED BY B-09 LIFECYCLE / VERIFIER INTEGRATION]` | PO issuer-authority and subject-class decisions are resolved; remaining dependencies are source-compatibility elements bounded as NOT VERIFIED and WP-04/WP-05 implementation/tests post-authorization |
 | **AC-09** | NC-05 | `TEST-PLANNED — SPECIFICATION READY` | White Paper v5.6 §Genesis; AA §16.12 | Untuk member payload_type MUSIC_AUDIO, digest bitstream audio terenkripsi dalam payload region PE-01 dibandingkan dengan members[].audio_payload_sha256 (64 lowercase hex); hash penuh child .nx dan ZIP wrapper tetap domain terpisah | Mismatch menghasilkan ERR_CONTAINER_HASH_MISMATCH; match hanya memenuhi pemeriksaan digest dan tidak memberikan authorization | `[TEST-PLANNED — SPEC READY]` | Kontrak field/path dan byte-domain AA §16.12; source mapping dan runtime test setelah otorisasi |
 | **AC-10** | NC-05 | `TEST-PLANNED — BLOCKED BY UNRESOLVED TAXONOMY` | White Paper v5.6 §Genesis; `sdk.ts#L205-L255`; E-01 | NC-05 / A-05 (Representasi kode error kanonikal Genesis signature pending taksonomi) | `OPEN (UNRESOLVED TAXONOMY)`| Architecture Dependency / Gate A | Konsisten; fail-closed `canPlay: false` pasti; kode error diskrit pending arsitektur. |
 | **AC-11** | NC-06 | `TEST-PLANNED — SPEC READY` | White Paper v5.6 §Container; `container.go#L110` | Ekstraksi kontainer mandiri `.nx` dari ZIP wrapper tanpa alterasi byte | `CLOSED (FROZEN BASELINE)` | Spec Ready / Gate A Ready | Konsisten; format kontainer PE-01 mematuhi invariant byte utuh. |
@@ -1212,7 +1212,7 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
 - **Kebijakan Unknown Fields — PO APPROVED:** Unknown fields wajib ditolak fail-closed dengan `ERR_MANIFEST_MALFORMED`. Kebijakan permissive-ignore tidak berlaku. Keputusan ini tidak melengkapi schema universal multi-payload atau menetapkan nama array/path JSON yang masih unresolved.
 
 #### 6.2 Rincian NC-02: Signature Album Signer, Input Kanonikal & Batas Payload (Temuan 1, B-08, AUDIT-TRUTH-03)
-- **Status Kontrak**: **`MODEL APPROVED — EXACT SIGNED-CONTENT CONTRACT / VERIFIER SPECIFICATION OPEN`**.
+- **Status Kontrak**: **`SIGNATURE-STRIPPED JCS / EXACT SIGNED-CONTENT / VERIFIER CONTRACT SPECIFIED BY AA §16.4`**.
 - **Definisi Input Signature & Resolusi Circular Dependency (B-08)**:
   1. Memasukkan field `album_signer_signature` ke dalam payload manifest yang dikanonisasi JCS untuk menandatangani dirinya sendiri menimbulkan ketergantungan melingkar (*circular dependency*).
   2. **Keputusan PO/Architecture Authority:** gunakan Signature-Stripped JCS. `album_signer_signature` dikeluarkan dari objek sebelum serialisasi RFC 8785. Detached signature file tidak dipilih.
@@ -1223,7 +1223,7 @@ Tabel berikut merangkum 16 kontrak normatif (*Normative Contracts*) dengan statu
   1. Format, makna, dan verifikasi Creator packaging signature pada masing-masing kontainer `.nx` (NC-06 / AC-04);
   2. Format, makna, atau kewenangan Genesis Ownership Certificate (NC-05 / AC-10);
   3. Verifikasi Registry Authority Certificate pada masing-masing `.nx`.
-- **Status Blocker**: Model konstruksi telah diputuskan PO/Architecture Authority sebagai Signature-Stripped JCS. B-08 tetap `OPEN / BLOCKED` hanya untuk exact signed-content field set, canonical byte-domain, verifier contract, dan negative/adversarial tests; AC-03 tetap execution-blocked sampai kontrak tersebut lengkap.
+- **Status Blocker**: Exact signed field set, canonical byte-domain, embedded signature envelope, and verifier sequence are specified by AA §16.4. B-08 remains open only for post-authorization engine implementation and cross-language/negative/adversarial test execution; AC-03 remains execution-blocked for those implementation/test deliverables, not for an unresolved PO choice or missing AA signature-scope decision.
 
 
 
@@ -4398,7 +4398,7 @@ The remaining sequence is:
 
 No additional broad Programmer investigation is required merely to prove Album Handling exists. Any future source request must be tied to a specific, material compatibility question that cannot be resolved from the bounded A1 evidence and existing plan. The default next work is AA-owned planning and contract reconciliation.
 
-#### 16.20 Canonical cross-section and traceability reconciliation — AA disposition
+### 16.20 Canonical cross-section and traceability reconciliation — AA disposition
 
 Bagian ini adalah active reconciliation overlay untuk PLAN kanonis. Historical audit records tidak dihapus. Jika snapshot historis atau redaksi lama bertentangan, active status pada §13.1.1, §16.18, §16.19 dan §16.20 mengendalikan. Tidak ada perubahan kode, schema, endpoint, konfigurasi atau runtime yang diotorisasi.
 
