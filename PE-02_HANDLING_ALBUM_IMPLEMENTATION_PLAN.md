@@ -4610,3 +4610,122 @@ This section is the controlling AA disposition for the two remaining Gate-B prer
 2. AA will evaluate only the cited compatibility and persistence predicates. No code, SDK, schema, migration, DDL/DML, endpoint, configuration, or runtime change is authorized by this request.
 3. Gate A remains `PASS — PLAN / CONTRACT READINESS ONLY`. Gate B remains `BLOCKED` pending the bounded evidence above and any exact AA architecture resolution triggered by it. PE-02 implementation remains `NOT AUTHORIZED`; Sprint 16 and PE-01 remain `CLOSED / FROZEN`; Sprint 17 remains `NOT STARTED`.
 
+### 16.21.10 AA — Programmer handoff: bounded Gate-B planning evidence return
+
+**Purpose and phase:** PLANNING / architecture-feasibility evidence only. Programmer must assess whether the already-approved PE-02 architecture can use existing Nexa persistence and native-proof foundations without violating Zero-DDL or changing native proof semantics. This is not implementation, post-implementation verification, production-readiness testing, or a request to prove that Album Handling already exists.
+
+**Exactly one deliverable:** Return one Markdown file named **PE-02_GATE_B_BOUNDED_PLANNING_EVIDENCE_RETURN.md**. Do not create or modify source files, PLAN files, schema, migrations, APIs, configuration, database records, tests, or runtime artifacts. Do not create a ZIP, patch, screenshot bundle, duplicate repository, or second report. This is a temporary evidence return; the canonical PLAN remains the sole retained plan artifact.
+
+#### 16.21.10.1 Mandatory order
+
+1. Read §§16.21.9–16.21.10 before collecting anything.
+2. Start from the original A1 source-evidence report integrated in §16.18. Extract existing source excerpts, paths/line ranges, schema references, caller paths, examined scope, and evidence classifications relevant to the matrices below. Use A1 first; do not repeat any search whose scope/result is already recorded.
+3. Classify every matrix cell using exactly one status:
+   - **SUPPORTED BY EXISTING A1 EVIDENCE** — direct, exact A1 evidence is cited.
+   - **NOT VERIFIED FROM A1** — A1 does not contain enough evidence.
+   - **NOT FOUND IN EXAMINED SCOPE** — A1 explicitly searched the relevant bounded scope and reported absence.
+   - **NOT APPLICABLE TO PLANNING FEASIBILITY** — the item is a new Album-specific capability assigned to post-authorization work, not an existing prerequisite.
+4. Only for a NOT VERIFIED cell expressly covered by §16.21.10.5, perform the smallest read-only inspection of that exact existing interface/path. Record exact path, commit, lines, and observation. If A1/PLAN does not identify the locator, leave NOT VERIFIED and stop; do not search broadly to discover alternatives.
+5. Preserve unavailable, ambiguous, and contradictory evidence as such. Do not resolve it through assumptions, inferred framework behavior, or implementation preference.
+6. Submit the one return file and stop. Do not begin implementation or wait for a test/benchmark phase.
+
+#### 16.21.10.2 Source baseline and citation rules
+
+1. Use the exact repository, branch, commit SHA, and examined scope stated in the original A1 evidence report. Copy them verbatim. Do not silently substitute current main, a newer commit, local working tree, or another branch.
+2. §16.8.2 and §16.16.2 currently contain different A1 commit SHA strings. Do not choose between them by inference. Copy the SHA from the original A1 report and explicitly flag this PLAN cross-reference discrepancy for AA reconciliation.
+3. Every positive source claim must cite repository, branch, commit SHA, exact path, line range, the smallest relevant source excerpt, and what it establishes. Schema claims require the exact existing DDL/schema and relevant field/type/index/constraint. Call-path claims identify producer → storage/API operation → consumer, with exact source locations for each available link.
+4. Distinguish source-defined behavior from assumptions and operational guarantees. A method/interface declaration, DTO, test name, comment, configuration key, or row-lock alone does not prove durability, atomicity, immutability, retention, backup, issuer authorization, cryptographic verification, or independent trust-anchor termination.
+5. Do not claim runtime behavior, deployed configuration, successful restart recovery, production operation, or test pass unless that exact evidence already exists in A1. No new runtime execution is requested.
+
+#### 16.21.10.3 Matrix A — B-04 / B-05 / NC-06: Zero-DDL persistence feasibility
+
+**Question:** Can the approved logical records and relationships be represented, written, read, correlated, protected from overwrite, and recovered using identified existing durable storage mechanisms, without DDL or schema change?
+
+PostgreSQL, a transaction, row-lock, object-storage client, or candidate Storage Engine/storage_object_id is not by itself proof. The PO identified Storage Engine/storage_object_id as a candidate only; its semantics are unverified.
+
+Return one row per requirement, with these columns: Requirement ID; existing mechanism/object/field; producer; write operation and transaction boundary; durable lookup/consumer; immutability and concurrency primitive; restart/recovery/retention/backup evidence; exact source citations; A1 status; planning disposition/gap.
+
+**A-WP01 — Checkout and per-member execution evidence**
+- Determine whether an existing durable object/record mechanism can store the immutable Checkout Manifest and separate per-member execution/settlement receipts without schema change.
+- Identify existing representations for bundle_checkout_id, immutable member identity, operation identity/member_execution_key, actual acquisition_id, entitlement reference, and payment/refund operation reference. These identifiers are distinct; do not conflate them.
+- Show write creation and deterministic consumer lookup. Identify uniqueness/conditional-create/append-only or equivalent controls that prevent duplicate creation and last-write-wins overwrite.
+- Identify License Daemon and payment/refund status lookup or authoritative receipt query only if already present in A1 or explicitly permitted by §16.21.10.5. State whether UNKNOWN/PENDING is distinguishable from confirmed outcomes. An HTTP client/request method does not prove provider status-query capability.
+- Identify recovery/reconciliation entry points and documented operational guarantees for durability, retention, backup, and restore. If not evidenced, mark NOT VERIFIED.
+
+**A-WP02 — B-05 child member hash**
+- Identify producer and consumer of acquired_package_sha256, exact stored schema/type, and semantic domain; demonstrate that it remains the ZIP/wrapper hash.
+- Separately identify any existing durable location and lookup path for exact child .nx member_sha256 and its immutable association with the correct member/acquisition/entitlement identity.
+- If no child-hash mapping is evidenced, report NOT VERIFIED or NOT FOUND IN EXAMINED SCOPE as justified. Do not alias, overwrite, or repurpose acquired_package_sha256; do not propose a new column/table.
+
+**A-WP05 / NC-06 — Album identity and ordered member relation**
+- This is a feasibility check of generic existing persistence/publication capabilities, not a demand that Album Handling or multi-member Album behavior already exists.
+- Identify an existing Studio/Storage mechanism that could durably represent stable Album identity and ordered member-to-Album association, including write and deterministic reload/lookup paths.
+- State whether that mechanism can preserve association through restart/retry/partial publication/recovery without relying on row order, timestamps, catalog order, or an in-memory collection.
+- Do not claim an individual-asset Marketplace catalog is already an Album relation. Do not implement Album identity or association.
+
+**Matrix A decision rule:** A row is FEASIBLE FROM EXISTING EVIDENCE only if every required link/invariant for that row is directly supported by exact source/schema/operational-contract evidence. Otherwise identify the precise unproven predicate. Partial evidence is not an overall PASS. AA decides sufficiency for Gate B.
+
+#### 16.21.10.4 Matrix B — B-09: six native-proof compatibility categories
+
+**Question:** Can the native proof material required by the approved three-tier Membership Authority design be embedded as evidence while preserving its original signed bytes/preimage and verified through existing authoritative Nexa trust/identity foundations?
+
+This is a compatibility assessment of existing foundations. It is NOT a demand that Album-specific Authority Designation, Album Signer capability, Tier-2 carrier, Album Manifest verifier integration, or Album-specific tests already exist. Those are new PE-02 capabilities assigned to WP-04/WP-05 under §16.16.3 and are outside the pre-authorization existence test.
+
+Return exactly six rows, one per category, with columns: category; native proof/serialized representation; signed bytes and exact preimage/canonicalization; authoritative verifier and caller path; issuer and subject/key lineage; validity/rotation/revocation/time semantics; independent trust-anchor termination; embedding compatibility without changing native proof; exact source citations; A1 status; planning disposition.
+
+1. **Genesis credential and trust-anchor termination.** Identify native serialized representation, exact signature preimage, verifier entry point, issuer/key chain, and how trust terminates at an independently provisioned anchor. Ed25519 signature validity alone does not establish trust-anchor authenticity. Do not invent/configure a new root.
+2. **Organization and Individual subject/key lineage.** Treat Organization and Individual Creator separately. Identify Subject ID binding, Genesis Root/recovery lineage where applicable, active key at the relevant time, and native verifier path. State exactly what A1 establishes for Organization and what remains partial/unverified for Individual.
+3. **Album-wide rights/authority basis.** Determine whether existing native ownership/rights evidence can establish authority over an Album as a whole or whether A1 only demonstrates member/asset-level evidence. Do not infer Album-wide authority from child OwnershipCertificates, Creator/Organization status, publication, or key possession. Do not require the new Album-specific Authority Designation carrier to exist now.
+4. **Registry/Federated issuer provenance and offline trust.** Separate Registry identity from Registry trust. Identify signed fields/preimage, issuer discovery/provenance, verifier/caller path, conflict/unknown/unavailable handling, and whether offline self-contained proof plus independent anchor are evidenced. Online evaluator success is not proof of offline trust or freshness.
+5. **Signed revocation/status evidence and Dual-Horizon evaluation.** Identify native signed revocation/status object, exact signed fields/preimage, issuer authorization/key provenance, verifier, and authentication of the revocation data itself. State whether the signed content covers the revoked-key/status set, not merely metadata such as registry ID/update time. Distinguish existing revocation primitives from new Album-specific application of the approved Dual-Horizon rule; do not require an Album evaluator now.
+6. **Tier-2 issuer/delegation evidence.** Identify existing delegation representation, exact signed preimage, issuer authorization, subject/key binding, purpose/scope, depth/subdelegation enforcement, validity, and revocation. State whether existing primitives can support approved Tier-2 semantics without changing native signed representation. Generic delegation alone does not prove ALBUM_MEMBERSHIP_SIGNING was issued. Do not require the new Album-specific Tier-2 carrier or Manifest integration now.
+
+**Matrix B decision rule:** For each category distinguish: (a) existing native proof is compatible and source-backed; (b) native proof exists but a specific predicate is unverified; (c) required native proof/anchor foundation is not found in A1's examined scope; or (d) an Album-specific capability is new implementation work. Do not mark incompatible solely because a new Album adapter/carrier/integration is not built. Do not mark compatible if native signed bytes, verifier, issuer/key provenance, or anchor termination cannot be established.
+
+#### 16.21.10.5 Only permitted bounded clarification
+
+After reviewing A1, only these read-only clarifications are permitted:
+
+1. **Storage Engine candidate interface:** exact existing API/source path and authoritative contract for object creation, read-by-ID, conditional create/update or immutability, concurrency, durability, retention, backup/restore, and recovery—but only if the exact interface is identified in A1 or existing PLAN references. This tests the candidate against §16.8.1; it is not a survey of storage systems.
+2. **License Daemon/payment-provider operation status:** exact existing request identity and status/receipt lookup contract, only for the integration/interface already identified in A1. Do not explore alternate providers, design an API, or assume compensation support.
+3. **One exact native-proof source ambiguity:** only where an A1 citation is internally inconsistent or omits a directly adjacent definition/call site essential to interpreting that citation. State the exact A1 citation, single ambiguity, exact adjacent path/line required, and inspect only that bounded location.
+
+No other new source search is authorized. If no exact locator is available, report NOT VERIFIED — NO BOUNDED LOCATOR IN A1 and stop for AA direction.
+
+#### 16.21.10.6 Explicit exclusions and stop conditions
+
+Programmer MUST NOT:
+- repeat A1, PSV-R10/R10A, or any search scope already closed in §16.18;
+- run repository-wide/cross-repository searches, grep sweeps, full test suites, benchmarks, load tests, deployment checks, or runtime experiments;
+- build, prototype, implement, refactor, or modify Album Handling, Album Signer, Membership Authority, Manifest verifier, persistence adapters, or proof adapters;
+- change application/SDK code, tests, SQL, DDL/DML, migrations, tables, columns, indexes, endpoints, API contracts, configuration, secrets, keys, trust stores, or deployment state;
+- create sample credentials, synthetic certificates, generic proof envelopes, new trust anchors, new storage schemas, or substitute proof formats;
+- infer persistence, atomicity, immutability, idempotency, durability, recovery, retention, backup, cryptographic validity, issuer authority, revocation, or offline trust from names, comments, conventions, or untested assumptions;
+- reinterpret, weaken, rename, or replace any PO/AA-approved field, identifier, purpose, scope, signature preimage, hash domain, Zero-DDL constraint, PE-01 contract, or frozen baseline;
+- mark an unproven item PASS, convert NOT VERIFIED to NOT FOUND, or present missing Album-specific implementation as an existing capability that must be built before authorization.
+
+Stop and report **STOP — CLARIFICATION REQUIRED** if resolution requires a product decision, change to an approved architecture contract, new trust model, schema change, or interpretation of unavailable evidence. Do not decide unilaterally.
+
+#### 16.21.10.7 Required single return-file structure
+
+The single file PE-02_GATE_B_BOUNDED_PLANNING_EVIDENCE_RETURN.md MUST contain these sections in this order:
+
+1. **Header and phase declaration:** filename, author/role, date, PLANNING ONLY, no implementation performed, no code/schema/runtime changed.
+2. **A1 source baseline:** repository, branch, exact commit SHA copied from original A1 report, examined paths/search scope, and PLAN SHA-reference discrepancy noted in §16.21.10.2.
+3. **Executive disposition:** separate preliminary statuses for B-04/B-05/NC-06 and B-09. No overall Gate-B recommendation unless every relevant row is evidenced.
+4. **Matrix A — Zero-DDL persistence feasibility:** all WP-01, WP-02, WP-05/NC-06 rows and columns in §16.21.10.3.
+5. **Matrix B — native-proof compatibility:** exactly six categories and columns in §16.21.10.4.
+6. **Bounded clarification log:** each permitted clarification in §16.21.10.5, exact locator, necessity, inspected material, and result. If none, state either NONE — A1 MATERIAL SUFFICIENT FOR THE BOUNDED REVIEW or NONE — REMAINING ITEMS NOT VERIFIABLE FROM A1, whichever is accurate.
+7. **Unresolved items and exact reason:** one item per row; distinguish evidence absent, not examined, contradictory, and intentionally new post-authorization Album capability.
+8. **Scope attestation:** affirm no repeated A1/PSV/broad search/full test/benchmark; no implementation or code/schema/config/runtime change; no PE-01/Sprint 16 frozen-baseline change; no new architecture/product decision.
+9. **Evidence index:** exact repository/branch/commit/path/line references for every positive claim. No duplicate source tree or unrelated attachment.
+
+If a cell cannot be completed, leave it NOT VERIFIED with a one-sentence reason and the missing exact evidence locator. Do not fill the gap with a proposed design.
+
+#### 16.21.10.8 AA review boundary and governance
+
+1. Programmer submits only the one return file. AA reviews citations, internal consistency, and whether each claim answers the planning-feasibility question. AA may request only an exact bounded clarification for a material ambiguity exposed by the return.
+2. Programmer does not decide Gate B and does not grant product approval or implementation authorization.
+3. The purpose is to determine whether the architecture is sufficiently feasible to plan and authorize under existing constraints—not to demonstrate that future PE-02 functionality is already implemented.
+4. Gate A remains **PASS — PLAN / CONTRACT READINESS ONLY**. Gate B remains **BLOCKED** until AA determines both pre-authorization feasibility groups adequately resolved. PE-02 implementation remains **NOT AUTHORIZED**; Sprint 16 and PE-01 remain **CLOSED / FROZEN**; Sprint 17 remains **NOT STARTED**.
+
