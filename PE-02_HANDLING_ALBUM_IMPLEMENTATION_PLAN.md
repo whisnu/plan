@@ -4431,7 +4431,7 @@ Matriks berikut adalah pemetaan aktif dua arah. Setiap AC harus dapat ditelusuri
 1. **Acceptance Criteria:** 34 total; 12 specification-ready (AC-04, AC-09, AC-11, AC-12, AC-17, AC-18, AC-19, AC-23, AC-24, AC-25, AC-30, AC-31); 22 execution-blocked (AC-01, AC-02, AC-03, AC-05, AC-06, AC-07, AC-08, AC-10, AC-13, AC-14, AC-15, AC-16, AC-20, AC-21, AC-22, AC-26, AC-27, AC-28, AC-29, AC-32, AC-33, AC-34); 0 PO decision required.
 2. **Register completeness:** NC-01..NC-16 are each represented in §16.20.1; B-01..B-09 are mapped to their owning NC and AC dependencies there. AC-01..AC-34 are all covered in the reverse-coverage check. Shared AC mappings are deliberate and do not change the single primary contract/dependency recorded in §8.
 3. **PO decision status:** CONF-01 membership authenticity/per-Album authority policy, CONF-02 Verify no-aggregate Option B, and Model B/CONF-03 commercial model are decided. B-04 feasibility is technical/storage compatibility, not an unresolved choice of commercial model.
-4. **NC-01:** exact top-level Manifest fields, common member fields, ordered member binding, payload discriminator, audio digest and Tier-1/Tier-2 evidence structures are specified. Complete machine-validatable nested schema/version rules and exact ZIP Manifest entry name/location remain open.
+4. **NC-01:** exact top-level Manifest fields and initial version primitive are specified; ZIP entry is fixed as root `manifest.json`. Native nested proof object compatibility/schema remains bounded by §16.21.1 and the A1 NOT VERIFIED ledger.
 5. **NC-02/B-08:** exact outer signed-content field set and Signature-Stripped JCS contract are specified in §16.4. Historical §6.2/audit snapshots that say exact signed-content remains undecided are superseded. Implementation and cross-language tests remain post-authorization.
 6. **NC-04/B-09:** PO authority policy and AA semantic carrier/offline closure contracts are specified. Album-specific implementation is absent at this planning stage. Individual Creator lifecycle and native proof serialization/verifier compatibility are not upgraded beyond A1 evidence. No PO issuer-authority decision remains open.
 7. **NC-06 versus NC-08:** NC-06 is Album identity/member ordering/Studio persistence/reload; NC-08 is Marketplace commercial checkout/member receipt/idempotency/reconciliation. Their identifiers and receipts are not interchangeable. WP-05 owns Album persistence; WP-01 owns commercial execution receipts.
@@ -4442,10 +4442,78 @@ Matriks berikut adalah pemetaan aktif dua arah. Setiap AC harus dapat ditelusuri
 12. **NC-16:** JCS formulas are specified in §16.13; durable receipt mapping is a B-04 dependency. Do not imply the formula creates a database constraint or replaces an existing acquisition identifier.
 ##### 16.20.3 Gate disposition after reconciliation
 
-- **Gate A remains NOT PASSED.** Active AC aggregate and A1 evidence boundary are corrected here, but independent re-audit must still verify the entire 34-row AC register, complete NC↔AC forward/reverse mapping, blocker closure criteria, error-code mapping, and absence of residual stale active statements. Historical audit snapshots remain historical.
-- **Gate B remains BLOCKED.** Concrete pre-coding items remain: complete nested Manifest schema/version and ZIP entry placement; indispensable A1 native proof serialization/signature/trust-anchor compatibility disposition; B-04/B-05 Zero-DDL durable mapping feasibility; and other pre-coding integration decisions in §16.19.4. Missing Album implementation, unrun post-authorization tests, and unmeasured post-authorization benchmark outputs are not by themselves Gate B blockers.
+- **Gate A remains NOT PASSED.** AC/NC/B traceability has been independently reconciled. Remaining material planning defect is NC-15's incomplete 20-code interface and Genesis/PE-01 compatibility disposition; native-proof compatibility claims remain bounded by A1 NOT VERIFIED evidence. Manifest ZIP entry/version decision is closed by §16.21.1.
+- **Gate B remains BLOCKED** only on the two indispensable pre-coding predicates in §16.21.7: Zero-DDL durable storage feasibility (B-04/B-05/NC-06) and native proof/signature/trust-anchor compatibility (B-09). Album-specific implementation, benchmark measurements, parser/extractor code, viewer adapters, and post-authorization tests are not pre-coding blockers.
 - **No Programmer re-investigation is authorized or requested.** A1 evidence limitations remain explicitly NOT VERIFIED. AA must not invent missing native source formats. If an indispensable compatibility predicate cannot be resolved from submitted evidence and authoritative documents, Gate B stays blocked pending AA/PO-level resolution; this does not reopen the completed Programmer correction handoff.
 - Sequence remains Gate A PASS → Gate B PASS → separate explicit PO implementation authorization. Sprint 16 and PE-01 remain CLOSED/FROZEN; Sprint 17 remains NOT STARTED.
+
+
+## 16.21 AA residual architecture closure — active decisions and bounded non-closures
+
+This section is the active AA disposition of the remaining planning residuals identified in §16.19.4 and §16.20. It distinguishes decisions AA can make from source-compatibility facts that cannot be inferred or fabricated. It does not authorize source, DDL, configuration, or runtime changes.
+
+### 16.21.1 NC-01 — canonical ZIP Manifest entry and initial schema version
+
+AA closes the previously unspecified ZIP Manifest entry placement and initial schema-version primitive:
+
+1. The ZIP wrapper MUST contain exactly one Manifest regular-file entry at the archive root named exactly `manifest.json` (ASCII lowercase). No alternate filename, nested location, extension, sidecar, detached Manifest, or discovery-by-content fallback is permitted.
+2. The Manifest entry is excluded from the declared child `.nx` member set. Directory entries remain permitted under the PO decision; they are structural only and are not members. The set of regular child `.nx` entries MUST be bijective with `members[]`. Any other undeclared regular file fails with `ERR_ZIP_ENTRY_MISMATCH`; a case-fold collision involving the reserved `manifest.json` entry fails at ZIP-reader layer with `ERR_ZIP_INVALID`.
+3. The initial canonical Manifest schema version is integer `1` (`schema_version: 1`). Missing, non-integer, zero, negative, or unsupported values fail with `ERR_MANIFEST_MALFORMED`. No permissive parsing or automatic migration is allowed. A future schema requires a separately specified and explicitly supported version.
+4. Manifest bytes MUST be valid UTF-8 JSON without a byte-order mark. Duplicate keys are rejected by B-01 before schema evaluation. Canonical signing bytes remain RFC 8785 UTF-8 after strict parsing and removal of only the top-level `signature` property under §16.4.
+5. This decision fixes ZIP entry name/location and the version primitive; it does NOT claim every nested native evidence object schema is independently machine-validatable today. The closed logical field sets in §16.2 and §16.16.4A/§16.16.4B remain controlling. Native Genesis/Identity/rights/federation/revocation/delegation serialization and signature semantics remain bounded by the A1 compatibility ledger. A category marked NOT VERIFIED cannot be replaced by an invented JSON shape.
+
+**Disposition:** NC-01 entry placement and initial version primitive are AA-DECIDED. The remaining residual is exact native evidence object compatibility/schema validation where A1 did not establish the existing representation. AC-01/AC-02 remain execution-blocked until indispensable nested-schema predicates are resolved and the parser/validator is implemented after authorization.
+
+### 16.21.2 B-04 / B-05 / NC-06 / NC-09 — Zero-DDL storage feasibility boundary
+
+1. The architecture contract is closed: WP-01/WP-02/WP-05 MUST use an existing durable storage capability and MUST NOT add DDL, migration, new table/column, or repurpose `acquired_package_sha256`. The immutable Checkout Manifest, per-member execution/settlement evidence, Album identity/ordered member association, and child `member_sha256` are distinct logical records/values with explicit identity mapping.
+2. `acquired_package_sha256` retains its evidenced/reported wrapper-package byte-domain. It MUST NOT be treated as child `.nx` hash. Child `member_sha256` is SHA-256 of exact final child `.nx` bytes. No inference from field names, row order, timestamps, filenames, or catalog order is permitted.
+3. A storage mechanism is acceptable only if implementation demonstrates durable write/read after restart, deterministic lookup, create-if-absent or equivalent immutability, concurrency-safe conditional mutation, integrity/authenticity, retention, backup/recovery, and reconciliation access. Volatile cache, temporary file, last-write-wins object overwrite, or an unverified Storage Engine candidate is not an authoritative receipt.
+4. AA cannot certify source-specific feasibility without verifiable source/DDL evidence. Existing A1/PSV reports are accepted as bounded Programmer submissions but do not establish the missing Zero-DDL store predicates to independent source-audit certainty. No repeat PSV or broad Programmer investigation is requested here.
+5. If already-submitted evidence does not establish a compatible existing store, the work package remains BLOCKED at that exact storage-feasibility predicate. No fallback DDL, semantic reuse of wrapper hash, or volatile persistence workaround is authorized. If the only feasible solution violates Zero-DDL, that incompatibility must return to PO; AA cannot waive it.
+
+**Disposition:** B-04/B-05/NC-06/NC-09 architecture semantics are DECIDED; source-backed Zero-DDL feasibility is NOT VERIFIED / BLOCKED. This is a genuine Gate B prerequisite because safe implementation cannot be bounded without knowing whether mandatory persistence invariants are achievable under the frozen Zero-DDL constraint.
+
+### 16.21.3 B-07 / NC-07 — benchmark and capacity boundary
+
+1. No proposed numeric value (500 MB, 4 GB, 200 entries, 10:1, 100:1, or earlier candidate) is normative. The 50-member value remains UX guidance only.
+2. The benchmark protocol in §16.7/§16.14 is complete as a method. Numeric caps are deployment-envelope decisions based on reproducible measurements, not a precondition that Album code already exists.
+3. Before a measured deployment profile is ratified, the extractor MUST require an explicit bounded deployment configuration for every enforced resource dimension and fail closed when a required bound is absent. It MUST stream and enforce counters during extraction; declared ZIP sizes alone are insufficient.
+4. Four-payload benchmark and adversarial measurements are WP-03 acceptance deliverables after implementation authorization (or may be performed earlier only as non-mutating measurement with an explicitly available representative environment). Their absence does not by itself block Gate B.
+
+**Disposition:** B-07 method DECIDED; measured numeric capacity profile remains POST-AUTHORIZATION ACCEPTANCE / NOT YET MEASURED. No numeric cap is invented.
+
+### 16.21.4 B-09 / NC-04 — native proof compatibility boundary
+
+1. The PO-approved Tier-1/Tier-2/Tier-3 authority model, field binding, embedded-evidence requirement, signature-layer separation, offline trust-anchor termination, and Dual-Horizon freshness semantics are fixed by §16.5 and §16.16.4A/§16.16.4B.
+2. The A1 compatibility ledger remains authoritative for evidence state. The six categories are not promoted from PARTIAL/NOT FOUND/NOT VERIFIED to PRESENT merely because the target logical carrier is specified.
+3. No generic JCS wrapper may replace native Genesis, Identity, Ownership, Registry, revocation, or delegation signature preimages. Inner evidence must be serialized and verified under its own existing native contract, then embedded in the PE-02 carrier; outer carrier and Manifest signatures do not cure an invalid native proof.
+4. Where an indispensable native proof representation, issuer/key lineage, trust-anchor termination, or verifier semantics remain NOT VERIFIED, Gate B remains BLOCKED. No additional Programmer investigation is requested; no missing representation is to be guessed. Resolution is limited to the exact compatibility predicate and must not create a new trust root or weaken offline verification.
+
+**Disposition:** Product and semantic architecture DECIDED; native compatibility closure remains NOT VERIFIED / BLOCKED at the indispensable predicates listed in §16.16.4B. B-09 implementation itself remains a post-authorization workstream and is not a blocker merely because Album-specific code does not yet exist.
+
+### 16.21.5 NC-13 / AC-32 — viewer lifecycle boundary
+
+The normalized `VIEWER_COMPLETED` semantics, per-viewer identity, deduplication, authorization/resource release, and fresh next-member JIT are specified in §16.11. Platform/payload event adapters and parity tests are implementation acceptance under WP-06. Missing future adapter code is not a pre-coding architecture blocker. A platform/payload pair that cannot provide a definitive completion event remains NOT READY; no timer, duration, visibility heuristic, or manual-next substitution is permitted.
+
+**Disposition:** AA architecture contract DECIDED; WP-06 source adapters and tests are POST-AUTHORIZATION implementation acceptance. AC-32 remains execution-blocked until implemented and tested, but its absence does not independently block Gate B.
+
+### 16.21.6 NC-15 / AC-10 / AC-26 — error registry disposition
+
+1. The current 20-code table remains PROPOSED, not frozen. Its semantic dimensions and layer-separation rules in §6.15/§16.9 remain active.
+2. The present table is not ready to be promoted to a canonical 20-code interface: Genesis signature failure has no safe dedicated code in the current list; `ERR_MARKETPLACE_REPLAY_DETECTED` describes an idempotent replay that should return/reconcile the existing operation rather than necessarily report failure; `ERR_LICENSE_DAEMON_COMMUNICATION` must not collapse PENDING/UNKNOWN external outcomes into terminal communication failure; and `ERR_ID_COLLISION` must not imply a SHA-256 digest or logical key is collision-free or that a database uniqueness constraint exists.
+3. AA will not silently map Genesis signature failure to a container-signature code, introduce a 21st code contrary to the historical 20-code constraint, or change PE-01 error behavior. Nor will AA label replay, pending, unknown, and confirmed failure as the same outcome.
+4. Before NC-15 can be frozen, each proposed code must have an exact trigger predicate; sole producer layer; affected object; machine disposition; retryability; user/operator action; membership/standalone/playback impact; evidence/provenance status; and explicit AC mapping. Genesis error handling must be reconciled without regressing PE-01. Any proposal changing a frozen PE-01 observable contract requires PO decision.
+5. Until reconciliation is complete, `ERR_...` values in the table are planning proposals only, and AC-10/AC-26 remain blocked by NC-15. This is a documentation/contract residual owned by AA, not a request for Programmer source investigation.
+
+**Disposition:** NC-15 NOT CLOSED; 20-code registry remains PROPOSED. Gate A remains NOT PASSED until the deterministic error interface and Genesis/PE-01 compatibility disposition are resolved.
+
+### 16.21.7 Active gate consequence
+
+- **Gate A:** remains NOT PASSED pending NC-15 deterministic error contract, native-proof compatibility disposition where it affects normative claims, and final active-section consistency. Manifest ZIP entry/version decision is closed by §16.21.1.
+- **Gate B:** remains BLOCKED only on indispensable pre-coding predicates: (a) B-04/B-05/NC-06 Zero-DDL durable storage feasibility; and (b) B-09 native proof representation/signature/trust-anchor compatibility. Missing Album implementation, B-07 measured caps, B-01/B-02/B-03/B-06 code/tests, B-09 Album-specific code/tests, and WP-06 viewer adapters are post-authorization work, not independent pre-coding blockers.
+- **Programmer:** no new investigation, repeated PSV, broad search, or test-suite rerun is requested. Submitted evidence remains bounded; unsupported facts stay NOT VERIFIED.
+- **Authorization:** PE-02 implementation remains NOT AUTHORIZED. Gate A PASS and Gate B PASS, followed by separate explicit PO authorization, are all still required.
 
 #### 16.19.6 Governance status — unchanged
 
