@@ -180,61 +180,16 @@ Matriks berikut mendokumentasikan penanganan terhadap 30 temuan audit historis A
 ## 2. RINGKASAN READINESS DAN KONTROL PENCEGAHAN AKAR MASALAH (PR/G/I)
 
 ### 2.1 Model Multi-Dimensi Kesiapan Acceptance Criteria (34 AC) (DEF-01)
-Dokumen ini membedakan secara tegas klasifikasi Acceptance Criteria ke dalam kategori status utama yang saling eksklusif dan mencakup tepat 34 AC tanpa tumpang tindih. Setiap AC memiliki satu klasifikasi status utama, dengan dependensi teknis, usulan spesifikasi, atau blocker arsitektur yang terpetakan secara transparan dan jujur:
+Klasifikasi aktif 34 Acceptance Criteria mengikuti keputusan PO terbaru pada §13.1.1: 12 AC specification-ready, 22 AC execution-blocked, dan 0 AC menunggu keputusan PO. Status implementasi yang belum ada tidak boleh disamakan dengan ketidaklengkapan kontrak pra-coding.
 
-```
-+--------------------------------------------------------------------------------------------------------------------+
-|                         MATRIKS STATUS ACCEPTANCE CRITERIA REKONSILIASI KANONIKAL (34 AC)                          |
-+--------------------------------------------------------------------+-----------------------------------------------+
-| Kategori Klasifikasi Status Utama (Total Tepat 34 AC)              | Cakupan ID AC & Rincian Ketergantungan        |
-+--------------------------------------------------------------------+-----------------------------------------------+
-| 1. [TEST-PLANNED — SPECIFICATION READY] (12 AC)                    | AC-04, AC-09, AC-11, AC-12, AC-17,    |
-|    Skenario uji dan kriteria penerimaan fail-closed terdefinisi     | AC-18, AC-19, AC-23, AC-24, AC-25,    |
-|    lengkap pada tingkat spesifikasi teknis rencana dokumen tanpa   | AC-30, AC-31                         |
-|    terhambat dependensi spesifikasi usulan atau celah arsitektur.  |                                                |
-|                                                                    | *Catatan Verifikasi & Keputusan PO:*          |
-|                                                                    | - AC-17: Kepatuhan skema statis DDL dipatuhi; |
-|                                                                    |   runtime live DB berstatus NOT VERIFIED.     |
-|                                                                    | - AC-25: Keputusan PO CONF-02 (Pilihan B      |
-|                                                                    |   APPROVED: Tanpa Status Agregat di Verify).  |
-|                                                                    |                                                |
-|                                                                    | - AC-30..31: Larangan Campuran & Failure      |
-|                                                                    |   Handling Ulangi/Lewati Disahkan.            |
-|                                                                    | - AC-33..34: Membership policy CONF-01        |
-|                                                                    |   disetujui PO; eksekusi Album tetap blocked  |
-|                                                                    |   oleh source authority/lifecycle evidence B-09.|
-+--------------------------------------------------------------------+-----------------------------------------------+
-| 2. [TEST-PLANNED — EXECUTION BLOCKED] (21 AC)                      | Sub-Kategori 2a: [MODUL ENGINE PENDING] (2):  |
-|    Skenario uji terencana, namun eksekusi pengujian terblokir      |   - AC-05 (B-01: Strict JSON Parser Engine)   |
-|    oleh modul implementasi internal yang belum dikoding, usulan    |   - AC-06 (B-02: RFC 8785 JCS Serializer)     |
-|                                                                    | Sub-Kategori 2b: [BLOCKED BY ARCH / SPEC] (19)|
-|                                                                    |   - AC-01 (NC-01: schema envelope/metadata and parser implementation) |
-|                                                                    |   - AC-02 (NC-01: manifest name/location and complete schema) |
-|                                                                    |   - AC-03 (B-08: exact signed-content/verifier implementation) |
-|                                                                    |
-|                                                                    |   - AC-08 (B-09: revocation/freshness source evidence) |
-|                                                                    |   - AC-10 (NC-05: Genesis error taxonomy)    |
-|    gap pemuatan kembali Album, prasyarat normatif JIT &            |   - AC-13 (B-07: measured ZIP quota benchmark pending) |
-|    implementasi autentisitas membership dan lifecycle signer belum tersedia, blocker arsitektur aktif,     |   - AC-14 (B-04: transaction/storage feasibility) |
-|    atau spesifikasi lifecycle non-audio yang belum terdefinisi.    |   - AC-15 (B-04: idempotency/replay/settlement) |
-|                                                                    |   - AC-16 (B-05: child hash storage mapping proof) |
-|                                                                    |   - AC-20 (B-06: Safe-Open TOCTOU)            |
-|                                                                    |   - AC-21 (B-06: post-open descriptor security)|
-|                                                                    |   - AC-22 (NC-13: JIT prerequisite integration) |
-|                                                                    |   - AC-26 (NC-15: error taxonomy cross-register) |
-|                                                                    |   - AC-27 (NC-16: receipt/DDL compatibility evidence) |
-|                                                                    |   - AC-28 (NC-06: Album identity/persistence) |
-|                                                                    |   - AC-29 (NC-06: Album reload/reconstruction) |
-|                                                                    |   - AC-32 (NC-13: Auto-Next viewer source feasibility) |
-|                                                                    |   - AC-33 and AC-34 (NC-14: membership verifier/lifecycle integration) |
-|                                                                    |   - (Remaining AC mapping is maintained in §8/§9; no new AC is added) |
-|                                                                    |                                                |
-| 3. [PO DECISION REQUIRED] (1 AC)                                   | AC-07: issuer ALBUM_MEMBERSHIP_SIGNING belum diputuskan. |
-+--------------------------------------------------------------------+-----------------------------------------------+
-| TOTAL                                                               | 12 + 21 + 1 = 34 AC                       |
-+--------------------------------------------------------------------+-----------------------------------------------+
+| Kategori klasifikasi utama | Cakupan AC | Makna status |
+|---|---|---|
+| `TEST-PLANNED — SPECIFICATION READY` (12) | AC-04, AC-09, AC-11, AC-12, AC-17, AC-18, AC-19, AC-23, AC-24, AC-25, AC-30, AC-31 | Expected result dan test contract cukup ditetapkan; bukan klaim test sudah dijalankan atau runtime diverifikasi. AC-17 tetap membedakan DDL statis dari live DB NOT VERIFIED. |
+| `TEST-PLANNED — EXECUTION BLOCKED` (22) | AC-01, AC-02, AC-03, AC-05, AC-06, AC-07, AC-08, AC-10, AC-13, AC-14, AC-15, AC-16, AC-20, AC-21, AC-22, AC-26, AC-27, AC-28, AC-29, AC-32, AC-33, AC-34 | Eksekusi menunggu implementasi pascaotorisasi, benchmark/evidence, atau residual spesifikasi/kompatibilitas pada baris AC individual. |
+| `PO DECISION REQUIRED` (0) | — | Tidak ada keputusan PO aktif yang belum diputuskan. CONF-01, CONF-02, dan Model B/CONF-03 telah diselesaikan; residual teknis dicatat terpisah. |
+| **TOTAL** | **34 AC** | **12 + 22 + 0 = 34** |
 
-```
+Subklasifikasi execution-blocked: AC-05 (B-01 strict parser module) dan AC-06 (B-02 JCS serializer module) adalah dua modul implementasi yang belum tersedia. Dua puluh AC lainnya menunggu dependency kontrak, integrasi, evidence, benchmark, atau implementasi yang dipetakan pada §8 dan §16.19. Tidak ada AC berstatus PO DECISION REQUIRED.
 
 #### Rekonsiliasi Individual Wajib Seluruh 34 Acceptance Criteria (DEF-01, Mandat Konsolidasi PO)
 Tabel berikut membuktikan penelusuran individual per AC mencakup seluruh 34 AC tanpa duplikasi, memisahkan kesiapan spesifikasi dari dependensi yang belum selesai:
@@ -4260,9 +4215,9 @@ The PO's 5–10 KB estimate is a planning estimate only, not a normative size gu
 
 This contract reuses existing Nexa Genesis, Identity, Organization Identity, ownership/rights, Federated Trust, Registry, and Dual-Horizon semantics. It does not create a new trust root or alter PE-01 standalone .nx trust. If a required proof type has no stable serializable representation or its native signature semantics cannot be verified offline, that is an explicit architecture compatibility defect to be resolved by AA before Gate B PASS. Programmer may provide bounded source evidence about the existing representation but may not invent a substitute format. Schema evolution requires an explicit supported schema_version; silent omission, externalization, or permissive parsing is prohibited.
 
-**10. Bounded Programmer source-evidence mapping required before Gate B PASS**
+**10. A1 source-evidence disposition — no-repeat boundary**
 
-The canonical Nexa White Paper/Roadmap define the existing Identity, Ownership Evidence, Registry/Federated Trust, Revocation Proof, and Organization Identity invariants, but do not themselves provide the concrete serialized JSON/object schemas for every proof category listed above. AA will not invent source facts or claim that an existing serialized representation exists. Programmer MUST provide a narrowly scoped, read-only source-evidence mapping for only these native proof representations and their actual verification call paths:
+The A1 evidence package and supplements are the bounded source-evidence submission available for this planning cycle. AA will not request a repeat or expanded Programmer investigation. The evidence establishes only the primitives and call paths expressly documented in A1; it does not establish a complete serialized native proof schema and offline verifier call path for every category below. Items not established by that submission remain `NOT VERIFIED — A1 EVIDENCE DOES NOT ESTABLISH THE REQUIRED SERIALIZED REPRESENTATION / VERIFIER PATH`. AA must not upgrade them to PRESENT, infer a schema from conceptual descriptions, or fabricate native source semantics:
 
 1. Genesis Root Certificate / Creator Genesis identity credential: exact serialized form, signed fields/preimage, issuer/subject/public-key binding, verification function, and trusted-anchor termination.
 2. Organization and Individual Creator key-lineage evidence: exact recovery/succession assertion shape, signed payload/preimage, recovery-key digest input, sequence/previous-key linkage, active-key-at-timestamp resolution, and conflict detection.
@@ -4271,7 +4226,7 @@ The canonical Nexa White Paper/Roadmap define the existing Identity, Ownership E
 5. Revocation Proof / status snapshot: exact signed proof structure, authority binding, recorded-time/sequence/version fields, Dual-Horizon interpretation, and offline freshness evaluation.
 6. Tier-2 Membership Authority / Album Signer identity and delegation: exact reusable native credential/delegation object(s), purpose/scope binding, signer key binding, validity, issuer lineage, and revocation proof.
 
-For each item, return PRESENT / PARTIAL / NOT FOUND; repository, branch, exact commit SHA; exact source paths and line ranges; raw relevant excerpts; caller-to-verifier call chain; existing test names/commands, exit codes and raw outputs. For NOT FOUND, identify only the bounded searched scope and exact search terms/commands. This is not a repeat of broad PSV and does not authorize code/schema/configuration/runtime changes. Programmer must not design a replacement or make architecture decisions; AA will decide whether an existing native object can be embedded unchanged or whether a new PE-02-specific wrapper/schema is required. Any new schema remains subject to AA specification and PO product-policy approval where applicable.
+For each category, preserve only the evidence state supported by A1 (PRESENT / PARTIAL / NOT FOUND / NOT VERIFIED) and its declared repository, branch, commit, directories and excerpts. No new Programmer handoff is issued by this reconciliation. The six categories remain an AA architecture-compatibility ledger: Genesis identity credential and trust-anchor termination; Individual Creator and Organization key-lineage serialization; Album-wide rights-basis object and verifier; Registry Authority/Federated Trust proof and offline trust-anchor path; signed revocation/status snapshot and Dual-Horizon evaluation; and Tier-2 capability/delegation native object and verifier. A category not concretely established by A1 remains NOT VERIFIED. Gate B MUST NOT PASS while an indispensable offline proof representation, native signature semantics, or trust-anchor verification path remains unresolved. This is a planning gate, not a request to repeat PSV and not authorization to change code/schema/configuration/runtime. AA owns architecture decisions; PO approval is required only if resolution changes product policy or frozen invariants.
 
 **10. Acceptance evidence after implementation authorization**
 
@@ -4442,6 +4397,46 @@ The remaining sequence is:
 6. **Separate PO implementation authorization:** only after Gate A PASS and Gate B PASS may the PO decide whether to authorize implementation. Neither gate result itself grants authorization.
 
 No additional broad Programmer investigation is required merely to prove Album Handling exists. Any future source request must be tied to a specific, material compatibility question that cannot be resolved from the bounded A1 evidence and existing plan. The default next work is AA-owned planning and contract reconciliation.
+
+#### 16.20 Canonical cross-section and traceability reconciliation — AA disposition
+
+Bagian ini adalah active reconciliation overlay untuk PLAN kanonis. Historical audit records tidak dihapus. Jika snapshot historis atau redaksi lama bertentangan, active status pada §13.1.1, §16.18, §16.19 dan §16.20 mengendalikan. Tidak ada perubahan kode, schema, endpoint, konfigurasi atau runtime yang diotorisasi.
+
+##### 16.20.1 Authoritative cross-register mapping
+
+| Architecture area | NC | Blocker | AC | Work package / acceptance boundary |
+|---|---|---|---|---|
+| Manifest schema, ZIP Manifest entry and member binding | NC-01 | B-01/B-02 parser/JCS modules; remaining schema/entry decision is AA planning | AC-01, AC-02, AC-28, AC-30, AC-31 | WP-05 creation/persistence; parser/JCS implementation post-authorization. AC-01/02 remain blocked by complete nested schema/version and ZIP entry name/location. |
+| Signature and verifier | NC-02 | B-08 | AC-03 | Signature contract §16.4; engine and cross-language vectors post-authorization. |
+| Identity, authority, signer lifecycle | NC-04 | B-09 | AC-07, AC-08, AC-22, AC-33, AC-34 | WP-04 capability/evidence/verifier; WP-05 Manifest integration. No PO decision pending. A1 gaps remain NOT VERIFIED; no new Programmer handoff. |
+| Genesis and payload digest | NC-05 | A-05 / taxonomy residual where registered | AC-09, AC-10 | §16.12 fixes audio digest; AC-10 Genesis error mapping remains unresolved; no change to PE-01 semantics. |
+| Member integrity and Album persistence | NC-06, NC-09 | B-05; B-04 only for commercial receipt/acquisition mapping | AC-04, AC-11, AC-12, AC-16, AC-28, AC-29, AC-31 | WP-02 child hash persistence; WP-05 Album identity/order/reload. Do not conflate NC-06 Album association with NC-08 commercial transaction receipt. |
+| ZIP extraction and capacity | NC-07, NC-12 | B-03, B-06, B-07 | AC-13, AC-20, AC-21 | WP-03 benchmark/capacity; Safe-Open/extraction implementation post-authorization. B-07 numeric limits remain pending measured evidence. |
+| Commercial bundle execution | NC-08, NC-16 | B-04 | AC-14, AC-15, AC-27 | WP-01 per-member durable receipt, mapping, idempotency, daemon reconciliation and recovery. member_execution_key is not acquisition_id; no DDL or assumed 2PC. |
+| JIT and viewer lifecycle | NC-13 | B-09 only for membership/JIT integration; viewer completion source belongs WP-06 | AC-22, AC-23, AC-24, AC-32 | Stage 8a/8b/8c §16.1; viewer lifecycle §16.11; WP-06 normalized event, deduplication, resource release and fresh next-member JIT. |
+| Verify behavior | NC-14 | B-09 | AC-25, AC-33, AC-34 | CONF-02 Option B: no aggregate Album status. AC-25 spec-ready; AC-33/34 membership gate and per-member behavior post-authorization. |
+| Error taxonomy | NC-15 | AA planning residual; no new B identifier | AC-26 plus relevant AC mappings in §6.15 | §16.9 fixes error dimensions; 20-code registry remains proposed until trigger/provenance/retryability and deterministic mappings are reconciled. AC-26 remains blocked. |
+
+##### 16.20.2 Active status reconciliation
+
+1. **Acceptance Criteria:** 34 total; 12 specification-ready (AC-04, AC-09, AC-11, AC-12, AC-17, AC-18, AC-19, AC-23, AC-24, AC-25, AC-30, AC-31); 22 execution-blocked (AC-01, AC-02, AC-03, AC-05, AC-06, AC-07, AC-08, AC-10, AC-13, AC-14, AC-15, AC-16, AC-20, AC-21, AC-22, AC-26, AC-27, AC-28, AC-29, AC-32, AC-33, AC-34); 0 PO decision required.
+2. **PO decision status:** CONF-01 membership authenticity/per-Album authority policy, CONF-02 Verify no-aggregate Option B, and Model B/CONF-03 commercial model are decided. B-04 feasibility is technical/storage compatibility, not an unresolved choice of commercial model.
+3. **NC-01:** exact top-level Manifest fields, common member fields, ordered member binding, payload discriminator, audio digest and Tier-1/Tier-2 evidence structures are specified. Complete machine-validatable nested schema/version rules and exact ZIP Manifest entry name/location remain open.
+4. **NC-02/B-08:** exact outer signed-content field set and Signature-Stripped JCS contract are specified in §16.4. Historical §6.2/audit snapshots that say exact signed-content remains undecided are superseded. Implementation and cross-language tests remain post-authorization.
+5. **NC-04/B-09:** PO authority policy and AA semantic carrier/offline closure contracts are specified. Album-specific implementation is absent at this planning stage. Individual Creator lifecycle and native proof serialization/verifier compatibility are not upgraded beyond A1 evidence. No PO issuer-authority decision remains open.
+6. **NC-06 versus NC-08:** NC-06 is Album identity/member ordering/Studio persistence/reload; NC-08 is Marketplace commercial checkout/member receipt/idempotency/reconciliation. Their identifiers and receipts are not interchangeable. WP-05 owns Album persistence; WP-01 owns commercial execution receipts.
+7. **NC-07/B-07:** security design and benchmark method are specified; numeric capacity limits are not ratified. Benchmark output is a future acceptance deliverable and does not mean Album implementation already exists.
+8. **NC-13/AC-32:** Stage 8a/8b/8c authorization boundaries are specified; viewer completion integration remains WP-06. No timer or UI-visibility heuristic is permitted.
+9. **NC-14:** CONF-02 Option B is active. Verify must not create an aggregate Album trust status. Membership authentication is a prerequisite for labeling files as Album members, not a global playback gate.
+10. **NC-15:** error dimensions are specified, but the 20-code list remains PROPOSED. It must not be described as a frozen canonical registry until every code has deterministic trigger, producer layer, affected object, retryability, user disposition, evidence reference and AC mapping.
+11. **NC-16:** JCS formulas are specified in §16.13; durable receipt mapping is a B-04 dependency. Do not imply the formula creates a database constraint or replaces an existing acquisition identifier.
+
+##### 16.20.3 Gate disposition after reconciliation
+
+- **Gate A remains NOT PASSED.** Active AC aggregate and A1 evidence boundary are corrected here, but independent re-audit must still verify the entire 34-row AC register, complete NC↔AC forward/reverse mapping, blocker closure criteria, error-code mapping, and absence of residual stale active statements. Historical audit snapshots remain historical.
+- **Gate B remains BLOCKED.** Concrete pre-coding items remain: complete nested Manifest schema/version and ZIP entry placement; indispensable A1 native proof serialization/signature/trust-anchor compatibility disposition; B-04/B-05 Zero-DDL durable mapping feasibility; and other pre-coding integration decisions in §16.19.4. Missing Album implementation, unrun post-authorization tests, and unmeasured post-authorization benchmark outputs are not by themselves Gate B blockers.
+- **No Programmer re-investigation is authorized or requested.** A1 evidence limitations remain explicitly NOT VERIFIED. AA must not invent missing native source formats. If an indispensable compatibility predicate cannot be resolved from submitted evidence and authoritative documents, Gate B stays blocked pending AA/PO-level resolution; this does not reopen the completed Programmer correction handoff.
+- Sequence remains Gate A PASS → Gate B PASS → separate explicit PO implementation authorization. Sprint 16 and PE-01 remain CLOSED/FROZEN; Sprint 17 remains NOT STARTED.
 
 #### 16.19.6 Governance status — unchanged
 
